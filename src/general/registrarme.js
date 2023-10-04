@@ -12,7 +12,7 @@ import { URL, INPUT } from '../Auth/config';
 import axios from 'axios';
 import { Toaster, toast } from 'react-hot-toast'
 import '../elementos/estilos.css'
-import { alert2,  confirmarGuardar, exito } from '../elementos/alert2'
+import { alert2, confirmarGuardar, exito } from '../elementos/alert2'
 import md5 from 'md5'
 
 
@@ -29,7 +29,6 @@ function Registro() {
     const [ape2, setApe2] = useState({ campo: null, valido: null });
     const [correo, setCorreo] = useState({ campo: null, valido: null });
     const [celular, setCelular] = useState({ campo: null, valido: null });
-    const [direccion, setDireccion] = useState({ campo: null, valido: null });
 
     const [modalInsertar, setModalInsertar] = useState(false);
 
@@ -38,11 +37,17 @@ function Registro() {
 
 
     let today = new Date()
-    let fecha = today.toISOString().split('T')[0]
+    let fecha_ = today.toLocaleDateString()
+    let dia = fecha_.split('/')[0]
+    if (dia.length === 1) dia = '0' + dia
+    let mes_ = fecha_.split('/')[1]
+    if (mes_.length === 1) mes_ = '0' + mes_
+    let año = fecha_.split('/')[2]
+    let fecha = año + '-' + mes_ + '-' + dia
     let hora = new Date().toLocaleTimeString().split(':')[0]
     let min = new Date().toLocaleTimeString().split(':')[1]
     let sec = new Date().toLocaleTimeString().split(':')[2]
-    if (hora.length ===1) hora = '0' + hora
+    if (hora.length === 1) hora = '0' + hora
     let horafinal = hora + ':' + min + ':' + sec
 
     try {
@@ -58,8 +63,7 @@ function Registro() {
 
         const insertar = async () => {
             if (username.valido === 'true' && pass.valido === 'true' && pass1.valido === 'true' &&
-                hospital.valido === 'true' && nombre.valido === 'true' && ape1.valido === 'true' && ape2.valido === 'true' &&
-                celular.valido === 'true' && direccion.valido === 'true' && correo.valido === 'true' && estado === 0) {
+                hospital.valido === 'true' && nombre.valido === 'true' && ape1.valido === 'true'  && estado === 0) {
                 if (pass.campo === pass1.campo) {
                     let accion = await confirmarGuardar({ titulo: 'Guardar Registro ?', boton: 'ok', texto: 'Ok para continuar.' })
                     if (accion.isConfirmed) {
@@ -70,8 +74,8 @@ function Registro() {
                                 'otros': md5(pass.campo),
                                 'hospital': hospital.campo,
                                 'nombre': nombre.campo,
-                                'ape1': ape1.campo, 'ape2': ape2.campo,
-                                'direccion': direccion.campo, 'celular': celular.campo, 'correo': correo.campo,
+                                'ape1': ape1.campo, 'ape2': ape2.campo?ape2.campo:'NO REGISTRADO',
+                                'celular': celular.campo ? celular.campo:'00000', 'correo': correo.campo ?correo.campo:'example@sdis.ve',
                                 'creado': fecha + ' ' + horafinal
                             }
                         }).then(async json => {
@@ -88,137 +92,143 @@ function Registro() {
                                     setApe1({ campo: null, valido: null })
                                     setApe2({ campo: null, valido: null })
                                     setCelular({ campo: null, valido: null })
-                                    setDireccion({ campo: null, valido: null })
                                     setCorreo({ campo: null, valido: null })
                                     setModalInsertar(false)
                                     setEstado(0)
                                 }
-                            }else {alert2({ icono: 'warning', titulo: 'Registro Fállido', boton: 'ok', texto: json.data.msg });setEstado(0)}
-                        }).catch(function (error) {setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                            } else { alert2({ icono: 'warning', titulo: 'Registro Fállido', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                        }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
                     }
                 } else alert2({ icono: 'error', titulo: 'Contraseñas diferentes', boton: 'ok', texto: 'las contraseñas no coinciden!, verifique e intente nuevamente' })
-            } else toast.error('Complete todos los campos con *, o verifique que todos los datos proporcionados sean los correctos')
+            } else toast.error('la informacion debe estar en el formato solicitado')
         }
 
         console.log(hospital, listaHopistal)
 
         return (
-            <>
-                <div className="container_1" >
-                    <div className='titulo-pagina' >
-                        FORMULARIO REGISTRO DE USUARIO
+            <div style={{ background: '#e5e5e5', paddingTop: '0.4rem', paddingBottom: '0.4rem', height: '100vh' }} >
+                <div className="container_regis" >
+                    <div className='contenedor-cabecera row'>
+                        <span className='titulo'> FORMULARIO REGISTRO DE USUARIO  </span>
                     </div>
-                    <div className='contenedor-cabecera'>
-                        <button className="btn-nuevo col-auto" onClick={() => setModalInsertar(true)} >
+                    <div className='separador mb-3 mb-sm-0 mb-md-0 mb-lg-0'>
+                        <span>
+                            {new Date().getFullYear() + '   '}::SDIS-VE
+                        </span>
+                    </div>
+
+
+                    <div className='contenedor p-2'>
+                        <div className='row elementos-contenedor'>
+                            <p className='nota'><span style={{ fontWeight: 'bold' }}>nota ::</span>Seleccione el establecimiento correcto</p>
+                            <p className='alertas' >{'Se recomienda llenar el siguiente formulario con informacion verdadera. Una vez realizado el registro el administrador le consedera el acceso al sistema SDIS-VE asignandole el rol correspondiente.'}</p>
+
+                        </div>
+                        <div className='cajaprimario-reportes p-3'>
+                            <Select1
+                                estado={hospital}
+                                cambiarEstado={setHospital}
+                                ExpresionRegular={INPUT.ID}
+                                lista={listaHopistal}
+                                etiqueta={'Establecimiento'}
+                                msg='Seleccione una opcion'
+                            />
+
+                            <div className='row'>
+                                <div className='col-lg-4 col-md-4 col-sm-4 col-12'>
+                                    <User_
+                                        estado={username}
+                                        cambiarEstado={setUsername}
+                                        placeholder="USUARIO"
+                                        ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
+                                        etiqueta='Username'
+                                        campoUsuario={true}
+                                        msg={'Este campo acepta letras minúsculas'}
+                                    /></div>
+                                <div className='col-lg-4 col-md-4 col-sm-4 col-6'>
+                                    <User_
+                                        estado={pass}
+                                        cambiarEstado={setPass}
+                                        placeholder="CONTRASEÑA"
+                                        ExpresionRegular={INPUT.PASSWORD}  //expresion regular  
+                                        etiqueta='Contraseña'
+                                        msg={'Este campo acepta todos los caracteres'}
+                                        campoUsuario={true}
+                                    /></div>
+                                <div className='col-lg-4 col-md-4 col-sm-4 col-6'>
+                                    <User_
+                                        estado={pass1}
+                                        cambiarEstado={setPass1}
+                                        placeholder="CONTRASEÑA"
+                                        ExpresionRegular={INPUT.PASSWORD}  //expresion regular  
+                                        etiqueta='Confirmar contraseña'
+                                        msg={'Este campo acepta todos los caracteres'}
+                                        campoUsuario={true}
+                                    /></div>
+                            </div>
+                            <InputUsuario
+                                estado={nombre}
+                                cambiarEstado={setNombre}
+                                placeholder="NOMBRE"
+                                ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
+                                etiqueta='Nombre'
+                                msg={'Este campo acepta solo letras '}
+                            />
+                            <div className='row'>
+                                <div className='col-6'>
+                                    <InputUsuario
+                                        estado={ape1}
+                                        cambiarEstado={setApe1}
+                                        placeholder="APELLIDO1"
+                                        ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
+                                        etiqueta='Primer apellido'
+                                        msg={'Este campo acepta solo letras '}
+                                    /></div>
+                                <div className='col-6'>
+                                    <InputUsuario
+                                        estado={ape2}
+                                        cambiarEstado={setApe2}
+                                        placeholder="APELLIDO 2 "
+                                        ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
+                                        etiqueta='Segundo apellido'
+                                        msg={'Este campo acepta solo letras '}
+                                        important={false}
+
+                                    /></div>
+                            </div>
+                            <div className='row'>
+                                <div className='col-6'>
+                                    <InputUsuario
+                                        estado={celular}
+                                        cambiarEstado={setCelular}
+                                        placeholder="CELULAR/TELEF."
+                                        ExpresionRegular={INPUT.TELEFONO}  //expresion regular  
+                                        etiqueta='Celular/Telf.'
+                                        msg={'Este campo acepta solo números '}
+                                        important={false}
+                                    /></div>
+                                <div className='col-6'>
+                                    <User_
+                                        estado={correo}
+                                        cambiarEstado={setCorreo}
+                                        placeholder="CORREO"
+                                        ExpresionRegular={INPUT.CORREO}  //expresion regular  
+                                        etiqueta='Correo'
+                                        msg={'Este campo acepta en formato de correo'}
+                                        campoUsuario={true}
+                                        important={false}
+                                    /></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div className='botonModal pb-2'>
+                        <button className="btn-nuevo col-auto" style={{ marginTop: '5px' }} onClick={() => setModalInsertar(true)} >
                             <FontAwesomeIcon className='btn-icon-nuevo' icon={faUser} />Registrarme
                         </button>
                     </div>
-                    <div className='contenedor p-2'>
-                        <Select1
-                            estado={hospital}
-                            cambiarEstado={setHospital}
-                            ExpresionRegular={INPUT.ID}
-                            lista={listaHopistal}
-                            etiqueta={'Establecimiento'}
-                            msg='Seleccione una opcion'
-                        />
 
-                        <div className='row'>
-                            <div className='col-lg-4 col-md-4 col-sm-4 col-12'>
-                                <User_
-                                    estado={username}
-                                    cambiarEstado={setUsername}
-                                    placeholder="USUARIO"
-                                    ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
-                                    etiqueta='Username'
-                                    campoUsuario={true}
-                                    msg={'Este campo acepta letras minúsculas'}
-                                /></div>
-                            <div className='col-lg-4 col-md-4 col-sm-4 col-6'>
-                                <User_
-                                    estado={pass}
-                                    cambiarEstado={setPass}
-                                    placeholder="CONTRASEÑA"
-                                    ExpresionRegular={INPUT.PASSWORD}  //expresion regular  
-                                    etiqueta='Contraseña'
-                                    msg={'Este campo acepta todos los caracteres'}
-                                    campoUsuario={true}
-                                /></div>
-                            <div className='col-lg-4 col-md-4 col-sm-4 col-6'>
-                                <User_
-                                    estado={pass1}
-                                    cambiarEstado={setPass1}
-                                    placeholder="CONTRASEÑA"
-                                    ExpresionRegular={INPUT.PASSWORD}  //expresion regular  
-                                    etiqueta='Confirmar contraseña'
-                                    msg={'Este campo acepta todos los caracteres'}
-                                    campoUsuario={true}
-                                /></div>
-                        </div>
-                        <InputUsuario
-                            estado={nombre}
-                            cambiarEstado={setNombre}
-                            placeholder="NOMBRE"
-                            ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
-                            etiqueta='Nombre'
-                            msg={'Este campo acepta solo letras '}
-                        />
-                        <div className='row'>
-                            <div className='col-6'>
-                                <InputUsuario
-                                    estado={ape1}
-                                    cambiarEstado={setApe1}
-                                    placeholder="APELLIDO1"
-                                    ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
-                                    etiqueta='Apellido paterno'
-                                    msg={'Este campo acepta solo letras '}
-                                /></div>
-                            <div className='col-6'>
-                                <InputUsuario
-                                    estado={ape2}
-                                    cambiarEstado={setApe2}
-                                    placeholder="APELLIDO 2 "
-                                    ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
-                                    etiqueta='Apellido materno'
-                                    msg={'Este campo acepta solo letras '}
-                                /></div>
-                        </div>
-                        <div className='row'>
-                            <div className='col-6'>
-                                <InputUsuario
-                                    estado={celular}
-                                    cambiarEstado={setCelular}
-                                    placeholder="CELULAR/TELEF."
-                                    ExpresionRegular={INPUT.TELEFONO}  //expresion regular  
-                                    etiqueta='Celular/Telf.'
-                                    msg={'Este campo acepta solo números '}
-                                /></div>
-                            <div className='col-6'>
-                                <User_
-                                    estado={correo}
-                                    cambiarEstado={setCorreo}
-                                    placeholder="CORREO"
-                                    ExpresionRegular={INPUT.CORREO}  //expresion regular  
-                                    etiqueta='Correo'
-                                    msg={'Este campo acepta en formato de correo'}
-                                    campoUsuario={true}
-                                /></div>
-                        </div>
-                        <InputUsuario
-                            estado={direccion}
-                            cambiarEstado={setDireccion}
-                            placeholder="DIRECCION"
-                            ExpresionRegular={INPUT.DIRECCION}  //expresion regular  
-                            etiqueta='Dirección'
-                            msg={'Este campo acepta letras numero y algunos carateres'}
-                        />
-
-                        <div className='cantidad-registros'>SDIS CHUQUISACA</div>
-                        Escoja cuidadosamente el establecimiento correspondiente
-                    </div>
-                    <div className='contenedor-foot'>
-
-                    </div>
                 </div>
 
                 <Modal isOpen={modalInsertar}>
@@ -261,14 +271,6 @@ function Registro() {
                             <div className='encabezado col-6'>Correo</div>
                             <div className='contenido col-6'>{correo.campo}</div>
                         </div>
-                        <div className='row p-2'>
-                            <div className='encabezado col-6'>Direccion</div>
-                            <div className='contenido col-6'>{direccion.campo}</div>
-                        </div>
-                        <div className='avisos'>Los datos de este formulario pertenecen a su nuevo perfil, el sistema usara esta informacion
-                            para mostrar los reportes necesarios por los que se insinúa sean las correctas.
-                            <p>CONSERVE BIEN LOS DATOS DE ACCESO (usuario y contraseña)</p>
-                        </div>
 
                     </ModalBody>
                     <div className='botonModal'>
@@ -283,7 +285,7 @@ function Registro() {
 
 
                 <Toaster position='top-right' />
-            </>
+            </div>
 
         );
 

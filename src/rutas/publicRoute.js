@@ -9,17 +9,17 @@ export default function PublicRoute({ component: Component, ...rest }) {
         const auth = useAuth();
         let url = null
         if (parseInt(localStorage.getItem('numRol')) === 1) {
-            url = "/formulario"
+            url = "/variables"
         }
 
         if (parseInt(localStorage.getItem('numRol')) === 2) {
-            url = "/formulario"
+            url = "/reportes2" 
         }
         if (parseInt(localStorage.getItem('numRol')) === 3) {
-            url = "/formulario"
+            url = "/reportes3"
         }
         if (parseInt(localStorage.getItem('numRol')) === 4) {
-            url = "/formulario"
+            url = "/reportes4"
         }
         
         if (parseInt(localStorage.getItem('numRol')) === 5) {

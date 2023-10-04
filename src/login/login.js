@@ -8,6 +8,8 @@ import { Toaster, toast } from 'react-hot-toast';
 import { URL } from '../Auth/config';
 import md5 from 'md5';
 import { alert2 } from '../elementos/alert2';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignIn, faStairs } from '@fortawesome/free-solid-svg-icons';
 
 
 export default function Login() {
@@ -72,6 +74,7 @@ export default function Login() {
                                 span="fas fa-envelope"
                                 campoUsuario={true}
                                 etiqueta={'Usuario'}
+                                eventoBoton={iniciarSesion}
                                 msg={'Este campo acepta letras minúsculas'}
                             />
                         </div>
@@ -84,23 +87,32 @@ export default function Login() {
                                 ExpresionRegular={INPUT.PASSWORD}
                                 span="fas fa-lock"
                                 etiqueta={'Contraseña'}
+                                eventoBoton={iniciarSesion}
                                 msg={'Este campo acepta de 4-12 de todos los caracteres'}
                             />
                         </div>
                         <button
                             onClick={iniciarSesion}
-                            className=" mb-3 btn btn-primary btn-block col-12 mb-4"
+                            className=" mb-3 btn btn-primary btn-block btn-iniciar col-12 mb-4"
                         >Ingresar
                         </button>
-                        <a
-                            href='/registrarme'
-                            className=" mb-3 btn btn-success btn-block col-12"
-                        >Registrarme
-                        </a>
+                        <div className='row mt-4 pb-4'>
+
+
+                                <div className='botonModal'>
+                                    <a style={{textDecoration:'none'}} href='/registrarme'>
+                                    <span style={{paddingRight:'15px', fontSize:'16px'}}> Registrarme</span>  <FontAwesomeIcon style={{fontSize:'18px', paddingRight:'3px'}} icon={faSignIn} />
+                                    </a>
+                                </div>
+
+
+
+                        </div>
+
                     </div>
                 </div>
                 <Toaster position='top-right' />
             </div>
-        </div>
+        </div >
     )
 }

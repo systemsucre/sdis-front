@@ -3,7 +3,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight, faEdit, faHandPointRight, faLock, faRefresh, faSave, faUser, } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faArrowRight, faCheck, faEdit, faHandPointRight, faLock, faPlay, faRecycle, faRefresh, faSave, faStop, faUser, faUserCheck, faUserCog, faUserEdit, } from '@fortawesome/free-solid-svg-icons';
 
 import useAuth from "../Auth/useAuth"
 import { InputUsuario, ComponenteInputBuscar_, Select1 } from '../elementos/elementos';  // componente input que incluye algunas de las funcionalidades como, setInput, validaciones cambio de estados
@@ -22,6 +22,7 @@ function Usuario() {
     const auth = useAuth()
 
     const [lista, setLista] = useState([]);
+    const [eliminado, setEliminado] = useState([{ id: 2, nombre: 'BAJA' }, { id: 1, nombre: 'ALTA' },]);
     const [usuario, setUsuario] = useState([]);
     const [cantidad, setCantidad] = useState(0);
     const [listaRol, setListaRol] = useState([]);
@@ -38,7 +39,7 @@ function Usuario() {
     const [ape2, setApe2] = useState({ campo: null, valido: null });
     const [correo, setCorreo] = useState({ campo: null, valido: null });
     const [celular, setCelular] = useState({ campo: null, valido: null });
-    const [direccion, setDireccion] = useState({ campo: null, valido: null });
+    const [eli, setEli] = useState({ campo: null, valido: null });
 
     const [modalInsertar, setModalInsertar] = useState(false);
     const [modalEditar, setModalEditar] = useState(false);
@@ -55,8 +56,13 @@ function Usuario() {
 
 
     let today = new Date()
-    let fecha = today.toISOString().split('T')[0]
-    console.log(today)
+    let fecha_ = today.toLocaleDateString()
+    let dia = fecha_.split('/')[0]
+    if (dia.length === 1) dia = '0' + dia
+    let mes_ = fecha_.split('/')[1]
+    if (mes_.length === 1) mes_ = '0' + mes_
+    let año = fecha_.split('/')[2]
+    let fecha = año + '-' + mes_ + '-' + dia
     let hora = new Date().toLocaleTimeString().split(':')[0]
     let min = new Date().toLocaleTimeString().split(':')[1]
     let sec = new Date().toLocaleTimeString().split(':')[2]
@@ -78,6 +84,19 @@ function Usuario() {
     try {
         useEffect(() => {
             document.title = 'USUARIOS'
+
+            window.addEventListener('onload',
+                window.onload = function () {
+                    window.location.hash = "no-back-button";
+                    window.location.hash = "Again-No-back-button"
+                    window.onhashchange = function () {
+
+                        listar(); setAct(1)
+
+                        document.title = 'USUARIOS'
+                        window.location.hash = "no-back-button";
+                    }
+                })
             if (inputBuscar.valido === null && act === 1) listar()
             if (inputBuscar.valido === 'false' && act === 1) listar()
 
@@ -88,7 +107,11 @@ function Usuario() {
         const listar = async () => {
             setEstado(1)
             setTexto('cargando...')
-            axios.post(URL + '/usuarios/listar1').then(json => {
+            axios.post(URL + '/usuarios/listar1', { cantidad: auth.cantidad }).then(json => {
+                if (json.data.hasOwnProperty("sesion")) {
+                    auth.logout()
+                    alert('LA SESION FUE CERRADO DESDE EL SERVIDOR, VUELVA A INTRODODUCIR SUS DATOS DE INICIO')
+                }
                 if (json.data.ok) {
                     setLista(json.data.data[0])
                     setCantidad(json.data.data[1])
@@ -100,7 +123,7 @@ function Usuario() {
         const listarNuevos = async () => {
             setEstado(1)
             setTexto('cargando...')
-            axios.post(URL + '/usuarios/listar2').then(json => {
+            axios.post(URL + '/usuarios/listar2', { cantidad: auth.cantidad }).then(json => {
                 if (json.data.ok) {
                     setLista(json.data.data[0])
                     setCantidad(json.data.data[1])
@@ -128,11 +151,9 @@ function Usuario() {
             }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
         }
         const listarHospital = async () => {
-            if (rol.valido === 'true') {
-                axios.post(URL + '/usuarios/establecimientos', { id: rol.campo }).then(json => {
-                    setListaHospital(json.data)
-                }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-            }
+            axios.post(URL + '/usuarios/establecimientos',).then(json => {
+                setListaHospital(json.data)
+            }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
         }
 
 
@@ -146,14 +167,13 @@ function Usuario() {
             setApe1({ campo: usuario[0].apellido1, valido: 'true' })
             setApe2({ campo: usuario[0].apellido2, valido: 'true' })
             setCelular({ campo: usuario[0].celular, valido: 'true' })
-            setDireccion({ campo: usuario[0].direccion, valido: 'true' })
             setCorreo({ campo: usuario[0].correo, valido: 'true' })
+            setEli({ campo: parseInt(usuario[0].eliminado) ? 2 : 1, valido: 'true' })
+
             setListaHospital([{ id: usuario[0].idestablecimiento, nombre: usuario[0].establecimiento }])
             setModalEditar(true)
         }
         const vaciarDatos = async () => {
-            listarHospital()
-            listarRol()
             setPass({ campo: null, valido: null })
             setPass1({ campo: null, valido: null })
             setId({ campo: null, valido: null })
@@ -163,7 +183,6 @@ function Usuario() {
             setApe1({ campo: null, valido: null })
             setApe2({ campo: null, valido: null })
             setCelular({ campo: null, valido: null })
-            setDireccion({ campo: null, valido: null })
             setCorreo({ campo: null, valido: null })
             setEstado(0)
             setModalEditar(false)
@@ -172,13 +191,11 @@ function Usuario() {
 
         const insertar = async () => {
             if (username.valido === 'true' && rol.valido === 'true' && pass.valido === 'true' && pass1.valido === 'true' &&
-                hospital.valido === 'true' && nombre.valido === 'true' && ape1.valido === 'true' && ape2.valido === 'true' &&
-                celular.valido === 'true' && direccion.valido === 'true' && correo.valido === 'true' && estado === 0) {
+                hospital.valido === 'true' && nombre.valido === 'true' && ape1.valido === 'true' && estado === 0) {
                 if (pass.campo === pass1.campo) {
                     let accion = await confirmarGuardar({ titulo: 'Guardar Registro ?', boton: 'ok', texto: 'Ok para continuar.' })
                     if (accion.isConfirmed) {
                         setEstado(1)
-                        setModalInsertar(false)
                         setTexto('Guardado...')
                         axios.post(URL + '/usuarios/registrar', {
                             "username": username.campo,
@@ -186,14 +203,17 @@ function Usuario() {
                             'hospital': hospital.campo,
                             'rol_': rol.campo,
                             'nombre': nombre.campo,
-                            'ape1': ape1.campo, 'ape2': ape2.campo,
-                            'direccion': direccion.campo, 'celular': celular.campo, 'correo': correo.campo,
-                            'creado': fecha + ' ' + horafinal
+                            'ape1': ape1.campo, 'ape2': ape2.campo ? ape2.campo : 'NO REGISTRADO',
+                            'celular': celular.campo ? celular.campo : '00000', 'correo': correo.campo ? correo.campo : 'example@sdis.ve',
+                            'creado': fecha + ' ' + horafinal,
+                            cantidad: auth.cantidad,
                         }).then(async json => {
                             if (json.data.ok) {
                                 alert2({ icono: 'success', titulo: 'Registro Guardado', boton: 'ok', texto: json.data.msg })
-                                setLista(json.data.data)
+                                setLista(json.data.data[0])
+                                setCantidad(json.data.data[1])
                                 vaciarDatos()
+                                setModalInsertar(false)
                                 setEstado(0)
                             } else { alert2({ icono: 'warning', titulo: 'Registro Fállido', boton: 'ok', texto: json.data.msg }); setEstado(0) }
                         }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
@@ -226,12 +246,43 @@ function Usuario() {
                 } else alert2({ icono: 'error', titulo: 'Contraseñas diferentes', boton: 'ok', texto: 'las contraseñas no coinciden!, verifique e intente nuevamente' })
             } else toast.error('Complete todos los campos con *, o verifique que todos los datos proporcionados sean los correctos')
         }
+        const validar = async () => {
+            if (id.valido === 'true' && rol.valido === 'true' &&
+                hospital.valido === 'true' && nombre.valido === 'true' && ape1.valido === 'true' && estado === 0) {
+                let accion = await confirmarActualizar({ titulo: 'Habilitar Registro ?', boton: 'ok', texto: 'Ok para continuar.' })
+                if (accion.isConfirmed) {
+                    setEstado(1)
+                    setTexto('Actualizando...')
+                    setModalEditar(false)
+                    setModalVer(false)
+                    axios.post(URL + '/usuarios/validar', {
+                        "id": id.campo,
+                        'hospital': hospital.campo,
+                        'rol_': rol.campo,
+                        'nombre': nombre.campo,
+                        'ape1': ape1.campo, "ape2": ape2.campo ? ape2.campo : 'NO REGISTRADO',
+                        'celular': celular.campo ? celular.campo : '00000', 'correo': correo.campo ? correo.campo : 'example@sdis.ve',
+                        'modificado': fecha + ' ' + horafinal,
+                        "cantidad": auth.cantidad,
+                    }).then(json => {
+                        if (json.data.ok) {
+                            alert2({ icono: 'success', titulo: 'Usuario habilitado', boton: 'ok', texto: json.data.msg })
+                            setLista(json.data.data[0])
+                            setCantidad(json.data.data[1])
+                            vaciarDatos()
+                            setEstado(0)
+                        } else { alert2({ icono: 'warning', titulo: 'Operacion Fállida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                    }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+
+                }
+            } else toast.error('Complete todos los campos com * y verifique que esten bien escritos')
+        }
+
 
 
         const actualizar = async (e) => {
             if (id.valido === 'true' && rol.valido === 'true' &&
-                hospital.valido === 'true' && nombre.valido === 'true' && ape1.valido === 'true' && ape2.valido === 'true' &&
-                celular.valido === 'true' && direccion.valido === 'true' && correo.valido === 'true' && estado === 0) {
+                hospital.valido === 'true' && nombre.valido === 'true' && ape1.valido === 'true' && estado === 0) {
                 let accion = await confirmarActualizar({ titulo: 'Actualizar Registro ?', boton: 'ok', texto: 'Ok para continuar.' })
                 if (accion.isConfirmed) {
                     setEstado(1)
@@ -243,13 +294,15 @@ function Usuario() {
                         'hospital': hospital.campo,
                         'rol_': rol.campo,
                         'nombre': nombre.campo,
-                        'ape1': ape1.campo, 'ape2': ape2.campo,
-                        'direccion': direccion.campo, 'celular': celular.campo, 'correo': correo.campo,
-                        'modificado': fecha + ' ' + horafinal
+                        'ape1': ape1.campo, "ape2": ape2.campo ? ape2.campo : 'NO REGISTRADO',
+                        'celular': celular.campo ? celular.campo : '00000', 'correo': correo.campo ? correo.campo : 'example@sdis.ve',
+                        'modificado': fecha + ' ' + horafinal,
+                        'estado': eli.campo === 2 ? 1 : 0 // registro eliminado
                     }).then(json => {
                         if (json.data.ok) {
                             alert2({ icono: 'success', titulo: 'Actualizado', boton: 'ok', texto: json.data.msg })
                             setUsuario(json.data.data)
+                            // setCantidad(json.data.data[1])
                             vaciarDatos()
                             setEstado(0)
                             setModalVer(true)
@@ -258,27 +311,6 @@ function Usuario() {
 
                 }
             } else toast.error('Complete todos los campos com * y verifique que esten bien escritos')
-        }
-
-        const eliminar = async (a) => {
-            let accion = await confirmarEliminar({ titulo: 'Eliminar Registro ?', boton: 'ok', texto: 'Ok para continuar.' })
-            if (accion.isConfirmed) {
-                if (usuario[0].id) {
-                    setEstado(1)
-                    setTexto('Eliminando...')
-                    setModalVer(false)
-                    axios.post(URL + '/usuarios/eliminar', { id: usuario[0].id, modificado: fecha + ' ' + horafinal }).then(json => {
-                        if (json.data.ok) {
-                            alert2({ icono: 'success', titulo: 'Registro Eliminado!', boton: 'ok', texto: json.data.msg })
-                            setUsuario([])
-                            vaciarDatos()
-                            setLista(json.data.data[0])
-                            setEstado(0)
-                            setCantidad(json.data.data[1])
-                        } else { alert2({ icono: 'warning', titulo: 'Operacion Fállida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
-                    }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                }
-            }
         }
 
         const buscar = () => {
@@ -308,12 +340,13 @@ function Usuario() {
             let dir = null
             if (act === 1)
                 dir = URL + '/usuarios/next'
-            if (act === 0)
+            if (act === 0) {
                 dir = URL + '/usuarios/next_'
+            }
             if (lista.length > 0) {
                 const last = lista[lista.length - 1].id
                 // console.log(last, lista)
-                axios.post(dir, { id: last }).then(json => {
+                axios.post(dir, { id: last, cantidad: auth.cantidad }).then(json => {
                     if (json.data.ok) {
                         setLista(json.data.data)
                     } else {
@@ -324,6 +357,7 @@ function Usuario() {
         }
 
         const anterior = () => {
+            // alert()
             let dir = null
             if (act === 1)
                 dir = URL + '/usuarios/anterior'
@@ -331,8 +365,8 @@ function Usuario() {
                 dir = URL + '/usuarios/anterior_'
             if (lista.length > 0) {
                 const last = lista[0].id
-                console.log(last, lista)
-                axios.post(dir, { id: last }).then(json => {
+                // console.log(last, lista)
+                axios.post(dir, { id: last, cantidad: auth.cantidad }).then(json => {
                     if (json.data.ok) {
                         setLista(json.data.data)
                     } else {
@@ -343,42 +377,35 @@ function Usuario() {
         }
 
         return (
-            <div>
+            <div style={{ background: '#e5e5e5', paddingTop: '0.4rem', paddingBottom: '0.4rem', height: '100vh' }}>
                 <div className="container_">
                     {estado === 1 && <Load texto={texto} />}
-                    <div className='titulo-pagina' >
-
-                    </div>
                     <div className='contenedor-cabecera row'>
 
-
-                        <div className='contenedor-titulo col-12 col-sm-6 col-md-6 col-lg-6'>
-                            <div className='titulo-pagina' >
-                                <p>
-                                    GESTIONAR USUARIOS{act === 0 &&
-                                        <span style={{ color: '#f54021', marginLeft: '5px' }}>{"  [USUARIOS SIN VALIDAR]"}</span>
-                                    }
-                                </p>
-                            </div>
+                        <div className='contenedor-cabecera row'>
+                            <span className='titulo'>
+                                GESTIONAR USUARIOS
+                                {act === 0 &&
+                                    <span style={{ color: '#dc3545', marginLeft: '5px' }}>{"  [USUARIOS NO HABILITADOS]"}</span>
+                                }
+                            </span>
                         </div>
-                        <div className='contenedor-boton col-12 col-sm-6 col-md-6 col-lg-6'>
 
-                            {act == 1 && <button className="btn-guardar col-auto" onClick={() => { setModalInsertar(true); listarHospital(); listarRol() }} >
+                    </div>
+                    <div className='contenedor p-2'>
+                        <div className=' row elementos-contenedor botonModal pb-3'>
+                            {act == 1 && <button className="btn-nuevo col-auto" onClick={() => { setModalInsertar(true); listarHospital(); listarRol() }} >
                                 <FontAwesomeIcon className='btn-icon-nuevo' icon={faUser} />Nuevo
                             </button>}
-                            {lista.length > 0 && lista[0].estado == 1 ?
-                                <button className="btn-editar col-auto" onClick={() => { listarNuevos(); setAct(0) }} >
-                                    <FontAwesomeIcon className='btn-icon-nuevo' icon={faUser} />Validar
-                                </button> :
-
-                                <button className="btn-guardar col-auto" onClick={() => { listar(); setAct(1) }} >
-                                    <FontAwesomeIcon className='btn-icon-nuevo' icon={faUser} />Volver
+                            {lista.length > 0 && lista[0].estado == 1 &&
+                                <button className="btn-simple col-auto" onClick={() => { listarNuevos(); setAct(0); document.title = 'habilitar Usuarios' }} >
+                                    <FontAwesomeIcon className='btn-icon-nuevo' icon={faUserCheck} />Habilitar
                                 </button>
                             }
+                            {/* <p className='alertas' >{'Se recomienda realizar los cambios con absoluta responsabilidad'}</p> */}
+
                         </div>
-                    </div>
-                    <div className='contenedor p-1'>
-                        <div className="container-4">
+                        <div className="container-4 pt-2">
                             <ComponenteInputBuscar_
                                 estado={inputBuscar}
                                 cambiarEstado={setInputBuscar}
@@ -394,33 +421,66 @@ function Usuario() {
                             <table className="table table-sm" >
                                 <thead>
                                     <tr >
-                                        <th className="col-5 ">TITULAR</th>
-                                        <th className="col-3 ">CELULAR</th>
+                                        <th></th>
+                                        <th className="col-4 ">TITULAR</th>
+                                        <th className="col-1 ">CELULAR</th>
+                                        <th className="col-2"></th>
                                         <th className="col-3 ">ESTABLECIMIENTO</th>
-                                        <th className="col-3 ">USUARIO</th>
+                                        <th className="col-2 ">USUARIO</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {lista.map((a) => (
                                         a.estado === 1 ?
-                                            <tr key={a.id} onClick={() => verUsuario(a.id)} className='item'>
-                                                <td className="col-5 ">
-                                                    <div className='cantidad-registros' style={{ cursor: 'pointer' }}>
+                                            <tr key={a.id} className='item'>
+
+                                                <th className='tooltip_' >
+                                                    <span class="tooltiptext_">Configurar Usuario</span>
+                                                    <button type="button" class="adicionar" 
+                                                    onClick={() => verUsuario(a.id)} >
+                                                        <FontAwesomeIcon icon={faUserCog} />
+                                                    </button>
+                                                </th>
+                                                <td > {a.titular}</td>
+                                                <td >{a.celular}</td>
+                                                <td >
+                                                    <div className='row'>
+                                                        <div className='col-auto'>
+                                                            {a.eliminado ?
+                                                                <FontAwesomeIcon className='stop' style={{ color: 'red' }} icon={faStop} />
+                                                                :
+                                                                <FontAwesomeIcon className='play' icon={faPlay} />}
+                                                        </div>
+                                                        <div className='col-auto'>
+                                                            {a.eliminado ? <span>SIN ACCESO</span> : <span> CON ACCESO</span>}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td  >{a.hospital}</td>
+                                                <td  >{a.username}</td>
+                                            </tr> : <tr key={a.id} className='item'>
+                                                <td className='tooltip_' >
+                                                    <span class="tooltiptext_">Click para mas detalles...  </span>
+                                                    <div className='cantidad-registros' style={{ cursor: 'pointer' }} onClick={() => verUsuario(a.id)}>
                                                         <FontAwesomeIcon icon={faHandPointRight} /> {a.titular}
                                                     </div>
                                                 </td>
-                                                <td className="col-3 ">{a.celular}</td>
-                                                <td className="col-3 " >{a.hospital}</td>
-                                                <td className="col-3 " >{a.username}</td>
-                                            </tr> : <tr key={a.id} onClick={() => verUsuario(a.id)} className='item'>
-                                                <td className="col-5" >
-                                                    <div className='cantidad-registros' style={{ cursor: 'pointer' }}>
-                                                        <FontAwesomeIcon icon={faHandPointRight} /> {a.titular}
+                                                <td >{a.celular}</td>
+                                                <td >
+                                                    <div className='row'>
+                                                        <div className='col-auto'>
+                                                            {a.eliminado ?
+                                                                <FontAwesomeIcon className='stop' icon={faRecycle} />
+                                                                :
+                                                                <FontAwesomeIcon className='play' icon={faPlay} />}
+                                                        </div>
+                                                        <div className='col-auto'>
+                                                            {a.eliminado ? <span>SIN ACCESO</span> : <span> CON ACCESO</span>}
+                                                        </div>
                                                     </div>
                                                 </td>
-                                                <td className="col-3 ">{a.celular}</td>
-                                                <td className="col-3 " >{a.hospital}</td>
-                                                <td className="col-3 " >{a.username}</td>
+                                                <td  >{a.hospital}</td>
+                                                <td  >{a.username}</td>
                                             </tr>
                                     ))}
                                 </tbody>
@@ -429,21 +489,15 @@ function Usuario() {
                         </div>
                         <div className='cantidad-registros'>{cantidad + ' Registro(s)'}
                         </div>
-                    </div>
-                    <div className='contenedor-foot'>
-                        <div className='navegador-tabla'>
-                            <a href="#" onClick={() => anterior()} className='move moveLeft'>
-                                Anterior
-                            </a>
 
-                            <a href="#" onClick={() => siguiente()} className='move moveRight'>
+                        <div className='navegador-tabla'>
+                            <span onClick={() => anterior()} className='move moveLeft'>
+                                Anterior
+                            </span>
+
+                            <span onClick={() => siguiente()} className='move moveRight'>
                                 Siguiente
-                            </a>
-                            {/* <div className='row'>
-                                <FontAwesomeIcon className='col-auto anterior' icon={faArrowLeft} onClick={() => anterior()} > </FontAwesomeIcon>
-                                <div className=' col-auto now'>{lista.length > 0 ? lista[lista.length - 1].id + ' - ' + lista[0].id : '0   -   0'}</div>
-                                <FontAwesomeIcon className='col-auto next' icon={faArrowRight} onClick={() => siguiente()}> </FontAwesomeIcon>
-                            </div> */}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -451,58 +505,64 @@ function Usuario() {
 
                 <Modal isOpen={modalVer}>
 
-                    {act == 1 ? <ModalHeader toggle={() => setModalVer(false)}>DATOS PERSONALES</ModalHeader> :
+                    {act == 1 ? <ModalHeader toggle={() => { setModalVer(false); listar() }}>DATOS PERSONALES</ModalHeader> :
                         <ModalHeader toggle={() => { setModalVer(false); listarNuevos() }}>DATOS PERSONALES</ModalHeader>}
                     <ModalBody>
                         {usuario.length > 0 && <div>
                             {usuario[0].estado == 0 && <p style={{ fontSize: '18px', color: '#f54021' }}>USUARIO SIN VALIDAR</p>}
-                            <div className='row p-2 mb-1'>
+                            <div className='row p-1 mb-1'>
                                 <div className='encabezado col-6'>Establecimiento</div>
                                 <div className='contenido col-6' >{usuario[0].establecimiento}</div>
                             </div>
-                            <div className='row p-2 mb-1'>
+                            <div className='row p-1 mb-1'>
                                 <div className='encabezado col-6'>Rol Usuario</div>
                                 <div className='contenido col-6'>{usuario[0].rol ? usuario[0].rol : 'NO TIENE'}</div>
                             </div>
-                            <div className='row p-2'>
+                            <div className='row p-1'>
                                 <div className='encabezado col-6'>Nombre de Usuario</div>
                                 <div className='contenido col-6'>{usuario[0].username}</div>
                             </div>
 
-                            <div className='row p-2'>
+                            <div className='row p-1'>
                                 <div className='encabezado col-6'>Nombre Completo</div>
                                 <div className='contenido col-6'>{usuario[0].nombre}</div>
                             </div>
-                            <div className='row p-2'>
-                                <div className='encabezado col-6'>Apellido Paterno</div>
+                            <div className='row p-1'>
+                                <div className='encabezado col-6'>Primer apellido</div>
                                 <div className='contenido col-6'>{usuario[0].apellido1}</div>
                             </div>
-                            <div className='row p-2'>
-                                <div className='encabezado col-6'>Apellido Materno</div>
+                            <div className='row p-1'>
+                                <div className='encabezado col-6'>Segundo apellido</div>
                                 <div className='contenido col-6'>{usuario[0].apellido2}</div>
                             </div>
-                            <div className='row p-2'>
+                            <div className='row p-1'>
                                 <div className='encabezado col-6'>Celular/telef.</div>
                                 <div className='contenido col-6'>{usuario[0].celular}</div>
                             </div>
-                            <div className='row p-2'>
+                            <div className='row p-1'>
                                 <div className='encabezado col-6'>Correo</div>
                                 <div className='contenido col-6'>{usuario[0].correo}</div>
                             </div>
-                            <div className='row p-2'>
-                                <div className='encabezado col-6'>Direccion</div>
-                                <div className='contenido col-6' >{usuario[0].direccion}</div>
-                            </div></div>}
+                            <div className='row p-1'>
+                                <div className='encabezado col-6'>Estado</div>
+                                <div className='contenido col-6' >{usuario[0].eliminado ? 'SIN ACCESO' : 'CON ACCESO'}</div>
+                            </div>
+                        </div>}
 
                     </ModalBody>
-                    <div className='botonModal'>
+                    {act === 1 ? <div className='botonModal'>
                         <button className="btn-eliminar col-auto" onClick={() => setModalRecet(true)} >
                             <FontAwesomeIcon className='btn-icon-nuevo' icon={faLock} />Reiniciar Contraseña
                         </button>
                         <button className="btn-editar col-auto" onClick={() => rellenar()} >
-                            <FontAwesomeIcon className='btn-icon-nuevo' icon={faEdit} />ACTUALIZAR
+                            <FontAwesomeIcon className='btn-icon-nuevo' icon={faUserEdit} />ACTUALIZAR
                         </button>
-                    </div>
+                    </div> :
+                        <div className='botonModal'>
+                            <button className="btn-editar col-auto" onClick={() => rellenar()} >
+                                <FontAwesomeIcon className='btn-icon-nuevo' icon={faCheck} />HABILITAR
+                            </button>
+                        </div>}
                     {/* <div className='cantidad-registros'>SISTEMA DEPARTAMENTAR DE INFORAMACION DE SALUD SDIS</div> */}
 
                 </Modal>
@@ -542,25 +602,31 @@ function Usuario() {
 
                     <ModalHeader toggle={() => setModalInsertar(false)}> Nuevo Usuario</ModalHeader>
                     <ModalBody>
-                        <Select1
-                            estado={rol}
-                            cambiarEstado={setRol}
-                            ExpresionRegular={INPUT.ID}
-                            lista={listaRol}
-                            etiqueta={'Rol'}
-                            msg='Seleccione una opcion'
-                            funcion={listarHospital}
-                            estado_={setHospital}
-                        />
+                        <div className='row'>
+                            <div className='col-12 col-sm-6 col-md-6 col-lg-6'>
+                                <Select1
+                                    estado={rol}
+                                    cambiarEstado={setRol}
+                                    ExpresionRegular={INPUT.ID}
+                                    lista={listaRol}
+                                    etiqueta={'Rol'}
+                                    msg='Seleccione una opcion'
 
-                        <Select1
-                            estado={hospital}
-                            cambiarEstado={setHospital}
-                            ExpresionRegular={INPUT.ID}
-                            lista={listaHopistal}
-                            etiqueta={'Establecimiento'}
-                            msg='Seleccione una opcion'
-                        />
+                                />
+                            </div>
+                            <div className='col-12 col-sm-6 col-md-6 col-lg-6'>
+
+                                <Select1
+                                    estado={hospital}
+                                    cambiarEstado={setHospital}
+                                    ExpresionRegular={INPUT.ID}
+                                    lista={listaHopistal}
+                                    etiqueta={'Establecimiento'}
+                                    msg='Seleccione una opcion'
+                                />
+                            </div>
+
+                        </div>
 
                         <div className='row'>
                             <div className='col-8'>
@@ -568,10 +634,10 @@ function Usuario() {
                                     estado={username}
                                     cambiarEstado={setUsername}
                                     placeholder="USUARIO"
-                                    ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
+                                    ExpresionRegular={INPUT.INPUT_USUARIO}  //expresion regular  
                                     etiqueta='Username'
                                     campoUsuario={true}
-                                    msg={'Este campo acepta letras minúsculas'}
+                                    msg={'Este campo acepta solo letras '}
                                 /></div>
                             <div className='col-6'>
                                 <User_
@@ -620,6 +686,7 @@ function Usuario() {
                                     ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
                                     etiqueta='Apellido materno'
                                     msg={'Este campo acepta solo letras '}
+                                    important={false}
                                 /></div>
                         </div>
                         <div className='row'>
@@ -631,6 +698,7 @@ function Usuario() {
                                     ExpresionRegular={INPUT.TELEFONO}  //expresion regular  
                                     etiqueta='Celular/Telf.'
                                     msg={'Este campo acepta solo números '}
+                                    important={false}
                                 /></div>
                             <div className='col-6'>
                                 <User_
@@ -641,16 +709,9 @@ function Usuario() {
                                     etiqueta='Correo'
                                     msg={'Este campo acepta en formato de correo'}
                                     campoUsuario={true}
+                                    important={false}
                                 /></div>
                         </div>
-                        <InputUsuario
-                            estado={direccion}
-                            cambiarEstado={setDireccion}
-                            placeholder="DIRECCION"
-                            ExpresionRegular={INPUT.DIRECCION}  //expresion regular  
-                            etiqueta='Dirección'
-                            msg={'Este campo acepta letras numero y algunos carateres'}
-                        />
 
                     </ModalBody>
                     <div className='botonModal'>
@@ -663,28 +724,44 @@ function Usuario() {
                 <Modal isOpen={modalEditar}>
 
                     <ModalHeader toggle={() => {
-                        vaciarDatos()
+                        vaciarDatos();
                     }}>  Actualizar Usuario</ModalHeader>
                     <ModalBody>
-                        <Select1
-                            estado={rol}
-                            cambiarEstado={setRol}
-                            ExpresionRegular={INPUT.ID}
-                            lista={listaRol}
-                            etiqueta={'Rol'}
-                            msg='Seleccione una opcion'
-                            funcion={listarHospital}
-                            estado_={setHospital}
-                        />
-                        <Select1
-                            estado={hospital}
-                            cambiarEstado={setHospital}
-                            ExpresionRegular={INPUT.ID}
-                            lista={listaHopistal}
-                            etiqueta={'Establecimiento'}
-                            msg='Seleccione una opcion'
-                        />
+                        <div className='row'>
 
+                            <div className='col-12 col-sm-4 col-md-4 col-lg-4'>
+                                <Select1
+                                    estado={rol}
+                                    cambiarEstado={setRol}
+                                    ExpresionRegular={INPUT.ID}
+                                    lista={listaRol}
+                                    etiqueta={'Rol'}
+                                    msg='Seleccione una opcion'
+                                />
+                            </div>
+                            <div className='col-12 col-sm-5 col-md-5 col-lg-5'>
+
+                                <Select1
+                                    estado={hospital}
+                                    cambiarEstado={setHospital}
+                                    ExpresionRegular={INPUT.ID}
+                                    lista={listaHopistal}
+                                    etiqueta={'Establecimiento'}
+                                    msg='Seleccione una opcion'
+                                />
+                            </div>
+                            <div className='col-12 col-sm-3 col-md-3 col-lg-3'>
+
+                                {act === 1 && <Select1
+                                    estado={eli}
+                                    cambiarEstado={setEli}
+                                    ExpresionRegular={INPUT.ID}
+                                    lista={eliminado}
+                                    etiqueta={'Estado'}
+                                    msg='Seleccione una opcion'
+                                />}
+                            </div>
+                        </div>
 
                         <InputUsuario
                             estado={nombre}
@@ -712,6 +789,7 @@ function Usuario() {
                                     ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
                                     etiqueta='Apellido materno'
                                     msg={'Este campo acepta solo letras '}
+                                    important={false}
                                 /></div>
                         </div>
                         <div className='row'>
@@ -723,6 +801,7 @@ function Usuario() {
                                     ExpresionRegular={INPUT.TELEFONO}  //expresion regular  
                                     etiqueta='Celular/Telf.'
                                     msg={'Este campo acepta solo números '}
+                                    important={false}
                                 /></div>
                             <div className='col-6'>
                                 <User_
@@ -733,24 +812,18 @@ function Usuario() {
                                     etiqueta='Correo'
                                     msg={'Este campo acepta en formato de correo'}
                                     campoUsuario={true}
+                                    important={false}
                                 /></div>
                         </div>
-                        <InputUsuario
-                            estado={direccion}
-                            cambiarEstado={setDireccion}
-                            placeholder="DIRECCION"
-                            ExpresionRegular={INPUT.DIRECCION}  //expresion regular  
-                            etiqueta='Dirección'
-                            msg={'Este campo acepta letras numero y algunos carateres'}
-                        />
+
                     </ModalBody>
                     <div className='botonModal'>
-                        <button className="btn-eliminar col-auto" onClick={() => eliminar()} >
-                            <FontAwesomeIcon className='btn-icon-nuevo' icon={faUser} />Eliminar
-                        </button>
-                        <button className="btn-editar col-auto" onClick={() => actualizar()} >
-                            <FontAwesomeIcon className='btn-icon-nuevo' icon={faEdit} />Actualizar
-                        </button>
+                        {act === 1 ? <button className="btn-editar col-auto" onClick={() => actualizar()} >
+                            <FontAwesomeIcon className='btn-icon-nuevo' icon={faUserEdit} />Actualizar
+                        </button> :
+                            <button className="btn-editar col-auto" onClick={() => validar()} >
+                                <FontAwesomeIcon className='btn-icon-nuevo' icon={faCheck} />Habilitar
+                            </button>}
                     </div>
                 </Modal>
 
@@ -759,8 +832,7 @@ function Usuario() {
         );
 
     } catch (error) {
-        setEstado(0);// auth.logout()
-        setEstado(0)
+
     }
 
 }

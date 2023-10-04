@@ -1,0 +1,6 @@
+
+Herramientas tecnológicas
+
+1.node version: 18.17.0 o superior
+2.npm 
+3. habilitar consola shell  (manejo de linea de comandos)

@@ -31,6 +31,17 @@ const AuthProvider = ({ children }) => {
 
     }, [user])
 
+
+    let altura = window.innerHeight
+    let cantidad = 7
+    if (altura > 700)
+        cantidad = 8
+    if (altura > 850)
+        cantidad = 10
+    if (altura > 1100)
+        cantidad = 16
+    if (altura > 1250)
+        cantidad = 23
     ///////////////////////////////////////////////////////////////
     const contextValue = {
         user,
@@ -69,7 +80,8 @@ const AuthProvider = ({ children }) => {
 
         isLogged() {
             return !!user;
-        }
+        },
+        cantidad
     }
     return <AuthContext.Provider value={contextValue}>
         {children}

@@ -11,11 +11,12 @@ const colores = {
 const Input = styled.input` 
 
     width:100%;
-    height: 20px;
-    font-size: 13px;
+    // height: 20px;
+    font-size: 12px;
     padding: 0px 5px 0px 5px;  //campos donde va abarcar el texto dentro del input
     margin-bottom: 0px;   
     transition: .3s ease all;
+    border-radius: 2px;
     border: 1px solid ${colores.borde};
 
     &:focus {

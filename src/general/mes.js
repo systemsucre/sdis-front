@@ -1,16 +1,16 @@
 import React from 'react';
-import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap';
+import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faEdit, faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { faClipboard, faCog, faCogs, faEdit, faHandPointRight, } from '@fortawesome/free-solid-svg-icons';
 
 import useAuth from "../Auth/useAuth"
-import { InputUsuario, Select1, Select1XL, } from '../elementos/elementos';  // componente input que incluye algunas de las funcionalidades como, setInput, validaciones cambio de estados
+import { InputUsuario, Select1XL, } from '../elementos/elementos';  // componente input que incluye algunas de las funcionalidades como, setInput, validaciones cambio de estados
 import { useState, useEffect } from "react";
 import { URL, INPUT } from '../Auth/config';
 import axios from 'axios';
-import { Toaster, toast } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import '../elementos/estilos.css'
 import { alert2, confirmarActualizar } from '../elementos/alert2'
 import Load from '../elementos/load'
@@ -34,13 +34,18 @@ function Mes() {
 
     const [estado, setEstado] = useState(null);
     const [texto, setTexto] = useState(null);
-
     let today = new Date()
-    let fecha = today.toISOString().split('T')[0]
+    let fecha_ = today.toLocaleDateString()
+    let dia = fecha_.split('/')[0]
+    if (dia.length === 1) dia = '0' + dia
+    let mes_ = fecha_.split('/')[1]
+    if (mes_.length === 1) mes_ = '0' + mes_
+    let año_ = fecha_.split('/')[2]
+    let fecha = año_ + '-' + mes_ + '-' + dia
     let hora = new Date().toLocaleTimeString().split(':')[0]
     let min = new Date().toLocaleTimeString().split(':')[1]
     let sec = new Date().toLocaleTimeString().split(':')[2]
-    if (hora.length ===1) hora = '0' + hora
+    if (hora.length === 1) hora = '0' + hora
     let horafinal = hora + ':' + min + ':' + sec
 
     try {
@@ -75,19 +80,23 @@ function Mes() {
             setEstado(1)
             setTexto('cargando...')
             axios.post(URL + '/mes/listarinicio', { gestion: fecha.split('-')[0] }).then(json => {
+                if (json.data.hasOwnProperty("sesion")) {
+                    auth.logout()
+                    alert('LA SESION FUE CERRADO DESDE EL SERVIDOR, VUELVA A INTRODODUCIR SUS DATOS DE INICIO')
+                }
                 if (json.data.ok) {
                     setLista(json.data.data[0])
                     setCantidad(json.data.data[1])
                     setEstado(0)
-                } else {alert2({ icono: 'warning', titulo: 'Operacion fallida o acceso denegado', boton: 'ok', texto: json.data.msg }); setEstado(0)}
-            }).catch(function (error) {setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                } else { alert2({ icono: 'warning', titulo: 'Operacion fallida o acceso denegado', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+            }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
         }
         const listarGestion = async () => {
             axios.post(URL + '/mes/listargestion').then(json => {
                 if (json.data.ok) {
                     setListaGestion(json.data.data)
                 } else alert2({ icono: 'warning', titulo: 'Operacion fallida o acceso denegado', boton: 'ok', texto: json.data.msg })
-            }).catch(function (error) {setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+            }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
         }
         const listar = async () => {
             if (gestion.valido === 'true') {
@@ -102,8 +111,8 @@ function Mes() {
                         setLista(json.data.data[0])
                         setCantidad(json.data.data[1])
                         setEstado(0)
-                    } else {alert2({ icono: 'warning', titulo: 'Operacion fallida o acceso denegado', boton: 'ok', texto: json.data.msg });setEstado(0)}
-                }).catch(function (error) {setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                    } else { alert2({ icono: 'warning', titulo: 'Operacion fallida o acceso denegado', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
             }
         }
 
@@ -130,45 +139,13 @@ function Mes() {
                         setCantidad(json.data.data[1])
                         setEstado(0)
                         alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
-                    } else {alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0)}
-                }).catch(function (error) {setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                    } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
 
                 setModalEditar(false)
             }
         }
 
-        const activar = async (a) => {
-
-            let accion = await confirmarActualizar({ titulo: 'Activar Mes', boton: 'ok', texto: 'Ok para continuar.' })
-            if (accion.isConfirmed) {
-                setEstado(1)
-                setTexto('Activando acceso...')
-                axios.post(URL + '/mes/activar', { id: a, modificado: fecha + ' ' + horafinal }).then(json => {
-                    if (json.data.ok) {
-                        setLista(json.data.data[0])
-                        setCantidad(json.data.data[1])
-                        setEstado(0)
-                        alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
-                    } else {alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0)}
-                }).catch(function (error) {setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-            }
-        }
-
-        const desactivar = async (a) => {
-            let accion = await confirmarActualizar({ titulo: 'Desartivar Mes', boton: 'ok', texto: 'Ok para continuar.' })
-            if (accion.isConfirmed) {
-                setEstado(1)
-                setTexto('Desactivando acceso...')
-                axios.post(URL + '/mes/desactivar', { id: a, modificado: fecha + ' ' + horafinal }).then(json => {
-                    if (json.data.ok) {
-                        setLista(json.data.data[0])
-                        setCantidad(json.data.data[1])
-                        setEstado(0)
-                        alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
-                    } else {alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0)}
-                }).catch(function (error) {setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-            }
-        }
 
         const rellenar = (f) => {
             setMes(f.mes.split(' ')[0])
@@ -188,52 +165,60 @@ function Mes() {
         }
 
         return (
-            <div>
+            <div style={{ background: '#e5e5e5', paddingTop: '0.4rem', paddingBottom: '0.4rem', height: '100vh' }}>
                 <div className="container_">
-                {estado === 1 && <Load texto={texto} />}
-                    <div className='contenedor-cabecera-1'>
-                        <div className='titulo-pagina' >
-                            {'MESES  (GESTIÓN ' + año + ')'}
+                    {estado === 1 && <Load texto={texto} />}
+
+                    <div className='contenedor-cabecera row'>
+
+                        <div className='contenedor-cabecera row'>
+                            <span className='titulo'>
+                                {'MESES  (GESTIÓN ' + año + ')'}
+                            </span>
                         </div>
                     </div>
+                    <div className='separador mb-3 mb-sm-0 mb-md-0 mb-lg-0'>
+                        <span>
+                            {'GESTION :: ' + año}
+                        </span>
+                    </div>
+                    <div className='contenedor p-2'>
+                        <div className=' row elementos-contenedor botonModal'>
+                            <div className='col-7'>
+                                <Select1XL
+                                    estado={gestion}
+                                    cambiarEstado={setGestion}
+                                    ExpresionRegular={INPUT.ID}
+                                    lista={listaGestion}
+                                    etiqueta={'Gestion'}
+                                    funcion={listar}
+                                    msg='Seleccione una opcion'
+                                /></div>
+                        </div>
 
-                    <div className='contenedor m-2'>
-                        <Select1XL
-                            estado={gestion}
-                            cambiarEstado={setGestion}
-                            ExpresionRegular={INPUT.ID}
-                            lista={listaGestion}
-                            etiqueta={'Gestion'}
-                            funcion={listar}
-                            msg='Seleccione una opcion'
-                        />
-                        <table className="table table-sm" >
-                            <thead>
-                                <tr >
-                                    <th className="col-2 ">MES</th>
-                                    <th className="col-lg-3 col-md-3 col-sm-3 col-2 ">ESTADO</th>
-                                    <th className="col-lg-4 col-3 ">INICIAL</th>
-                                    <th className="col-lg-4 col-3">FINAL</th>
-                                    <th className="col-1  "></th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div className="table table-responsive custom p-2 mb-2" >
+                        <div className="table table-responsive custom mb-2" style={{ height: '310px' }}>
                             <table className="table table-sm" >
+                                <thead>
+                                    <tr >
+                                        <th ></th>
+                                        <th className="col-6 ">MES</th>
+                                        <th className="col-3 ">INICIAL</th>
+                                        <th className="col-3">FINAL</th>
+                                    </tr>
+                                </thead>
                                 <tbody >
                                     {lista.map((a) => (
                                         <tr key={a.id} >
-                                            <td className="col-2 ">{a.mes}</td>
-                                            {a.estado === 1 ?
-                                                <td className="col-3 " >
-                                                    <FontAwesomeIcon icon={faWindowClose} onClick={() => desactivar(a.id)} className='boton-xm-desactivar' />
-                                                    ACTIVO</td> :
-                                                <td className="col-3 " >
-                                                    <FontAwesomeIcon icon={faCheck} onClick={() => activar(a.id)} className='boton-xm-activar' />
-                                                    NO ACTIVO</td>}
-                                            <td className="col-4 " >{a.ini}</td>
-                                            <td className="col-4 " >{a.fin}</td>
-                                            <td className="col-2 " onClick={() => rellenar(a)}><div className='cantidad-registros' style={{ cursor: 'pointer' }}>Gestionar</div></td>
+                                            <th className='tooltip_' >
+                                                <span class="tooltiptext_">Click para configurar accesos</span>
+                                                <button type="button" class="adicionar" onClick={() => rellenar(a)}style={{ cursor: 'pointer' }}>
+                                                    <FontAwesomeIcon icon={faCog} />
+                                                </button>
+                                            </th>
+
+                                            <td >{a.mes}</td>
+                                            <td  >{a.ini}</td>
+                                            <td  >{a.fin}</td>
 
                                         </tr>
                                     ))}
@@ -253,7 +238,7 @@ function Mes() {
 
                     <ModalHeader toggle={() => {
                         setModalEditar(false)
-                    }}>  {'GESTIÓN  ' + año + ' (' + mes + ')'}</ModalHeader>
+                    }}>  {mes + ' (GESTIÓN  ' + año + ')'}</ModalHeader>
                     <ModalBody>
                         <div className='row'>
                             <div className='col-6'>
@@ -261,7 +246,6 @@ function Mes() {
                                     estado={ini}
                                     tipo='date'
                                     cambiarEstado={setIni}
-                                    placeholder="Clasificacion"
                                     ExpresionRegular={INPUT.FECHA}  //expresion regular  
                                     etiqueta='Fecha inicial'
                                     msg={'Este campo acepta letras, numero y algunos caracteres'}
@@ -272,7 +256,6 @@ function Mes() {
                                     estado={iniH}
                                     tipo='time'
                                     cambiarEstado={setIniH}
-                                    placeholder="Clasificacion"
                                     ExpresionRegular={INPUT.HORA}  //expresion regular  
                                     etiqueta='hora Inicial'
                                     msg={'Este campo acepta letras, numero y algunos caracteres'}
@@ -285,7 +268,6 @@ function Mes() {
                                     estado={fin}
                                     tipo='date'
                                     cambiarEstado={setFin}
-                                    placeholder="Clasificacion"
                                     ExpresionRegular={INPUT.FECHA}  //expresion regular  
                                     etiqueta='Fecha Fin'
                                     msg={'Este campo acepta letras, numero y algunos caracteres'}
@@ -296,7 +278,6 @@ function Mes() {
                                     estado={finH}
                                     tipo='time'
                                     cambiarEstado={setFinH}
-                                    placeholder="Clasificacion"
                                     ExpresionRegular={INPUT.HORA}  //expresion regular  
                                     etiqueta='Hora Final'
                                     msg={'Este campo acepta letras, numero y algunos caracteres'}
@@ -310,15 +291,12 @@ function Mes() {
                         </button>
                     </div>
                 </Modal>
-
-                <Toaster position='top-right' />
             </div>
 
         );
 
     } catch (error) {
         setEstado(0);// auth.logout()
-        setEstado(0)
     }
 
 }

@@ -1,3 +1,8 @@
+
+:root {
+--color-boton-editar: #2980B9;
+--color-boton-editar-hover: #20638f;
+}
 .main {
     text-align: left;
     direction: ltr;
@@ -9,11 +14,10 @@
     line-height: 18px;
     margin: 0;
     -webkit-text-size-adjust: none;
-    cursor: pointer;
     min-height: 657px;
     background-color: #cccccc;
     padding-top: 20px;
-    height: 100%;
+    height: 100vh;
     padding: 20px;
 }
 
@@ -24,37 +28,58 @@
     background-color: white;
     /* padding: 5px; */
 }
-.sistema{
-    background-color: #f0f0f0;
-    color:rgb(31, 31, 31);
+
+.sistema {
+    background-color: #DC7633;
+    color: white;
     font-size: 26px;
     /* font-weight: bold; */
     margin: auto;
     text-align: center;
-    height:100px;
+    height: 85px;
     padding-top: 35px;
 }
 
-.institucion{
+.institucion {
     margin: 1rem;
 }
+
 .titulo {
     text-align: center;
     font-style: bold;
-    color:orangered;
-    margin:0.1rem;
+    color: orangered;
+    margin: 0.1rem;
 }
-.titulo1{
+
+.titulo1 {
     text-align: center;
-    color:rgb(221, 81, 81);
+    color: rgb(221, 81, 81);
     font-size: 12px;
     font-family: Verdana;
-    margin:0 !important;
+    margin: 0 !important;
 }
-.titulo2{
+
+.titulo2 {
     text-align: center;
-    color:rgb(221, 81, 81);
-    font-style:bold;
+    color: rgb(221, 81, 81);
+    font-style: bold;
     font-size: 15px;
     font-family: Verdana;
+}
+.botonModal {
+    height: auto;
+    display: flex;
+    justify-content: right;
+}
+
+
+.btn-iniciar {
+    border-radius: 0px !important;
+    background-color: var(--color-boton-editar);
+    padding-top: 3px;
+    height: 32px !important;
+}
+.btn-iniciar:hover {
+    background: var(--color-boton-editar-hover);
+    transition: .3s ease-in-out all;
 }

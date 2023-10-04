@@ -28,7 +28,6 @@ function Menu() {
     const [ape2, setApe2] = useState({ campo: null, valido: null });
     const [correo, setCorreo] = useState({ campo: null, valido: null });
     const [celular, setCelular] = useState({ campo: null, valido: null });
-    const [direccion, setDireccion] = useState({ campo: null, valido: null });
 
     const [estado, setEstado] = useState(0)
 
@@ -44,17 +43,16 @@ function Menu() {
 
     const auth = useAuth()
     const salir = async () => {
-        const ok = await salir_({ titulo: 'Cerrar Sesión', boton: 'ok', texto: 'Ok para continuar.' })
-        if (ok.isConfirmed) {
-            auth.logout()
-        }
+        // const ok = await salir_({ titulo: 'Cerrar Sesión', boton: 'ok', texto: 'Ok para continuar.' })
+        // if (ok.isConfirmed) {
+        auth.logout()
+        // }
     }
     const rellenar = async () => {
         setNombre({ campo: usuario[0].nombre, valido: 'true' })
         setApe1({ campo: usuario[0].apellido1, valido: 'true' })
         setApe2({ campo: usuario[0].apellido2, valido: 'true' })
         setCelular({ campo: usuario[0].celular, valido: 'true' })
-        setDireccion({ campo: usuario[0].direccion, valido: 'true' })
         setCorreo({ campo: usuario[0].correo, valido: 'true' })
         setModalEditar(true)
     }
@@ -92,14 +90,13 @@ function Menu() {
 
 
     const actualizar = async (e) => {
-        if (nombre.valido === 'true' && ape1.valido === 'true' && ape2.valido === 'true' &&
-            celular.valido === 'true' && direccion.valido === 'true' && correo.valido === 'true') {
+        if (nombre.valido === 'true' && ape1.valido === 'true' ) {
             let accion = await confirmarActualizar({ titulo: 'Actualizar Registro ?', boton: 'ok', texto: 'Ok para continuar.' })
             if (accion.isConfirmed) {
                 axios.post(URL + '/miPerfil/actualizarMiPerfil', {
                     'nombre': nombre.campo,
-                    'ape1': ape1.campo, 'ape2': ape2.campo,
-                    'direccion': direccion.campo, 'celular': celular.campo, 'correo': correo.campo,
+                    'ape1': ape1.campo, "ape2": ape2.campo ? ape2.campo : 'NO REGISTRADO',
+                    'celular': celular.campo ? celular.campo : '00000', 'correo': correo.campo ? correo.campo : 'example@sdis.ve',
                     'modificado': fecha + ' ' + horafinal
                 }).then(json => {
                     if (json.data.ok) {
@@ -136,20 +133,18 @@ function Menu() {
                     </ul>
                 </ul>
                 <ul className='menu__links'>
-                    <li className='menu__item hidden_from_formulario'>
-                        <a href='/formulario' className='menu__link'>FORMULARIO</a>
-                    </li>
+
 
                     {parseInt(localStorage.getItem('numRol')) === 1 &&
                         <>
                             <li className='menu__item hidden_from_variables'>
-                                <a href='/variables' className='menu__link hidden_from_g_variables'>VARIABLES</a>
+                                <a href='/variables' className='menu__link hidden_from_g_variables'>FORMULARIOS SDIS-VE</a>
                             </li>
                             <li className='menu__item menu__item--show'>
                                 <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
                                 <ul className='menu__nesting'>
                                     <li className='menu__inside hidden_from_g_usuarios'>
-                                        <a href='/usuarios' className='menu__link menu_link--inside'>Gestionar Usuarios</a>
+                                        <a href='/usuarios' className='menu__link menu_link--inside'>Usuarios</a>
                                     </li>
                                     <li className='menu__inside hidden_from_administracion'>
                                         <a href='/establecimiento' className='menu__link menu_link--inside '>Establecimientos</a>
@@ -171,8 +166,9 @@ function Menu() {
                     {parseInt(localStorage.getItem('numRol')) === 2 &&
                         <>
                             <li className='menu__item hidden_from_formulario'>
-                                <a href='#' className='menu__link'>REPORTES</a>
+                                <a href='/reportes2' className='menu__link'>REPORTES</a>
                             </li>
+
                             <li className='menu__item menu__item--show'>
                                 <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
                                 <ul className='menu__nesting'>
@@ -182,18 +178,60 @@ function Menu() {
                                     <li className='menu__inside hidden_from_mes'>
                                         <a href='/meses' className='menu__link menu_link--inside '>Meses</a>
                                     </li>
+                                </ul>
+                            </li>
+                        </>
+                    }
+                    {parseInt(localStorage.getItem('numRol')) === 3 &&
+                        <>
+                            <li className='menu__item hidden_from_formulario'>
+                                <a href='/reportes3' className='menu__link'>REPORTES</a>
+                            </li>
 
+                            <li className='menu__item menu__item--show'>
+                                <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <ul className='menu__nesting'>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='#' className='menu__link menu_link--inside'>Oportunidad de información</a>
+                                    </li>
+
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/formulario' className='menu__link menu_link--inside'>Formulario</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </>
+                    }
+                    {parseInt(localStorage.getItem('numRol')) === 4 &&
+                        <>
+                            <li className='menu__item hidden_from_formulario'>
+                                <a href='/reportes4' className='menu__link'>REPORTES</a>
+                            </li>
+
+                            <li className='menu__item menu__item--show'>
+                                <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <ul className='menu__nesting'>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='#' className='menu__link menu_link--inside'>Oportunidad de información</a>
+                                    </li>
+
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/formulario' className='menu__link menu_link--inside'>Formulario</a>
+                                    </li>
                                 </ul>
                             </li>
                         </>
                     }
 
-
-                    {parseInt(localStorage.getItem('numRol')) === 5 &&
+                    {parseInt(localStorage.getItem('numRol')) === 5 && <>
+                        <li className='menu__item hidden_from_formulario'>
+                            <a href='/formulario' className='menu__link'>FORMULARIO</a>
+                        </li>
 
                         <li className='menu__item hidden_from_formulario'>
-                            <a href='#' className='menu__link'>REPORTES</a>
+                            <a href='/reportes5' className='menu__link'>REPORTES</a>
                         </li>
+                    </>
                     }
 
                     <br />
@@ -256,10 +294,7 @@ function Menu() {
                             <div className='encabezado col-6'>Correo</div>
                             <div className='contenido col-6'>{usuario[0].correo}</div>
                         </div>
-                        <div className='row p-2'>
-                            <div className='encabezado col-6'>Direccion</div>
-                            <div className='contenido col-6'>{usuario[0].direccion}</div>
-                        </div></>}
+                    </>}
 
                 </ModalBody>
                 <div className='botonModal'>
@@ -333,19 +368,21 @@ function Menu() {
                             <InputUsuario
                                 estado={ape1}
                                 cambiarEstado={setApe1}
-                                placeholder="APELLIDO1"
+                                placeholder="PRIMER APELLIDO"
                                 ExpresionRegular={INPUT.NOMBRE_PERSONA}  //expresion regular  
-                                etiqueta='Apellido paterno'
+                                etiqueta='Primer apellido'
                                 msg={'Este campo acepta solo letras '}
                             /></div>
                         <div className='col-6'>
                             <InputUsuario
                                 estado={ape2}
                                 cambiarEstado={setApe2}
-                                placeholder="APELLIDO 2 "
+                                placeholder="SEGUNDO APELLIDO"
                                 ExpresionRegular={INPUT.PASSWORD}  //expresion regular  
-                                etiqueta='Apellido materno'
+                                etiqueta='Segundo apellido'
                                 msg={'Este campo acepta solo letras '}
+                                important={false}
+
                             /></div>
                     </div>
                     <div className='row'>
@@ -357,6 +394,8 @@ function Menu() {
                                 ExpresionRegular={INPUT.TELEFONO}  //expresion regular  
                                 etiqueta='Celular/Telf.'
                                 msg={'Este campo acepta solo números '}
+                                important={false}
+
                             /></div>
                         <div className='col-6'>
                             <User_
@@ -367,16 +406,9 @@ function Menu() {
                                 etiqueta='Correo'
                                 msg={'Este campo acepta en formato de correo'}
                                 campoUsuario={true}
+                                important={false}
                             /></div>
                     </div>
-                    <InputUsuario
-                        estado={direccion}
-                        cambiarEstado={setDireccion}
-                        placeholder="DIRECCION"
-                        ExpresionRegular={INPUT.DIRECCION}  //expresion regular  
-                        etiqueta='Dirección'
-                        msg={'Este campo acepta letras numero y algunos carateres'}
-                    />
                 </ModalBody>
                 <div className='botonModal'>
                     <button className="btn-editar col-auto" onClick={() => actualizar()} >
@@ -384,7 +416,15 @@ function Menu() {
                     </button>
                 </div>
             </Modal>
-            <Toaster position='top-right' />
+            <Toaster position='bottom-right' toastOptions={{
+                className: '',
+                duration: 2000,
+                style: {
+                    background: '#363636',
+                    color: '#fff',
+                    fontSize: "12px",
+                }
+            }} />
 
         </nav>
     )

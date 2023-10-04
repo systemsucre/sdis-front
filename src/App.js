@@ -6,7 +6,7 @@ import AppRouter from './rutas/AppRouter'
 
 function App() {
   return (
-    <AuthProvider>
+    <AuthProvider >
       <AppRouter />
     </AuthProvider>
   );

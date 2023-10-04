@@ -12,7 +12,7 @@ const Input = styled.input`
 
     width:100%;
     // height: 20px;
-    font-size: 13px;
+    font-size: 11px;
     padding: 0px 5px 0px 5px;  //campos donde va abarcar el texto dentro del input
     margin-bottom: 0px;   
     transition: .3s ease all;
@@ -32,19 +32,14 @@ const Input = styled.input`
         border: 1px solid ${colores.error} !important;
         color:red
     `}
-    @media(max-width:400px) {
-        font-size: 12px;
-    }
-    @media(max-width:300px) {
-        font-size: 11px;
-    }
+
 `;
 
 const InputDinamico = styled.input` 
 
     width:100%;
     // height: 20px;
-    font-size: 12px;
+    font-size: 11px;
     padding: 0px 5px 0px 5px;  //campos donde va abarcar el texto dentro del input
     margin-bottom: 0px;   
     transition: .3s ease all;
@@ -69,12 +64,7 @@ const InputDinamico = styled.input`
 
         color:red
     `}
-    @media(max-width:400px) {
-        font-size: 12px;
-    }
-    @media(max-width:300px) {
-        font-size: 11px;
-    }
+
 `;
 const InputSimple = styled.input` 
 
@@ -114,7 +104,6 @@ const LeyendaError = styled.span`
     text-align: left; 
     position: absolute;
 
-    color: ${colores.texto};
 
     ${props => props.valido === 'true' && css`
         display: none;    
@@ -152,7 +141,7 @@ const InputBuscador = styled.input`
 
 const SelectStyle = styled.select`
     width:100%;
-    font-size: 13px;
+    font-size: 11px;
     padding: 0 5px 0 5px;  //campos donde va abarcar el texto dentro del input
     transition: .3s ease all;
     color:#4c4c51;
@@ -170,12 +159,12 @@ const SelectStyle = styled.select`
     ${props => props.valido === 'false' && css`
         border: 1px solid ${colores.error} !important;
     `}
-    @media(max-width:400px) {
-        font-size: 12px;
-    }
-    @media(max-width:300px) {
-        font-size: 11px;
-    }
+    // @media(max-width:400px) {
+    //     font-size: 12px;
+    // }
+    // @media(max-width:300px) {
+    //     font-size: 11px;
+    // }
 `;
 
 
@@ -224,21 +213,70 @@ const SelectStylexl = styled.select`
 `;
 
 
+const SelectSm = styled.select`
+    width:100%;
+    font-size: 13px;
+    padding: 0 5px 0 5px;  //campos donde va abarcar el texto dentro del input
+    transition: .3s ease all;
+    color:#4c4c51;
+    border: 1px solid #595959;
+    font-weight: bold;
+    border-radius: 2px;
+    &:focus {
+        border:1px solid #595959;
+        outline: node;
+        box-shadow: 3px 0px 30px rgba(163,163,163,0.4);
+    }
+    ${props => props.valido === 'true' && css`
+        border: 1px solid #595959 !important;
+    `}
 
-const FilaDos = styled.div`
+    ${props => props.valido === 'false' && css`
+        border: 1px solid #595959 !important;
+    `}
+    @media(max-width:400px) {
+        font-size: 11px;
+    }
+    @media(max-width:300px) {
+        font-size: 11px;
+    }
+`;
 
+const ContenedorCheck = styled.div` 
+
+margin: 0px;
+padding:0px;
 height:auto;
 width:100%;
+font-weight: bold;
 font-size : 11.5px;
-grid-column :span 2  !important;  // abarca dos columnas
-div {
+grid-column :span 2;  // abarca dos columnas
+input {
     margin-right : 5px;  //para separar el parrafo de la casilla check
 }
 
-// @media (max-width: 800px){  //en dispositivos pequeños se dapatara a una columna 
-//     grid-column: span 1;
-// }
+@media (max-width: 800px){  //en dispositivos pequeños se dapatara a una columna 
+    grid-column: span 1;
+}
+`;
+
+const ContenedorCheckXL = styled.div` 
+
+margin: 0px;
+padding:0px;
+height:auto;
+width:100%;
+font-weight: bold;
+grid-column :span 2;  // abarca dos columnas
+input {
+    margin-right : 5px;  //para separar el parrafo de la casilla check
+}
+
+@media (max-width: 800px){  //en dispositivos pequeños se dapatara a una columna 
+    grid-column: span 1;
+}
 `;
 
 
-export { Input, InputDinamico, InputSimple, LeyendaError, InputBuscador, SelectStyle, SelectStylexl, FilaDos }
+export { Input, InputDinamico, InputSimple, LeyendaError, InputBuscador, SelectStyle, SelectStylexl, ContenedorCheck,SelectSm,
+     ContenedorCheckXL}

@@ -19,6 +19,10 @@ import { TIEMPO_INACTIVO } from "../Auth/config";
 import Usuario from '../general/usuarios';
 import Registro from '../general/registrarme';
 import Variable from '../proyecto/variables';
+import Reportes5 from '../proyecto/reportes/reprtes5';
+import Reportes4 from '../proyecto/reportes/reprtes4';
+import Reportes3 from '../proyecto/reportes/reprtes3';
+import Reportes2 from '../proyecto/reportes/reprtes2';
 
 export default function AppRouter() {
 
@@ -66,7 +70,7 @@ export default function AppRouter() {
     return (
 
       <BrowserRouter>
-        <div onClick={handleClick} onKeyPress={handleKeyPress}>
+        <div onClick={handleClick} onKeyPress={handleKeyPress} >
           {auth.isLogged() && <Menu />}
           <Switch>
             <PublicRoute exact path="/" component={Login} />
@@ -77,6 +81,11 @@ export default function AppRouter() {
             <Check exact path='/usuarios' component={Usuario} />
             <Check exact path='/variables' component={Variable} />
             <Check exact path='/formulario' component={Formulario} />
+            
+            <Check exact path='/reportes5' component={Reportes5} />
+            <Check exact path='/reportes4' component={Reportes4} />
+            <Check exact path='/reportes3' component={Reportes3} />
+            <Check exact path='/reportes2' component={Reportes2} />
             <Route exact path="*" component={E500} />
           </Switch>
         </div>

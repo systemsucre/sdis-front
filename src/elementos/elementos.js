@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Input, LeyendaError, InputBuscador, SelectStyle, InputSimple, SelectStylexl } from './stylos'
+import { Input, LeyendaError, InputBuscador, SelectStyle, SelectStylexl, SelectSm, ContenedorCheck, ContenedorCheckXL } from './stylos'
 import { useEffect, useState } from 'react'
-import { faArrowDown, faArrowUp, faChevronDown, faEnvelope, faGlobe, faMailBulk, faPhone, faSearch } from '@fortawesome/free-solid-svg-icons'
+import {  faEnvelope, faGlobe, faMailBulk, faPhone, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom/cjs/react-router-dom.min'
 import { faFacebook } from '@fortawesome/free-brands-svg-icons'
 
@@ -27,7 +27,7 @@ const InputUsuario = ({ estado, cambiarEstado, name, placeholder, tipo = 'text',
 
     const validacion = () => {
         if (ExpresionRegular) {
-            if (ExpresionRegular.test(estado.campo)) {
+            if (ExpresionRegular.test(estado.campo) && estado.campo != null) {
                 cambiarEstado({ ...estado, valido: 'true' })  //el valor del campo valido, debe ser una cadena 
                 setMensaje(null)
             }
@@ -38,11 +38,11 @@ const InputUsuario = ({ estado, cambiarEstado, name, placeholder, tipo = 'text',
         }
     }
 
-
+    // console.log(estado)
     return (
         <div >
             {/* <div className=" field" style={{ position: 'relative', paddingBottom: '0px' }}> */}
-            <p className='nombreentradas'>{important ? etiqueta + '   *' : etiqueta}
+            <p className='nombreentradas'>{important ? etiqueta + '   *' : etiqueta+' (Opcional)'}
                 <Input
                     type={tipo}
                     className="form-control form-control-sm"
@@ -169,6 +169,63 @@ const Select1 = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion
     )
 }
 
+const SelectSM = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion, estado_ = null, etiqueta, msg, }) => {
+    const [mensaje, setMensaje] = useState(null)
+    useEffect(() => {
+        setTimeout(() => {
+            setMensaje(null)
+        }, 10000)
+    }, [mensaje])
+
+    const onChange = (e) => {
+        cambiarEstado({ campo: parseInt(e.target.value), valido: 'true' });
+    }
+    const validacion = () => {
+        if (ExpresionRegular) {
+            if (ExpresionRegular.test(estado.campo) && estado.campo != 'Seleccionar') {
+                cambiarEstado({ ...estado, valido: 'true' })  //el valor del campo valido, debe ser una cadena 
+                if (funcion) {
+                    funcion()
+                    if (estado_)
+                        estado_({ campo: null, valido: null })
+                }
+
+                setMensaje(null)
+
+            }
+            else {
+                cambiarEstado({ ...estado, valido: 'false' })
+                setMensaje(msg)
+            }
+        }
+    }
+
+
+    return (
+        <div >
+            <p className='nombreentradas reportes-select'>{etiqueta}
+                <SelectSm
+                    name={Name}
+                    className="form-control form-control-sm"
+                    onChange={onChange}
+                    // onKeyUp={validacion} //se ejecuta cuando dejamos de presionar la tecla
+                    // onBlur={validacion}  //si presionamos fuera del input
+                    valido={estado.valido}
+                    value={estado.campo || ''}
+                    onClick={validacion}
+                >
+                    <option>Seleccionar</option>
+
+                    {lista.map((r) => (
+
+                        <option key={r.id} value={r.id}>{r.nombre}</option>
+                    ))}
+                </SelectSm>
+                <LeyendaError>{mensaje}</LeyendaError>
+            </p>
+        </div>
+    )
+}
 
 const Select1XL = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion, estados = null, etiqueta, msg, }) => {
     const [mensaje, setMensaje] = useState(null)
@@ -208,23 +265,23 @@ const Select1XL = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funci
         <div >
             <p className='nombreentradas'>{etiqueta + '   *  '}
                 {/* <div className='my-custom-select'> */}
-                    <SelectStylexl
-                        className="form-control form-control-sm"
-                        onChange={onChange}
-                        // onKeyUp={funcion} //se ejecuta cuando dejamos de presionar la tecla
-                        // onBlur={validacion}  //si presionamos fuera del input
-                        valido={estado.valido}
-                        value={estado.campo || ''}
-                        onClick={validacion}
-                    >
-                        <option>Seleccionar</option>
+                <SelectStylexl
+                    className="form-control form-control-sm"
+                    onChange={onChange}
+                    // onKeyUp={funcion} //se ejecuta cuando dejamos de presionar la tecla
+                    // onBlur={validacion}  //si presionamos fuera del input
+                    valido={estado.valido}
+                    value={estado.campo || ''}
+                    onClick={validacion}
+                >
+                    <option>Seleccionar</option>
 
-                        {lista.map((r) => (
+                    {lista.map((r) => (
 
-                            <option key={r.id} value={r.id}>{r.nombre}</option>
-                        ))}
-                    </SelectStylexl>
-                    {/* <label for="my-select">
+                        <option key={r.id} value={r.id}>{r.nombre}</option>
+                    ))}
+                </SelectStylexl>
+                {/* <label for="my-select">
                         <span class="material-icons">
                             <FontAwesomeIcon icon={faChevronDown} />
                         </span>
@@ -235,6 +292,115 @@ const Select1XL = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funci
         </div>
     )
 }
+
+const ComponenteCheck = ({ id, item, admitidos, funcion = null, setLista = null, prefijo }) => {
+    // lista: setlista de indicadores para en caso de ponerlos en vacio
+    // funcion: funcion listar indicadores para cargar la lista si y solo si se selecciona un variable
+    const onChange = (e) => {
+
+        if (e.target.checked) {
+
+            admitidos.push(parseInt(e.target.value))
+            if (admitidos.length === 1) {
+                if (funcion) {
+                    funcion(admitidos[0])
+                }
+            }
+            else if(setLista) setLista([])
+
+
+        }
+
+        if (e.target.checked === false) {
+            let indiceEliminar = null
+            admitidos.forEach(x => {
+                if (x == parseInt(e.target.value)) {
+                    indiceEliminar = admitidos.indexOf(parseInt(e.target.value))
+                    admitidos.splice(indiceEliminar, 1);
+                }
+            })
+            if (admitidos.length === 1) {
+                if (funcion) {
+                    funcion(admitidos[0])
+                }
+            }
+            else  if(setLista) setLista([])
+        }
+        let check = document.getElementById(1111)
+        if (check)
+            check.checked = false
+        let check2 = document.getElementById(2222)
+        if (check2)
+            check2.checked = false
+    }
+
+
+    let check = false
+    admitidos.forEach(e => {
+        if (id === e)
+            check = true
+    })
+
+    return (
+        <ContenedorCheck>
+            <label htmlFor={id + prefijo} > {/*el id es un elemento escencial al momento de marcar el check  */}
+                <input
+                    type="checkbox"
+                    name={id}
+                    value={id}
+                    id={id + prefijo}
+                    onChange={onChange}
+                    defaultChecked={check}
+                />
+                <small>{item}</small>
+            </label>
+        </ContenedorCheck>
+    )
+}
+
+
+const ComponenteCheckXL = ({ id, item, setAdmitidos, admitidos, lista, prefijo, estado }) => {
+    const onChange = (e) => {
+        if (e.target.checked) {
+            lista.forEach(e1 => {
+                admitidos.push(e1.id)
+                document.getElementById(e1.id + prefijo).checked = true
+                let result = admitidos.filter((item, index) => {
+                    return admitidos.indexOf(item) === index;
+                })
+                setAdmitidos(result)
+            })
+            // console.log(admitidos)
+            estado(true)
+        }
+
+        if (e.target.checked === false) {
+            setAdmitidos([])
+            lista.forEach(e1 => {
+                document.getElementById(e1.id + prefijo).checked = false
+            })
+            estado(false)
+            // console.log(admitidos)
+        }
+    }
+
+    return (
+        <ContenedorCheckXL>
+            <label htmlFor={id} > {/*el id es un elemento escencial al momento de marcar el check  */}
+                <input
+                    type="checkbox"
+                    name={id}
+                    value={id}
+                    id={id}
+                    onChange={onChange}
+                // defaultChecked={check}
+                />
+                <small style={{ color: '#595959', paddingTop: '0', fontSize: "12px" }}>{item}</small>
+            </label>
+        </ContenedorCheckXL>
+    )
+}
+
 
 const PiePagina = () => {
 
@@ -286,4 +452,4 @@ const PiePagina = () => {
         </div>
     )
 }
-export { InputUsuario, ComponenteInputBuscar_, Select1, Select1XL, PiePagina }
+export { InputUsuario, ComponenteInputBuscar_, Select1, Select1XL, PiePagina, ComponenteCheck, ComponenteCheckXL,SelectSM }

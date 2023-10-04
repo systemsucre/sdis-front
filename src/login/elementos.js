@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 
 
 
-const InputUsuario = ({ estado, cambiarEstado, name, placeholder, tipo = 'text', ExpresionRegular, etiqueta, campoUsuario = false, msg, important = true }) => {
+const InputUsuario = ({ estado, cambiarEstado, name, placeholder, tipo = 'text', ExpresionRegular, etiqueta, campoUsuario = false, msg, eventoBoton= null, important = true }) => {
 
     const [mensaje, setMensaje] = useState(null)
 
@@ -34,11 +34,18 @@ const InputUsuario = ({ estado, cambiarEstado, name, placeholder, tipo = 'text',
         }
     }
 
+    const handleKeyPress = (e) => {
+        if (eventoBoton)
+            if (e.keyCode === 13 && estado.valido === 'true') {
+                eventoBoton()
+            }
+    }
+
 
     return (
         <div >
             {/* <div className=" field" style={{ position: 'relative', paddingBottom: '0px' }}> */}
-            <p className='nombreentradas'>{important ? etiqueta + '   *' : etiqueta}
+            <p className='nombreentradas'>{important ? etiqueta + '   *' : etiqueta +' (Opcional)'}
                 <Input
                     type={tipo}
                     className="form-control form-control-sm"
@@ -51,6 +58,7 @@ const InputUsuario = ({ estado, cambiarEstado, name, placeholder, tipo = 'text',
                     onKeyUp={validacion} //se ejecuta cuando dejamos de presionar la tecla
                     onBlur={validacion}  //si presionamos fuera del input
                     valido={estado.valido}
+                    onKeyDown={handleKeyPress}
                 />
                 <LeyendaError>{mensaje}</LeyendaError>
             </p>
