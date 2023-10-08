@@ -359,7 +359,7 @@ const ComponenteCheck = ({ id, item, admitidos, funcion = null, setLista = null,
 }
 
 
-const ComponenteCheckXL = ({ id, item, setAdmitidos, admitidos, lista, prefijo, estado }) => {
+const ComponenteCheckXL = ({ id, item, setAdmitidos, admitidos, lista, prefijo, }) => {
     const onChange = (e) => {
         if (e.target.checked) {
             lista.forEach(e1 => {
@@ -370,8 +370,7 @@ const ComponenteCheckXL = ({ id, item, setAdmitidos, admitidos, lista, prefijo, 
                 })
                 setAdmitidos(result)
             })
-            // console.log(admitidos)
-            estado(true)
+            // console.log(admitidos) 
         }
 
         if (e.target.checked === false) {
@@ -379,7 +378,6 @@ const ComponenteCheckXL = ({ id, item, setAdmitidos, admitidos, lista, prefijo, 
             lista.forEach(e1 => {
                 document.getElementById(e1.id + prefijo).checked = false
             })
-            estado(false)
             // console.log(admitidos)
         }
     }

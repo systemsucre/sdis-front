@@ -173,7 +173,7 @@ function Menu() {
                                 <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
                                 <ul className='menu__nesting'>
                                     <li className='menu__inside hidden_from_g_usuarios'>
-                                        <a href='#' className='menu__link menu_link--inside'>Oportunidad de información</a>
+                                        <a href='/oportunidad-de-informacion-sedes' className='menu__link menu_link--inside'>Oportunidad de información</a>
                                     </li>
                                     <li className='menu__inside hidden_from_mes'>
                                         <a href='/meses' className='menu__link menu_link--inside '>Meses</a>
@@ -192,7 +192,7 @@ function Menu() {
                                 <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
                                 <ul className='menu__nesting'>
                                     <li className='menu__inside hidden_from_g_usuarios'>
-                                        <a href='#' className='menu__link menu_link--inside'>Oportunidad de información</a>
+                                        <a href='/oportunidad-de-informacion-redes' className='menu__link menu_link--inside'>Oportunidad de información</a>
                                     </li>
 
                                     <li className='menu__inside hidden_from_formulario'>
@@ -212,7 +212,7 @@ function Menu() {
                                 <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
                                 <ul className='menu__nesting'>
                                     <li className='menu__inside hidden_from_g_usuarios'>
-                                        <a href='#' className='menu__link menu_link--inside'>Oportunidad de información</a>
+                                        <a href='/oportunidad-de-informacion-municipios' className='menu__link menu_link--inside'>Oportunidad de información</a>
                                     </li>
 
                                     <li className='menu__inside hidden_from_formulario'>
@@ -252,7 +252,7 @@ function Menu() {
                     </li>
                 </ul>
                 <div className='menu__hamburguer'>
-                    <img src='./img/menu.png' className='menu__img' alt='menu amburguer' />
+                    <img src='img/menu.png' className='menu__img' alt='SDIS-VE' />
                 </div>
             </section>
             <Modal isOpen={modalVer}>

@@ -3,7 +3,7 @@ import { Modal, ModalBody, ModalHeader, Table } from 'reactstrap';
 
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCirclePlus, faEdit, faExclamation, faExclamationCircle, faExclamationTriangle, faHandPointRight, faPause, faPlay, faPlus, faPlusCircle, faPlusSquare, faRecycle, faSave, faStop, faTrashAlt, faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { faCirclePlus, faEdit, faExclamation, faExclamationCircle, faExclamationTriangle, faEye, faHandPointRight, faPause, faPlay, faPlus, faPlusCircle, faPlusSquare, faRecycle, faSave, faStop, faTrashAlt, faWindowClose } from '@fortawesome/free-solid-svg-icons';
 
 import useAuth from "../Auth/useAuth"
 import { InputUsuario, Select1, } from '../elementos/elementos';  // componente input que incluye algunas de las funcionalidades como, setInput, validaciones cambio de estados
@@ -1126,7 +1126,7 @@ function Variable() {
 
 
         const insertarOtroInput = async () => {
-            if (ordenInput.valido === 'true' && idInput.valido === 'true' && input.valido === 'true' && nivel.valido === 'true' && 
+            if (ordenInput.valido === 'true' && idInput.valido === 'true' && input.valido === 'true' && nivel.valido === 'true' &&
                 idVariable.valido === 'true' && codigo && estado === 0 && ini.valido === 'true' && fin.valido === 'true' && gestion.valido === 'true') {
                 let accion = await confirmarGuardar({ titulo: 'Añadir subvariable', boton: 'ok', texto: ' Ok para continuar...' })
                 if (accion.isConfirmed) {
@@ -1141,7 +1141,7 @@ function Variable() {
                         nivel: nivel.campo,
                         ini: ini.campo,
                         fin: fin.campo,
-                        estado:estadoPadre,
+                        estado: estadoPadre,
                         gestion: gestion.campo,
                         variable_: idVariable.campo,
                         creado: fecha + ' ' + horafinal
@@ -1218,10 +1218,10 @@ function Variable() {
                                 <Table className="table table-sm ancho-tabla" >
                                     <thead>
                                         <tr >
-                                            <th style={{background:'white', border:'2px solid  #006699 ', borderBottom:'none'}} ></th>
-                                            <th className="col-5 ">FORMULARIO SDIS-VE</th>
+                                            <th style={{ background: 'white', border: '2px solid  #006699 ', borderBottom: 'none' }} ></th>
+                                            <th className="col-7 ">FORMULARIO SDIS-VE</th>
                                             <th className="col-1">GESTION</th>
-                                            <th className="col-2">VER FORMULARIO</th>
+                                            <th ></th>
                                             <th className="col-2">Nivel de Aplicación</th>
 
                                         </tr>
@@ -1244,20 +1244,14 @@ function Variable() {
                                                 </td>
                                                 <td  >{a.gestion}</td>
                                                 <td className='tooltip_' >
-                                                    {a.estado == 0 && <span class="tooltiptext_">Formulario desactivado. Click para ver mas... </span>}
-                                                    {a.estado == 1 && <span class="tooltiptext_">Formulario activo. Click para ver mas...</span>}
+                                                    <span class="tooltiptext_">Ver Formulario </span>
                                                     <div style={{ cursor: 'pointer' }} className='row' onClick={() => {
                                                         setNombreVariable(a.variable);
                                                         listarIndicadoresParaFormulario(a.id); setEstadoVar(a.estado); setIdVarForm(a.id)
                                                     }}>
                                                         <div className='col-auto' >
-                                                            {a.estado == 1 && <FontAwesomeIcon className='play' icon={faPlay} />}
-                                                            {a.estado == 0 && <FontAwesomeIcon className='stop' icon={faStop} />}
-                                                        </div>
-                                                        <div className='col-auto'>
-                                                            <div className=' ver-form' style={{ cursor: 'pointer' }}>
-                                                                <span>VER FORMULARIO</span>
-                                                            </div>
+                                                            {a.estado == 1 && <FontAwesomeIcon className='play-f' icon={faEye} />}
+                                                            {a.estado == 0 && <FontAwesomeIcon className='stop-f' icon={faEye} />}
                                                         </div>
                                                     </div>
 
@@ -1314,7 +1308,7 @@ function Variable() {
                                 <table className="table table-sm ancho-tabla" >
                                     <thead>
                                         <tr >
-                                            <th style={{background:'white', border:'2px solid  #006699 ' , borderBottom:'none'}} ></th>
+                                            <th style={{ background: 'white', border: '2px solid  #006699 ', borderBottom: 'none' }} ></th>
                                             <th className="col-4 ">VARIABLE</th>
                                             <th className="col-4">FORMULARIO</th>
                                             <th className="col-2">ESTADO</th>
@@ -1414,7 +1408,7 @@ function Variable() {
                                 <table className="table table-sm ancho-tabla" >
                                     <thead>
                                         <tr >
-                                            <th  style={{background:'white', border:'2px solid  #006699 ' , borderBottom:'none'}}  ></th>
+                                            <th style={{ background: 'white', border: '2px solid  #006699 ', borderBottom: 'none' }}  ></th>
                                             <th className="col-5 ">SUBVARIABLES</th>
                                             <th className="col-2">ESTADO</th>
                                             <th className="col-3  ">DESDE</th>
@@ -1535,7 +1529,7 @@ function Variable() {
                                             {(a.tope === 0 && a.nivel === 1) && <div>{a.orden + '.' + a.input}</div>}
                                             {(a.tope === 0 && a.nivel > 1) && <div>{a.input}</div>}
 
-                                            {a.tope === 1 && a.nivel === 1 && 
+                                            {a.tope === 1 && a.nivel === 1 &&
                                                 <div className='row fila-sin-margen'>
                                                     <div className='col-8'><span>{a.nivel === 1 ? a.orden + '.' + a.input : a.input}</span></div>
                                                     <div className='col-4'>
@@ -1549,7 +1543,7 @@ function Variable() {
                                                     </div>
                                                 </div>
                                             }
-                                            {a.tope === 1 && a.nivel > 1 && 
+                                            {a.tope === 1 && a.nivel > 1 &&
                                                 <div className='row fila-sin-margen'>
                                                     <div className='col-8'><span>{a.nivel === 1 ? a.orden + '.' + a.input : a.input}</span></div>
                                                     <div className='col-4'>

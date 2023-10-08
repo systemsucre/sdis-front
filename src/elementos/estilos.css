@@ -634,6 +634,7 @@ td {
 @media(max-width:800px) {
     td {
         font-size: 13px;
+        padding: 0;
     }
 }
 
@@ -1463,6 +1464,19 @@ td {
     height: 12px !important;
     width: 12px !important;
 }
+.play-f{
+    color: var(--color-boton-guardar);
+    height: 18px !important;
+    width: 18px !important;
+}
+
+.stop-f {
+    color: orange;
+    height: 18px !important;
+    width: 18px !important;
+}
+
+
 .nodisponible {
     color: var(--color-boton-eliminar);
     height: 12px !important;

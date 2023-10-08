@@ -421,11 +421,10 @@ function Usuario() {
                             <table className="table table-sm" >
                                 <thead>
                                     <tr >
-                                        <th></th>
+                                        <th style={{background:'white', border:'2px solid  #006699 ' , borderBottom:'none'}} ></th>
                                         <th className="col-4 ">TITULAR</th>
-                                        <th className="col-1 ">CELULAR</th>
-                                        <th className="col-2"></th>
-                                        <th className="col-3 ">ESTABLECIMIENTO</th>
+                                        <th className="col-2 ">CELULAR</th>
+                                        <th className="col-4 ">ESTABLECIMIENTO</th>
                                         <th className="col-2 ">USUARIO</th>
                                     </tr>
                                 </thead>
@@ -441,21 +440,12 @@ function Usuario() {
                                                         <FontAwesomeIcon icon={faUserCog} />
                                                     </button>
                                                 </th>
-                                                <td > {a.titular}</td>
-                                                <td >{a.celular}</td>
                                                 <td >
-                                                    <div className='row'>
-                                                        <div className='col-auto'>
-                                                            {a.eliminado ?
+                                                {a.eliminado ?
                                                                 <FontAwesomeIcon className='stop' style={{ color: 'red' }} icon={faStop} />
                                                                 :
-                                                                <FontAwesomeIcon className='play' icon={faPlay} />}
-                                                        </div>
-                                                        <div className='col-auto'>
-                                                            {a.eliminado ? <span>SIN ACCESO</span> : <span> CON ACCESO</span>}
-                                                        </div>
-                                                    </div>
-                                                </td>
+                                                                <FontAwesomeIcon className='play' icon={faPlay} />} {a.titular}</td>
+                                                <td >{a.celular}</td>
                                                 <td  >{a.hospital}</td>
                                                 <td  >{a.username}</td>
                                             </tr> : <tr key={a.id} className='item'>

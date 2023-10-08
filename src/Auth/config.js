@@ -1,5 +1,5 @@
 // const URL = 'https://consultoria.alwaysdata.net'
- const URL = 'http://localhost:3001'
+ const URL = 'http://localhost:8001/servernet_/'
 
 const TIEMPO_INACTIVO = 40 // MINUTOS DE TOLERANCIA ANTESDE QUE EL USUARIO VUELVA A INTERACTUAR CON EL SISTEMA YA SEA MEDIANTE MUOSE O TECLADO
 const INPUT = {

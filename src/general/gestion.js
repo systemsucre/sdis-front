@@ -154,9 +154,9 @@ function Gestion() {
                             <table className="table table-sm">
                                 <thead>
                                     <tr >
-                                        <th ></th>
+                                        <th style={{ background: 'white', border: '2px solid  #006699 ', borderBottom: 'none' }} ></th>
                                         <th className="col-10 ">GESTION</th>
-                                        <th className="col-2 text-center">ESTADO</th>
+                                        <th className="col-2 ">ESTADO</th>
                                     </tr>
                                 </thead>
                                 <tbody >
@@ -170,10 +170,10 @@ function Gestion() {
                                                 </button>
                                             </th>
                                             <td >  {'GESTION' + a.gestion}</td>
-                                            <td className='text-center'>
+                                            <td >
 
 
-                                                <div className='row botonModal' style={{ justifyContent: 'center' }}>
+                                                <div className='row botonModal' >
                                                     <div className='col-auto'>
                                                         {a.estado === 1 ?
                                                             <FontAwesomeIcon className='play' icon={faPlay} />
@@ -182,7 +182,7 @@ function Gestion() {
                                                     </div>
                                                     <div className='col-auto'>
                                                         {/* <div className='ver-form' > */}
-                                                        {a.estado === 1 ? <span> Iniciado</span> : <span> Detenido </span>}
+                                                        {a.estado === 1 ? <span> Habilitado</span> : <span> Deshabilitado </span>}
                                                         {/* </div> */}
                                                     </div>
                                                 </div>

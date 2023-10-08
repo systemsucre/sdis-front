@@ -474,6 +474,56 @@ function Formulario() {
                             hora: horafinal,
                         }).then(j => {
                             console.log(c, j.data)
+                            if (j.data.ok == false) {
+                                const codError = j.data.data
+                                if (parseInt(codError) == 40001) {
+                                    console.log('reiniciando transaccion 1')
+                                    axios.post(URL + '/registro/guardar', {
+                                        mes: mes.campo,
+                                        gestion: gestion.campo,
+                                        indicador: indicador.campo,
+                                        fecha: fecha,
+                                        variable: variable.campo,
+                                        input: element.id,
+                                        valor: element.valor,
+                                        hora: horafinal
+                                    }).then(j1 => {
+                                        if (j1.data.ok == false) {
+                                            const codError = j1.data.data
+                                            if (parseInt(codError) == 40001) {
+                                                console.log('reiniciando transaccion 1')
+                                                axios.post(URL + '/registro/guardar', {
+                                                    mes: mes.campo,
+                                                    gestion: gestion.campo,
+                                                    indicador: indicador.campo,
+                                                    fecha: fecha,
+                                                    variable: variable.campo,
+                                                    input: element.id,
+                                                    valor: element.valor,
+                                                    hora: horafinal,
+                                                }).then(j2 => {
+                                                    if (j2.data.ok == false) {
+                                                        const codError = j2.data.data
+                                                        if (parseInt(codError) == 40001) {
+                                                            console.log('reiniciando transaccion 1')
+                                                            axios.post(URL + '/registro/guardar', {
+                                                                mes: mes.campo,
+                                                                gestion: gestion.campo,
+                                                                indicador: indicador.campo,
+                                                                fecha: fecha,
+                                                                variable: variable.campo,
+                                                                input: element.id,
+                                                                valor: element.valor,
+                                                                hora: horafinal,
+                                                            })
+                                                        }
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    })
+                                }
+                            }
                             if (j.data.ok && c === data_.length) {
                                 aux = j.data.data
                                 setTimeout(() => {
@@ -485,7 +535,6 @@ function Formulario() {
                                 }, 2500)
                             }
                             c = c + 1
-
                         })
                     });
 

@@ -200,7 +200,7 @@ function Mes() {
                             <table className="table table-sm" >
                                 <thead>
                                     <tr >
-                                        <th ></th>
+                                        <th style={{background:'white', border:'2px solid  #006699 ' , borderBottom:'none'}}  ></th>
                                         <th className="col-6 ">MES</th>
                                         <th className="col-3 ">INICIAL</th>
                                         <th className="col-3">FINAL</th>
@@ -210,7 +210,7 @@ function Mes() {
                                     {lista.map((a) => (
                                         <tr key={a.id} >
                                             <th className='tooltip_' >
-                                                <span class="tooltiptext_">Click para configurar accesos</span>
+                                                <span class="tooltiptext_">Modificar fechas</span>
                                                 <button type="button" class="adicionar" onClick={() => rellenar(a)}style={{ cursor: 'pointer' }}>
                                                     <FontAwesomeIcon icon={faCog} />
                                                 </button>
@@ -287,7 +287,7 @@ function Mes() {
                     </ModalBody>
                     <div className='botonModal'>
                         <button className="btn-editar col-auto" onClick={() => actualizar()} >
-                            <FontAwesomeIcon className='btn-icon-nuevo' icon={faEdit} />Actualizar Accesos
+                            <FontAwesomeIcon className='btn-icon-nuevo' icon={faEdit} />Actualizar
                         </button>
                     </div>
                 </Modal>

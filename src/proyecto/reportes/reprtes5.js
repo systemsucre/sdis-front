@@ -650,7 +650,7 @@ function Reportes5() {
                             {listaGrupo.map(lg => (
                                 grupoSeleccionados.map(gs => (
                                     parseInt(lg.id) === parseInt(gs) && <div key={gs}>
-                                        <p style={{ fontSize: '12.5px', marginBottom: '0' }}>{lg.nombre}   </p>
+                                        <p style={{ fontSize: '12.5px', marginBottom: '0', fontWeight:'bold' }}>{lg.nombre}   </p>
                                         <div className="table table-responsive custom" style={{ height: 'auto', padding: "0.0rem 0.0rem", marginBottom: '0' }}>
                                             <Table className=' table-sm' style={{ border: "1px solid #000040", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
                                                 {cabecera.length > 0 &&
