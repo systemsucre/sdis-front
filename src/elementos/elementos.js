@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Input, LeyendaError, InputBuscador, SelectStyle, SelectStylexl, SelectSm, ContenedorCheck, ContenedorCheckXL } from './stylos'
 import { useEffect, useState } from 'react'
-import {  faEnvelope, faGlobe, faMailBulk, faPhone, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faGlobe, faMailBulk, faPhone, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom/cjs/react-router-dom.min'
 import { faFacebook } from '@fortawesome/free-brands-svg-icons'
 
@@ -42,7 +42,7 @@ const InputUsuario = ({ estado, cambiarEstado, name, placeholder, tipo = 'text',
     return (
         <div >
             {/* <div className=" field" style={{ position: 'relative', paddingBottom: '0px' }}> */}
-            <p className='nombreentradas'>{important ? etiqueta + '   *' : etiqueta+' (Opcional)'}
+            <p className='nombreentradas'>{important ? etiqueta + '  *' : etiqueta + ''}
                 <Input
                     type={tipo}
                     className="form-control form-control-sm"
@@ -111,7 +111,7 @@ const ComponenteInputBuscar_ = ({ estado, cambiarEstado, name, ExpresionRegular,
     )
 }
 
-const Select1 = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion, estado_ = null, etiqueta, msg, }) => {
+const Select1 = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion, estado_ = null, etiqueta, msg, funcion1, funcion2, funcion3 }) => {
     const [mensaje, setMensaje] = useState(null)
     useEffect(() => {
         setTimeout(() => {
@@ -130,6 +130,20 @@ const Select1 = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion
                     funcion()
                     if (estado_)
                         estado_({ campo: null, valido: null })
+                }
+                if (funcion1) {
+                    if (estado.campo == 5)
+                        funcion1()
+                }
+                if (funcion2) {
+                    if (estado.campo == 4) {
+                        funcion2()
+                        console.log('municipio en componentes')
+                    }
+                }
+                if (funcion3) {
+                    if (estado.campo == 3)
+                        funcion3()
                 }
 
                 setMensaje(null)
@@ -160,7 +174,7 @@ const Select1 = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion
 
                     {lista.map((r) => (
 
-                        <option key={r.id} value={r.id}>{r.nombre}</option>
+                        <option key={r.id} value={r.id} style={{color:'#595959', fontSize:'12px'}}>{r.nombre}</option>
                     ))}
                 </SelectStyle>
                 <LeyendaError>{mensaje}</LeyendaError>
@@ -169,7 +183,73 @@ const Select1 = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion
     )
 }
 
-const SelectSM = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion, estado_ = null, etiqueta, msg, }) => {
+const SelectSMString = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion, estado_ = null, etiqueta, msg, nivel = null }) => {
+    const [mensaje, setMensaje] = useState(null)
+    useEffect(() => {
+        setTimeout(() => {
+            setMensaje(null)
+        }, 10000)
+    }, [mensaje])
+
+    const onChange = (e) => {
+        cambiarEstado({ campo: e.target.value, valido: 'true' });
+    }
+    const validacion = () => {
+        if (ExpresionRegular) {
+            if (ExpresionRegular.test(estado.campo) && estado.campo != 'Seleccionar') {
+                cambiarEstado({ ...estado, valido: 'true' })  //el valor del campo valido, debe ser una cadena 
+                if (funcion) {
+                    funcion()
+                    if (estado_)
+                        estado_({ campo: null, valido: null })
+                }
+
+                setMensaje(null)
+
+                if (nivel) {
+                    console.log('asignacion nivel')
+                    setTimeout(() => {
+                        lista.forEach(e_ => {
+                            if (e_.id == estado.campo) { nivel(e_.numero); console.log('asignar nivel,', e_.numero, estado) }
+                        })
+                    }, 200)
+                }
+            }
+            else {
+                cambiarEstado({ ...estado, valido: 'false' })
+                setMensaje(msg)
+            }
+        }
+    }
+
+
+    return (
+        <div >
+            <p className='nombreentradassm reportes-select' >{etiqueta}
+                <SelectSm
+                    name={Name}
+                    className="form-control form-control-sm"
+                    onChange={onChange}
+                    // onKeyUp={validacion} //se ejecuta cuando dejamos de presionar la tecla
+                    // onBlur={validacion}  //si presionamos fuera del input
+                    valido={estado.valido}
+                    value={estado.campo || ''}
+                    onClick={validacion}
+                >
+                    <option>Seleccionar</option>
+
+                    {lista.map((r, index) => (
+
+                        <option key={index} value={r.id} style={{color:'#595959', fontSize:'12px'}}>{r.nombre}</option>
+                    ))}
+                </SelectSm>
+                <LeyendaError>{mensaje}</LeyendaError>
+            </p>
+        </div>
+    )
+}
+
+const SelectSM = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion, estado_ = null, etiqueta, msg,  very = 0 }) => {
     const [mensaje, setMensaje] = useState(null)
     useEffect(() => {
         setTimeout(() => {
@@ -203,7 +283,7 @@ const SelectSM = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcio
 
     return (
         <div >
-            <p className='nombreentradas reportes-select'>{etiqueta}
+            <p className='nombreentradassm reportes-select' >{etiqueta}
                 <SelectSm
                     name={Name}
                     className="form-control form-control-sm"
@@ -214,20 +294,19 @@ const SelectSM = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcio
                     value={estado.campo || ''}
                     onClick={validacion}
                 >
-                    <option>Seleccionar</option>
+                    {very == 0 && < option > Seleccionar</option>}
 
-                    {lista.map((r) => (
+                    {lista.map((r, index) => (
 
-                        <option key={r.id} value={r.id}>{r.nombre}</option>
+                        <option key={index} value={r.id} style={{color:'#595959', fontSize:'12px'}}>{r.nombre}</option>
                     ))}
                 </SelectSm>
                 <LeyendaError>{mensaje}</LeyendaError>
             </p>
-        </div>
+        </div >
     )
 }
-
-const Select1XL = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funcion, estados = null, etiqueta, msg, }) => {
+const Select1XL = ({ estado, cambiarEstado, ExpresionRegular, lista, funcion, estados = null, etiqueta, msg, very = 0 }) => {
     const [mensaje, setMensaje] = useState(null)
     useEffect(() => {
         setTimeout(() => {
@@ -265,7 +344,7 @@ const Select1XL = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funci
         <div >
             <p className='nombreentradas'>{etiqueta + '   *  '}
                 {/* <div className='my-custom-select'> */}
-                <SelectStylexl
+                <SelectSm
                     className="form-control form-control-sm"
                     onChange={onChange}
                     // onKeyUp={funcion} //se ejecuta cuando dejamos de presionar la tecla
@@ -274,19 +353,13 @@ const Select1XL = ({ estado, cambiarEstado, Name, ExpresionRegular, lista, funci
                     value={estado.campo || ''}
                     onClick={validacion}
                 >
-                    <option>Seleccionar</option>
+                    {very == 0 && <option value={'no valido'}>Seleccionar</option>}
 
                     {lista.map((r) => (
 
                         <option key={r.id} value={r.id}>{r.nombre}</option>
                     ))}
-                </SelectStylexl>
-                {/* <label for="my-select">
-                        <span class="material-icons">
-                            <FontAwesomeIcon icon={faChevronDown} />
-                        </span>
-                    </label>
-                </div> */}
+                </SelectSm>
                 <LeyendaError style={{ fontSize: '12px' }}>{mensaje}</LeyendaError>
             </p>
         </div>
@@ -306,7 +379,7 @@ const ComponenteCheck = ({ id, item, admitidos, funcion = null, setLista = null,
                     funcion(admitidos[0])
                 }
             }
-            else if(setLista) setLista([])
+            else if (setLista) setLista([])
 
 
         }
@@ -324,7 +397,7 @@ const ComponenteCheck = ({ id, item, admitidos, funcion = null, setLista = null,
                     funcion(admitidos[0])
                 }
             }
-            else  if(setLista) setLista([])
+            else if (setLista) setLista([])
         }
         let check = document.getElementById(1111)
         if (check)
@@ -398,56 +471,61 @@ const ComponenteCheckXL = ({ id, item, setAdmitidos, admitidos, lista, prefijo, 
         </ContenedorCheckXL>
     )
 }
+const ComponenteCheckMTM = ({ id, item, admitidos, marcarTodos = false }) => {
+
+    const onChange = (e) => {
+        if (e.target.checked) {
+            admitidos.push(parseInt(e.target.value))
+        }
+
+        if (e.target.checked === false) {
+            let indiceEliminar = null
+            admitidos.forEach(x => {
+                if (x == parseInt(e.target.value)) {
+                    indiceEliminar = admitidos.indexOf(parseInt(e.target.value))
+                    admitidos.splice(indiceEliminar, 1);
+                }
+            })
+        }
+    }
 
 
-const PiePagina = () => {
+    let check = false
+    admitidos.forEach(e => {
+        console.log(e, id, 'comparacion')
+        if (parseInt(id) === e) {
+            check = true
+        }
+    })
+
+    if (marcarTodos) {
+        console.log('sekeccion de subsectro en componente ', admitidos)
+        admitidos.forEach(e => {
+            // console.log(e, id, 'comparacion')
+            if (parseInt(id) === e) {
+                check = true
+            }
+        })
+    }
+
+    // console.log('seleccionados ', admitidos)
 
     return (
-        <div className='footer-pague'><p className='nombre-intitucion'> SERVICIO DEPARTAMENTAL DE SALUD DE CHUQUISACA</p>
-            <div className='row'>
-                <div className='col-12 col-sm-6 col-md-4 col-lg-4'>
-
-                    <div class="text_to_html">
-                        <h3>©Area Informatica</h3>
-                        <p>Unidad Sistemas de informacion</p>
-                        <h6>Oficina, Calle Rodendo Villa N123 Sucre-Bolivia</h6>
-                    </div>
-                </div>
-
-                <div className='col-12 col-sm-6 col-md-4 col-lg-4'>
-
-                    <span className='soporte-tecnico'> CONTACTOS</span>
-                    <ul class="footercontact">
-                        <li><FontAwesomeIcon icon={faPhone} />  5443334, 4343453</li>
-                        <li><FontAwesomeIcon icon={faEnvelope} /> sedesch@gob.bo</li>
-
-                    </ul>
-                </div>
-
-                <div className='col-12 col-sm-6 col-md-4 col-lg-4'>
-                    <div className="socials_wrapper">
-                        <ul className="socials">
-                            <li>
-                                <span ><FontAwesomeIcon className='icon-redes' icon={faFacebook} /></span>
-                                <a href="https://www.facebook.com/SEDESCh" title="https://www.facebook.com/SEDESCh" alt="https://www.facebook.com/SEDESCh" target="_blank">
-
-                                    <span className="sr-only">https://www.facebook.com/SEDESCh</span>
-                                    Página de Facebook
-                                </a>
-                            </li>
-                            <li>
-                                <span><FontAwesomeIcon className='icon-redes' icon={faGlobe} /></span>
-                                <a href="https://sedeschuquisaca.gob.bo/" title="https://sedeschuquisaca.gob.bo/" alt="https://sedeschuquisaca.gob.bo/" target="_blank">
-                                    <span className="sr-only">https://sedeschuquisaca.gob.bo/</span> Sitio Web
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
+        <ContenedorCheck>
+            <label htmlFor={id + 'ser'} > {/*el id es un elemento escencial al momento de marcar el check  */}
+                <input
+                    type="checkbox"
+                    name={id}
+                    value={id}
+                    id={id + 'ser'}
+                    onChange={onChange}
+                    defaultChecked={check}
+                />
+                <small>{item}</small>
+            </label>
+        </ContenedorCheck>
     )
 }
-export { InputUsuario, ComponenteInputBuscar_, Select1, Select1XL, PiePagina, ComponenteCheck, ComponenteCheckXL,SelectSM }
+
+
+export { InputUsuario, ComponenteInputBuscar_, Select1, Select1XL, ComponenteCheck, ComponenteCheckXL, SelectSM, SelectSMString, ComponenteCheckMTM }

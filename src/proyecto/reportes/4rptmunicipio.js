@@ -1,9 +1,6 @@
 import React from 'react';
 
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight, faCheck, faCheckCircle, faClose, faHandPointRight, faUpDown, faWindowClose } from '@fortawesome/free-solid-svg-icons';
-
 import useAuth from "../../Auth/useAuth"
 import { useState, useEffect } from "react";
 import { URL, INPUT } from '../../Auth/config';
@@ -20,7 +17,7 @@ const ExcelJS = require('exceljs')
 
 
 
-function Reportes5() {
+function ReportesMunicipio() {
     const auth = useAuth()
 
     let today = new Date()
@@ -40,20 +37,15 @@ function Reportes5() {
     const [ventana, setVentana] = useState(0)
     const [estado, setEstado] = useState(0)
     const [texto, setTexto] = useState(null);
-
+    const [listaSs, setListaSs] = useState([]);
+    const [ss, setSs] = useState({ campo: null, valido: null })
     const [grupoSeleccionados, setGruposSeleccionado] = useState([])
     const [variablesSeleccionado, setVariablesSeleccionados] = useState([])
 
     const [listaGrupo, setListaGrupo] = useState([]);
     const [listaVariable, setListaVariable] = useState([]);
+    const [est, setEst] = useState([]);
 
-    ///////////////////////////  USO PRINCIPAL PARA IDENTIFICAR SI SE VAN A SELECCIONAR TODAS LAS VARIABLES(TRUE) O SOLO UNA VARIABLE (FALSE)
-    const [todosGrupos, setTodosGrupos] = useState(false)
-    const [variable, setVariable] = useState({ campo: null, valido: null }) // solo una variable
-
-    ///////////////////////////  USO PRINCIPAL PARA IDENTIFICAR SI SE VAN A SELECCIONAR TODAS LOS INDICADORES(TRUE) O SOLO UN INDICADOR (FALSE)
-    const [todosVariables, setTodosVariables] = useState(false)
-    const [indicador, setIndicador] = useState({ campo: null, valido: null }) // solo un indicador
 
 
     const [listaGestion, setListaGestion] = useState([]);
@@ -61,6 +53,7 @@ function Reportes5() {
     const [listaMes, setListaMes] = useState([]);
     const [mes1, setMes1] = useState({ campo: null, valido: null })
     const [mes2, setMes2] = useState({ campo: null, valido: null })
+    const [estab, setEstab] = useState({ campo: null, valido: null })
 
     // DATOS PARA REPORTES
     const [listaIndicadores, setListaIndicadores] = useState([]);
@@ -74,9 +67,10 @@ function Reportes5() {
             if (listaGestion.length < 1) {
                 document.title = 'REPORTES'
                 listarGestion()
-                listarGrupoInicio()
             }
-        }, [])
+            if (ss.campo == 1000) listarTodosGrupos()
+            else listarGrupos()
+        }, [ss])
 
         const token = localStorage.getItem("token")
         axios.interceptors.request.use(
@@ -91,21 +85,29 @@ function Reportes5() {
         )
 
         const listarGestion = async () => {
-            axios.post(URL + '/reportes5/listargestion').then(json => {
+            axios.post(URL + '/reportes4/listargestion').then(json => {
                 if (json.data.hasOwnProperty("sesion")) {
                     auth.logout()
                     alert('LA SESION FUE CERRADO DESDE EL SERVIDOR, VUELVA A INTRODODUCIR SUS DATOS DE INICIO')
                 }
                 if (json.data.ok) {
-                    setListaGestion(json.data.data)
-                    listarMes(json.data.data[0].id)
-                    setGestion({ campo: json.data.data.length > 0 ? json.data.data[0].id : null, valido: json.data.data.length > 0 ? 'true' : null })
+                    // console.log(json.data.data, 'lista gestion')
+                    setListaGestion(json.data.data[0])
+                    setEst(json.data.data[2])
+                    listarMes(json.data.data[0][0].id)
+                    listarTodosGrupos(json.data.data[0][0].id)
+                    json.data.data[1].unshift({ id: 1000, nombre: 'TODOS' })
+                    json.data.data[2].unshift({ id: 1000, nombre: 'CONSOLIDADO MUNICIPIO ' + localStorage.getItem('mun') })
+                    setSs({ campo: 1000, valido: 'true' })
+                    setEstab({ campo: 1000, valido: 'true' })
+                    setListaSs(json.data.data[1])
+                    setGestion({ campo: json.data.data[0].length > 0 ? json.data.data[0][0].id : null, valido: json.data.data[0].length > 0 ? 'true' : null })
                 } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
         }
         const listarMes = async (id = null) => {
             if (gestion.valido === 'true' || id) {
-                axios.post(URL + '/reportes5/listarmes', { id: id ? id : gestion.campo, fecha: fecha + ' ' + horafinal }).then(json => {
+                axios.post(URL + '/reportes4/listarmes', { id: id ? id : gestion.campo, fecha: fecha + ' ' + horafinal }).then(json => {
                     if (json.data.ok) {
                         // console.log(json.data.data, 'lista de meses')
                         setListaMes(json.data.data)
@@ -123,17 +125,24 @@ function Reportes5() {
             }
         }
 
-        const listarGrupoInicio = async () => {
-            axios.post(URL + '/reportes5/listarvariableinicio').then(json => {
-                if (json.data.ok) {
-                    setListaGrupo(json.data.data)
-                } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
-            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+        const listarTodosGrupos = async (id = null) => {
+            console.log('todos los grupos')
+            if (gestion.valido === 'true' || id) {
+                axios.post(URL + '/reportes4/listartodosvariable', { id: id ? id : gestion.campo, }).then(json => {
+                    if (json.data.ok) {
+                        setListaGrupo(json.data.data)
+                        // console.log(json.data.data,'data de la bd')
+                    } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
+                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+            }
         }
 
+
+
         const listarGrupos = async () => {
+            console.log('grupos elegidos')
             if (gestion.valido === 'true') {
-                axios.post(URL + '/reportes5/listarvariable', { id: gestion.campo }).then(json => {
+                axios.post(URL + '/reportes4/listarvariable', { id: gestion.campo, ssector: ss.campo }).then(json => {
                     if (json.data.ok) {
                         setListaGrupo(json.data.data)
                         // console.log(json.data.data,'data de la bd')
@@ -147,7 +156,7 @@ function Reportes5() {
             setListaVariable([])
             setEstado(1)
             setTexto('Cargando...')
-            axios.post(URL + '/reportes5/listarindicadores', { variable: id }).then(json => {
+            axios.post(URL + '/reportes4/listarindicadores', { variable: id }).then(json => {
                 if (json.data.ok) {
                     setListaVariable(json.data.data)
                     setEstado(0)
@@ -156,105 +165,197 @@ function Reportes5() {
                 } else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); setEstado(0) }
             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); setEstado(0) });
         }
+
+
+
+
+
+
         const procesar = async () => {
-            // console.log(grupoSeleccionados, 'grupos seleccinados')
-
-            if (mes1.valido === 'true' && mes2.valido === 'true' && gestion.valido === 'true')
-                if (grupoSeleccionados.length > 0) {
-                    setEstado(1)
-                    setTexto('Espere unos segundos, se esta procesando la informacion...')
-                    if (variablesSeleccionado.length > 0) {
-                        let data_ = []
-                        axios.post(URL + '/reportes5/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
-                            if (json.data.ok)
-                                setCabecera(json.data.data)
-                            else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                        }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        axios.post(URL + '/reportes5/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
-                            if (json.data.ok)
-                                setListaIndicadores(json.data.data)
-                            else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                        }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        variablesSeleccionado.forEach(e => {
-
-                            axios.post(URL + '/reportes5/indicadorespecifico', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                                if (json.data.ok) {
-                                    console.log(json.data.data[0], 'datos para los reportes especifico')
-                                    json.data.data[1].forEach(e1 => {
-                                        json.data.data[0].forEach(e2 => {
-                                            if (parseInt(e1.input) === parseInt(e2.idinput)) {
-                                                e1.valor = e2.valor
-                                            }
-                                        })
-                                        data_.push(e1)
-                                    })
-                                }
+            if (estab.campo === 1000) {
+                // consolidad todo el municipio
+                if (mes1.valido === 'true' && mes2.valido === 'true' && gestion.valido === 'true')
+                    if (grupoSeleccionados.length > 0) {
+                        setEstado(1)
+                        setTexto('Espere unos segundos, se esta procesando la informacion...')
+                        if (variablesSeleccionado.length > 0) {
+                            let data_ = []
+                            axios.post(URL + '/reportes4/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
+                                if (json.data.ok)
+                                    setCabecera(json.data.data)
                                 else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        })
-                        setData(data_)
-                        setTimeout(() => {
-                            setData([])
+                            axios.post(URL + '/reportes4/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
+                                if (json.data.ok)
+                                    setListaIndicadores(json.data.data)
+                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                            variablesSeleccionado.forEach(e => {
+
+                                axios.post(URL + '/reportes4/indicadorespecificoconsolidado', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                                    if (json.data.ok)
+                                        json.data.data[1].forEach(e1 => {
+                                            json.data.data[0].forEach(e2 => {
+                                                if (parseInt(e1.input) === parseInt(e2.idinput)) {
+                                                    e1.valor = e2.valor
+                                                }
+                                            })
+                                            data_.push(e1)
+                                        })
+                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                            })
                             setData(data_)
-                            setEstado(0)
-                        }, 2000)
+                            setTimeout(() => {
+                                setData([])
+                                setData(data_)
+                                setEstado(0)
+                            }, 2000)
 
-                    } else {
-                        console.log(grupoSeleccionados)
-                        let dataCabeceras = []
-                        let dataInd_ = []
-                        let data_ = []
-                        grupoSeleccionados.forEach(e => {
-                            axios.post(URL + '/reportes5/listarcabeceras', { variable: e }).then(json => {
-                                if (json.data.ok)
-                                    json.data.data.forEach(e => {
-                                        dataCabeceras.push(e)
-                                    })
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                            axios.post(URL + '/reportes5/listarindicadores', { variable: e }).then(json => {
-                                if (json.data.ok)
-                                    json.data.data.forEach(e => {
-                                        dataInd_.push(e)
-                                    })
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                            axios.post(URL + '/reportes5/unavariable', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                                if (json.data.ok) {
-                                    console.log(json.data.data[0], 'datos para los reportes')
-                                    json.data.data[1].forEach(e1 => {
-                                        json.data.data[0].forEach(e2 => {
-                                            if (parseInt(e1.input) === parseInt(e2.idinput)) {
-                                                e1.valor = e2.valor
-                                            }
+                        } else {
+                            console.log(grupoSeleccionados)
+                            let dataCabeceras = []
+                            let dataInd_ = []
+                            let data_ = []
+                            grupoSeleccionados.forEach(e => {
+                                axios.post(URL + '/reportes4/listarcabeceras', { variable: e }).then(json => {
+                                    if (json.data.ok)
+                                        json.data.data.forEach(e => {
+                                            dataCabeceras.push(e)
                                         })
-                                        data_.push(e1)
-                                    })
-                                }
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        })
-                        setCabecera(dataCabeceras)
-                        setListaIndicadores(dataInd_)
-                        setData(data_)
-                        setTimeout(() => {
-                            setData([])
-                            setCabecera([])
-                            setListaIndicadores([])
+                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+
+                                axios.post(URL + '/reportes4/listarindicadores', { variable: e }).then(json => {
+                                    if (json.data.ok)
+                                        json.data.data.forEach(e => {
+                                            dataInd_.push(e)
+                                        })
+                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+
+                                axios.post(URL + '/reportes4/unavariableconsolidado', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                                    if (json.data.ok)
+                                        json.data.data[1].forEach(e1 => {
+                                            json.data.data[0].forEach(e2 => {
+                                                if (parseInt(e1.input) === parseInt(e2.idinput)) {
+                                                    e1.valor = e2.valor
+                                                }
+                                            })
+                                            data_.push(e1)
+                                        })
+                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                            })
+                            setCabecera(dataCabeceras)
                             setListaIndicadores(dataInd_)
                             setData(data_)
+                            setTimeout(() => {
+                                setData([])
+                                setCabecera([])
+                                setListaIndicadores([])
+                                setListaIndicadores(dataInd_)
+                                setData(data_)
+                                setCabecera(dataCabeceras)
+                                setEstado(0)
+                            }, 4000)
+                        }
+                        setVentana(1)
+                    } else alert2({ icono: 'question', titulo: 'selecione una o mas opciones del cuaderno', boton: 'ok' })
+                else alert2({ icono: 'question', titulo: 'selecione los parametros año, mes1 y mes2', boton: 'ok' })
+            } else {
+                // por establecimiento
+                if (mes1.valido === 'true' && mes2.valido === 'true' && gestion.valido === 'true' && estab.valido === 'true')
+                    if (grupoSeleccionados.length > 0) {
+                        setEstado(1)
+                        setTexto('Espere unos segundos, se esta procesando la informacion...')
+                        if (variablesSeleccionado.length > 0) {
+                            let data_ = []
+                            axios.post(URL + '/reportes4/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
+                                if (json.data.ok)
+                                    setCabecera(json.data.data)
+                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                            axios.post(URL + '/reportes4/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
+                                if (json.data.ok)
+                                    setListaIndicadores(json.data.data)
+                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                            variablesSeleccionado.forEach(e => {
+
+                                axios.post(URL + '/reportes4/indicadorespecificoestablecimiento', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo, est: estab.campo }).then(json => {
+                                    if (json.data.ok)
+                                        json.data.data[1].forEach(e1 => {
+                                            json.data.data[0].forEach(e2 => {
+                                                if (parseInt(e1.input) === parseInt(e2.idinput)) {
+                                                    e1.valor = e2.valor
+                                                }
+                                            })
+                                            data_.push(e1)
+                                        })
+                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                            })
+                            setData(data_)
+                            setTimeout(() => {
+                                setData([])
+                                setData(data_)
+                                setEstado(0)
+                            }, 2000)
+
+                        } else {
+                            console.log(grupoSeleccionados)
+                            let dataCabeceras = []
+                            let dataInd_ = []
+                            let data_ = []
+                            grupoSeleccionados.forEach(e => {
+                                axios.post(URL + '/reportes4/listarcabeceras', { variable: e }).then(json => {
+                                    if (json.data.ok)
+                                        json.data.data.forEach(e => {
+                                            dataCabeceras.push(e)
+                                        })
+                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+
+                                axios.post(URL + '/reportes4/listarindicadores', { variable: e }).then(json => {
+                                    if (json.data.ok)
+                                        json.data.data.forEach(e => {
+                                            dataInd_.push(e)
+                                        })
+                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+
+                                axios.post(URL + '/reportes4/unavariableporestablecimiento', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo, est: estab.campo }).then(json => {
+                                    if (json.data.ok)
+                                        json.data.data[1].forEach(e1 => {
+                                            json.data.data[0].forEach(e2 => {
+                                                if (parseInt(e1.input) === parseInt(e2.idinput)) {
+                                                    e1.valor = e2.valor
+                                                }
+                                            })
+                                            data_.push(e1)
+                                        })
+                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                            })
                             setCabecera(dataCabeceras)
-                            setEstado(0)
-                        }, 4000)
-                    }
-                    setVentana(1)
-                } else alert2({ icono: 'question', titulo: 'selecione una o mas formularios', boton: 'ok' })
-            else alert2({ icono: 'question', titulo: 'selecione los parametros año, mes1 y mes2', boton: 'ok' })
-
+                            setListaIndicadores(dataInd_)
+                            setData(data_)
+                            setTimeout(() => {
+                                setData([])
+                                setCabecera([])
+                                setListaIndicadores([])
+                                setListaIndicadores(dataInd_)
+                                setData(data_)
+                                setCabecera(dataCabeceras)
+                                setEstado(0)
+                            }, 4000)
+                        }
+                        setVentana(1)
+                    } else alert2({ icono: 'question', titulo: 'selecione una o mas opciones del cuaderno', boton: 'ok' })
+                else alert2({ icono: 'question', titulo: 'selecione los parametros año, mes1 y mes2 ', boton: 'ok', texto: 'Si desea ver la informacion por establecimientos, seleccione una' })
+            }
         }
-
         const excel = () => {
             const workbook = new ExcelJS.Workbook();
             workbook.creator = 'SDIS-VE';
@@ -305,6 +406,9 @@ function Reportes5() {
                 if (e.id == gestion.campo) gestion_ = e.nombre
             })
 
+            est.forEach(e => {
+                if (e.id == estab.campo) entidad = e.nombre
+            })
             // CONFIGURACION DE LOS TIRULOS, NOMBRE HOSPITAL, MESES Y GESTION
             principal.addImage(imageId, { tl: { col: 1.1, row: 0.1 }, ext: { width: 100, height: 95 } })
             principal.addImage(imageIdGob, { tl: { col: 10.6, row: 0.1 }, ext: { width: 100, height: 100 } })
@@ -330,8 +434,9 @@ function Reportes5() {
             principal.mergeCells('B6:F6');
             principal.getCell('B6').alignment = { vertical: 'center', horizontal: 'left' };
 
-
-            principal.getCell('B6').value = 'ESTABLECIEMIENTO : ' + localStorage.getItem('est')
+            if (estab.campo == 1000) { // mun
+                principal.getCell('B6').value = 'INFORMACION: ' + entidad + '-' + localStorage.getItem('mun')
+            } else principal.getCell('B6').value = 'ESTABLECIEMIENTO : ' + entidad
             principal.getCell('B6').font = { bold: 600, color: { argb: '595959' }, italic: false }
 
 
@@ -492,7 +597,7 @@ function Reportes5() {
                 const url = window.URL.createObjectURL(blob);
                 const anchor = document.createElement('a');
                 anchor.href = url;
-                anchor.download = 'FORMULARIO ADICIONAL 301C ' + gestion_ + '_' + mes1_ + '-' + mes2_ + '- est.' + localStorage.getItem('est') + '.xlsx';
+                anchor.download = 'FORMULARIO ADICIONAL 301C ' + gestion_ + '_' + mes1_ + '-' + mes2_ + '-' + entidad + '.xlsx';
                 // 'FORMULARIO ADICIONAL 301C 2023_ABRIL-NOVIEMBRE_SAN ROQUE'
                 anchor.click();
                 window.URL.revokeObjectURL(url);
@@ -508,10 +613,11 @@ function Reportes5() {
             <div style={{ background: '#e5e5e5', paddingTop: '0.5rem', paddingBottom: '0.5rem', height: '95vh' }} >
                 {estado === 1 && <Load texto={texto} />}
                 {ventana === 0 ?
-                    <div className="container_reportes">
+                    <div className="container_reportes_formulario ">
                         <div className='header-reportes'>
-                            <p className='titulo'>reportes estadísticos </p>
-                            <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#595959', textAlign: 'center', marginBottom: '0' }} className='text-center'>{'ESTABLECIMIENTO: ' + localStorage.getItem('est')}  </p>
+                            {/* <img src='img/sedes22.png' className='icono-partido' alt='sdis-ve' /> */}
+                            <p className='titulo'>reporte estadístico </p>
+                            <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#595959', textAlign: 'center', marginBottom: '0' }} className='text-center'>{'MUNICIPIO :: ' + localStorage.getItem('mun')}  </p>
 
                         </div>
                         <div className='separador mb-3 mb-sm-0 mb-md-0 mb-lg-0'>
@@ -519,51 +625,82 @@ function Reportes5() {
                                 PARÁMETROS DE SELECCION::
                             </span>
                         </div>
-                        <p className='texto-mov' style={{ marginBottom: '0', fontSize: '14px', fontWeight: 'bold' }}>{''}</p>
+                        <p className='texto-mov' style={{ marginBottom: '0', fontSize: '12px' }}>{''}</p>
                         <div className='p-0 p-sm-2 p-md-3 p-lg-3 pb-0 pt-0 pt-lg-0 pt-md-0 pb-lg-0'>
                             <div className='orden-tiempo '>
-                                <div className='row pb-2'>
-                                    <div className='col-4 col-sm-2 col-md-2 col-lg-2 p-1' >
-                                        <SelectSM
-                                            estado={gestion}
-                                            cambiarEstado={setGestion}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={listaGestion}
-                                            etiqueta={'Gestion'}
-                                            funcion={listarGrupos}
-                                            msg='Seleccione una opcion'
-                                        />
-                                    </div>
-                                    <div className='col-4 col-sm-3 col-md-3 col-lg-3 p-1' onClick={() => { listarMes() }} >
-                                        <SelectSM
-                                            estado={mes1}
-                                            cambiarEstado={setMes1}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={listaMes}
-                                            etiqueta={'de:'}
-                                            msg='Seleccione una opcion'
-                                        />
-                                    </div>
-                                    <div className='col-4 col-sm-3 col-md-3 col-lg-3 p-1' onClick={() => { listarMes() }} >
-                                        <SelectSM
-                                            estado={mes2}
-                                            cambiarEstado={setMes2}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={listaMes}
-                                            etiqueta={'a:'}
-                                            msg='Seleccione una opcion'
-                                        />
-                                    </div>
+                                <div className='col-12'>
+                                    <div className='row mb-1 '>
+                                        <div className='col-6 col-sm-4 col-md-2 col-lg-2 p-1' onClick={() => {
+                                            setListaGrupo([]); setListaVariable([]); setGruposSeleccionado([]); setVariablesSeleccionados([])
+                                        }} >
+                                            <SelectSM
+                                                estado={ss}
+                                                cambiarEstado={setSs}
+                                                ExpresionRegular={INPUT.ID}
+                                                lista={listaSs}
+                                                etiqueta={'Sub-Sector'}
+                                                // fn_1={[listarTodosGrupos, listarGrupos]}
+                                                msg='Seleccione una opcion'
+                                                very={1}
+                                            />
+                                        </div>
+                                        <div className='col-6 col-sm-2 col-md-1 col-lg-1 p-1' >
+                                            <SelectSM
+                                                estado={gestion}
+                                                cambiarEstado={setGestion}
+                                                ExpresionRegular={INPUT.ID}
+                                                lista={listaGestion}
+                                                very={1}
+                                                etiqueta={'Gestion'}
+                                                msg='Seleccione una opcion'
+                                            />
+                                        </div>
 
+                                        <div className='col-4 col-sm-2 col-md-1 col-lg-1 p-1' onClick={() => { listarMes() }} >
+                                            <SelectSM
+                                                estado={mes1}
+                                                cambiarEstado={setMes1}
+                                                ExpresionRegular={INPUT.ID}
+                                                lista={listaMes}
+                                                etiqueta={'de:'}
+                                                msg='Seleccione una opcion'
+                                                very={1}
+
+                                            />
+                                        </div>
+                                        <div className='col-4 col-sm-2 col-md-1 col-lg-1 p-1' onClick={() => { listarMes() }} >
+                                            <SelectSM
+                                                estado={mes2}
+                                                cambiarEstado={setMes2}
+                                                ExpresionRegular={INPUT.ID}
+                                                lista={listaMes}
+                                                etiqueta={'a:'}
+                                                msg='Seleccione una opcion'
+                                                very={1}
+
+                                            />
+                                        </div>
+                                        <div className='col-4 p-1'  >
+                                            <SelectSM
+                                                estado={estab}
+                                                cambiarEstado={setEstab}
+                                                ExpresionRegular={INPUT.ID}
+                                                lista={est}
+                                                etiqueta={'Tipo Reporte'}
+                                                msg='Seleccione una opcion'
+                                                very={1}
+                                            />
+                                        </div>
+
+                                    </div>
                                 </div>
-                                {window.innerWidth < 500 && <div className='col-12' >
-                                    <div className='col-12 col-sm-10 col-md-4 col-lg-3  m-auto row mt-1'>
+                                {window.innerWidth < 500 && <div className='col-12'>
+                                    <div className=' row mt-3'>
                                         <div className='col-4'><p className='blue1'></p></div>
                                         <div className='col-4'><p className='red1'></p></div>
                                         <div className='col-4'><p className='blue2'></p></div>
                                     </div>
-                                </div>
-                                }
+                                </div>}
                             </div>
                         </div>
                         <div className='cajaprimario-reportes m-0 m-sm-2 m-md-3 m-lg-3 mt-0 mt-lg-0 '>
@@ -573,7 +710,7 @@ function Reportes5() {
 
                                     <div className='row'  >
                                         <div className='col-12 col-sm-12 col-md-7 col-lg-7' >
-                                            <h5 className='titulo-parametros'>Formularios</h5>
+                                            <h5 className='titulo-parametros'>Cuaderno</h5>
                                             <div className='table table-responsive caja-scroll' style={{ marginBottom: '.1rem' }}>
                                                 <Table className="table table-sm" >
                                                     <tbody >
@@ -607,7 +744,7 @@ function Reportes5() {
                                                     admitidos={grupoSeleccionados}
                                                     lista={listaGrupo}
                                                     prefijo={'grupo'}
-                                                    estado={setTodosGrupos}
+                                                // estado={setTodosGrupos}
                                                 />
                                             </div>
                                         </div>
@@ -638,12 +775,12 @@ function Reportes5() {
                                                 admitidos={variablesSeleccionado}
                                                 lista={listaVariable}
                                                 prefijo={'variables'}
-                                                estado={setTodosVariables}
+                                            // estado={setTodosVariables}
                                             />}
                                         </div>
                                     </div>
-                                    <div className='botonModal'>
-                                        <button className='botonProcesar' onClick={() => procesar()}>Generar</button>
+                                    <div className='botonModal mt-1'>
+                                        <button className='botonProcesar' onClick={() => procesar()}>GENERAR</button>
                                     </div>
                                 </div>
                             </div>
@@ -652,40 +789,93 @@ function Reportes5() {
                     :
                     <div className="container_reportes m-auto" style={{ width: '97%' }}>
 
-                        <p className='titulo-reportes_1' style={{ marginBottom: '0px' }} onClick={() => console.log(data, 'datso del valores')} > FORMULARIO ADICIONAL 301c</p>
+                        <p className='titulo-reportes_1' style={{ marginBottom: '0px' }} > FORMULARIO ADICIONAL 301c</p>
                         <p className='titulo-reportes_1' style={{ marginBottom: '0px' }}>GESTION {' ' + año}</p>
-                        <div className='row'>
-                            <div className='col-6'>
-                                <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
-                                    {'ESTABLECIMIENTO: ' + localStorage.getItem('est')} </p>
+                        {estab.campo == 1000 ?
+                            <>
+                                <div className='row'>
+                                    <div className='col-6'>
+                                        {est.map(e => (
+                                            parseInt(e.id) == parseInt(estab.campo) && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
+                                                'MUNICIPIO: ' + localStorage.getItem('mun')
+                                            }  </p>
+                                        ))}
+                                    </div>
+                                    <div className='col-6'>
+                                        {listaSs.map(e => (
+                                            ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className='row'>
+                                    <div className='col-6'>
+                                        <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
+                                            {'TIPO REPORTE : CONSOLIDADO'}</p>
+                                    </div>
+                                    <div className='col-6'>
+                                        <p className='titulo-reportes'
+                                            style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
+                                            {
+                                                listaMes.map(e => (
+                                                    mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
+                                                ))
+                                            }
+                                            {
+                                                listaMes.map(e => (
+                                                    mes2.campo == e.id && <span >{e.nombre} </span>
+                                                ))
+                                            }
+                                        </p>
 
-                            </div>
-                            <div className='col-6'>
-                                <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + localStorage.getItem('ss')} </p>
-                            </div>
-                        </div>
+                                    </div>
+                                </div>
+                            </>
+                            : <>
+                                <div className='row'>
+                                    <div className='col-6'>
+                                        {est.map(e => (
+                                            parseInt(e.id) == parseInt(estab.campo) && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
+                                                'ESTABLECIMIENT0: ' + e.nombre.split('(')[0]
+                                            }  </p>
+                                        ))}
 
-                        <div className='col-6'>
-                            <p className='titulo-reportes'
-                                style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
-                                {
-                                    listaMes.map(e => (
-                                        mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
-                                    ))
-                                }
-                                {
-                                    listaMes.map(e => (
-                                        mes2.campo == e.id && <span >{e.nombre} </span>
-                                    ))
-                                }
-                            </p>
+                                    </div>
+                                    <div className='col-6'>
+                                        {listaSs.map(e => (
+                                            ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className='row'>
+                                    <div className='col-6'>
+                                        <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
+                                            {'TIPO REPORTE : POR ESTABLECIMIENTO'}</p>
+                                    </div>
+                                    <div className='col-6'>
+                                        <p className='titulo-reportes'
+                                            style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
+                                            {
+                                                listaMes.map(e => (
+                                                    mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
+                                                ))
+                                            }
+                                            {
+                                                listaMes.map(e => (
+                                                    mes2.campo == e.id && <span >{e.nombre} </span>
+                                                ))
+                                            }
+                                        </p>
 
-                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        }
                         <div className='p-2'>
+
                             {listaGrupo.map(lg => (
                                 grupoSeleccionados.map(gs => (
                                     parseInt(lg.id) === parseInt(gs) && <div key={gs}>
-                                        <p style={{ fontSize: '12.5px', marginBottom: '0', fontWeight: 'bold' }}>{lg.nombre}  </p>
+                                        <p style={{ fontSize: '13px', marginBottom: '0', fontWeight: 'bold' }}>{lg.nombre}  </p>
                                         <div className="table table-responsive custom" style={{ height: 'auto', padding: "0.0rem 0.0rem", marginBottom: '0' }}>
                                             <Table className=' table-sm' style={{ border: "1px solid #000040", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
                                                 {cabecera.length > 0 &&
@@ -763,7 +953,7 @@ function Reportes5() {
                                                                 <td className="col-3 mincelda TituloSecundario" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }}>{ind.indicador}</td>
                                                                 {
                                                                     data.map(d => (
-                                                                        parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center "
+                                                                        parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center item_1"
                                                                             style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
                                                                             <div style={{ height: '29px' }}  >{d.valor}</div>
                                                                         </td>
@@ -779,7 +969,7 @@ function Reportes5() {
                             ))}
 
                             <div className='botonModal p-1'>
-                                <button className='botonVolverReportes' onClick={() => window.location.href = '/reportes5'}>  VOLVER</button>
+                                <button className='botonVolversm' onClick={() => window.location.href = '/reportes-por-municipio'}>Volver</button>
                                 <button className='botonExcel' onClick={() => excel()} >EXCEL</button>
                             </div>
                         </div>
@@ -794,4 +984,4 @@ function Reportes5() {
     }
 
 }
-export default Reportes5;
+export default ReportesMunicipio;

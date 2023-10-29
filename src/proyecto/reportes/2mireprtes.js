@@ -15,12 +15,11 @@ import Load from '../../elementos/load'
 import { ComponenteCheck, ComponenteCheckXL, SelectSM } from '../../elementos/elementos';
 import { Table } from 'reactstrap';
 import { img } from './logo';
-import { imgG } from './gobernacion';
 const ExcelJS = require('exceljs')
 
 
 
-function Reportes5() {
+function Mireportes2() {
     const auth = useAuth()
 
     let today = new Date()
@@ -40,7 +39,8 @@ function Reportes5() {
     const [ventana, setVentana] = useState(0)
     const [estado, setEstado] = useState(0)
     const [texto, setTexto] = useState(null);
-
+    const [listaSs, setListaSs] = useState([]);
+    const [ss, setSs] = useState({ campo: null, valido: null })
     const [grupoSeleccionados, setGruposSeleccionado] = useState([])
     const [variablesSeleccionado, setVariablesSeleccionados] = useState([])
 
@@ -74,7 +74,6 @@ function Reportes5() {
             if (listaGestion.length < 1) {
                 document.title = 'REPORTES'
                 listarGestion()
-                listarGrupoInicio()
             }
         }, [])
 
@@ -88,24 +87,29 @@ function Reportes5() {
                 auth.logout()
                 return Promise.reject(error)
             }
-        )
+        ) 
 
         const listarGestion = async () => {
-            axios.post(URL + '/reportes5/listargestion').then(json => {
+            axios.post(URL + '/reportes2/listargestion').then(json => {
                 if (json.data.hasOwnProperty("sesion")) {
                     auth.logout()
                     alert('LA SESION FUE CERRADO DESDE EL SERVIDOR, VUELVA A INTRODODUCIR SUS DATOS DE INICIO')
                 }
                 if (json.data.ok) {
-                    setListaGestion(json.data.data)
-                    listarMes(json.data.data[0].id)
-                    setGestion({ campo: json.data.data.length > 0 ? json.data.data[0].id : null, valido: json.data.data.length > 0 ? 'true' : null })
+                    // console.log(json.data.data, 'lista gestion')
+                    setListaGestion(json.data.data[0])
+                    listarMes(json.data.data[0][0].id)
+                    listarTodosGrupos(json.data.data[0][0].id)
+                    json.data.data[1].unshift({ id: 1000, nombre: 'TODOS' })
+                    setSs({ campo: 1000, valido: 'true' })
+                    setListaSs(json.data.data[1])
+                    setGestion({ campo: json.data.data[0].length > 0 ? json.data.data[0][0].id : null, valido: json.data.data[0].length > 0 ? 'true' : null })
                 } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
         }
         const listarMes = async (id = null) => {
             if (gestion.valido === 'true' || id) {
-                axios.post(URL + '/reportes5/listarmes', { id: id ? id : gestion.campo, fecha: fecha + ' ' + horafinal }).then(json => {
+                axios.post(URL + '/reportes2/listarmes', { id: id ? id : gestion.campo, fecha: fecha + ' ' + horafinal }).then(json => {
                     if (json.data.ok) {
                         // console.log(json.data.data, 'lista de meses')
                         setListaMes(json.data.data)
@@ -122,32 +126,39 @@ function Reportes5() {
                 }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
             }
         }
-
-        const listarGrupoInicio = async () => {
-            axios.post(URL + '/reportes5/listarvariableinicio').then(json => {
-                if (json.data.ok) {
-                    setListaGrupo(json.data.data)
-                } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
-            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-        }
-
-        const listarGrupos = async () => {
-            if (gestion.valido === 'true') {
-                axios.post(URL + '/reportes5/listarvariable', { id: gestion.campo }).then(json => {
+        const listarTodosGrupos = async (id = null) => {
+            console.log('todos los grupos')
+            if (gestion.valido === 'true' || id) {
+                axios.post(URL + '/reportes2/listartodosvariableS', { id: id ? id : gestion.campo, }).then(json => {
                     if (json.data.ok) {
                         setListaGrupo(json.data.data)
                         // console.log(json.data.data,'data de la bd')
                     } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
                 }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-            }
+            } else toast.error('Seleccione la gestion ')
         }
+
+
+
+        const listarGrupos = async () => {
+            console.log('listar grupos especificos')
+            if (gestion.valido === 'true') {
+                axios.post(URL + '/reportes2/listarvariableS', { id: gestion.campo, ssector: ss.campo }).then(json => {
+                    if (json.data.ok) {
+                        setListaGrupo(json.data.data)
+                        // console.log(json.data.data,'data de la bd')
+                    } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
+                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+            } else toast.error('Seleccione la gestion ')
+        }
+
 
 
         const listarVariables = async (id) => {
             setListaVariable([])
             setEstado(1)
             setTexto('Cargando...')
-            axios.post(URL + '/reportes5/listarindicadores', { variable: id }).then(json => {
+            axios.post(URL + '/reportes2/listarindicadores', { variable: id }).then(json => {
                 if (json.data.ok) {
                     setListaVariable(json.data.data)
                     setEstado(0)
@@ -156,6 +167,12 @@ function Reportes5() {
                 } else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); setEstado(0) }
             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); setEstado(0) });
         }
+
+
+
+
+
+
         const procesar = async () => {
             // console.log(grupoSeleccionados, 'grupos seleccinados')
 
@@ -165,21 +182,20 @@ function Reportes5() {
                     setTexto('Espere unos segundos, se esta procesando la informacion...')
                     if (variablesSeleccionado.length > 0) {
                         let data_ = []
-                        axios.post(URL + '/reportes5/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
+                        axios.post(URL + '/reportes2/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
                             if (json.data.ok)
                                 setCabecera(json.data.data)
                             else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                         }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        axios.post(URL + '/reportes5/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
+                        axios.post(URL + '/reportes2/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
                             if (json.data.ok)
                                 setListaIndicadores(json.data.data)
                             else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                         }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
                         variablesSeleccionado.forEach(e => {
 
-                            axios.post(URL + '/reportes5/indicadorespecifico', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                                if (json.data.ok) {
-                                    console.log(json.data.data[0], 'datos para los reportes especifico')
+                            axios.post(URL + '/reportes2/indicadorespecificoS', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                                if (json.data.ok)
                                     json.data.data[1].forEach(e1 => {
                                         json.data.data[0].forEach(e2 => {
                                             if (parseInt(e1.input) === parseInt(e2.idinput)) {
@@ -188,7 +204,6 @@ function Reportes5() {
                                         })
                                         data_.push(e1)
                                     })
-                                }
                                 else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
                         })
@@ -205,7 +220,7 @@ function Reportes5() {
                         let dataInd_ = []
                         let data_ = []
                         grupoSeleccionados.forEach(e => {
-                            axios.post(URL + '/reportes5/listarcabeceras', { variable: e }).then(json => {
+                            axios.post(URL + '/reportes2/listarcabeceras', { variable: e }).then(json => {
                                 if (json.data.ok)
                                     json.data.data.forEach(e => {
                                         dataCabeceras.push(e)
@@ -213,7 +228,7 @@ function Reportes5() {
                                 else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
 
-                            axios.post(URL + '/reportes5/listarindicadores', { variable: e }).then(json => {
+                            axios.post(URL + '/reportes2/listarindicadores', { variable: e }).then(json => {
                                 if (json.data.ok)
                                     json.data.data.forEach(e => {
                                         dataInd_.push(e)
@@ -221,9 +236,8 @@ function Reportes5() {
                                 else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
 
-                            axios.post(URL + '/reportes5/unavariable', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                                if (json.data.ok) {
-                                    console.log(json.data.data[0], 'datos para los reportes')
+                            axios.post(URL + '/reportes2/unavariableS', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                                if (json.data.ok)
                                     json.data.data[1].forEach(e1 => {
                                         json.data.data[0].forEach(e2 => {
                                             if (parseInt(e1.input) === parseInt(e2.idinput)) {
@@ -232,7 +246,6 @@ function Reportes5() {
                                         })
                                         data_.push(e1)
                                     })
-                                }
                                 else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
                         })
@@ -260,10 +273,16 @@ function Reportes5() {
             workbook.creator = 'SDIS-VE';
             workbook.lastModifiedBy = 'SDIS-VE';
 
-            const principal = workbook.addWorksheet('ESTRUCTURA', {
+            const principal = workbook.addWorksheet('DATOS', {
+                views:
+                    [
+                        // { showGridLines: false },
+                        // { state: 'frozen', xSplit: 0, ySplit: 6, topLeftCell: 'G10', activeCell: 'A2' }
+                        // {state: 'split', xSplit:2000,ySplit:3000,topLeftCell:'G10', activeCell:'A2'}
+                    ],
                 properties:
                 {
-                    tabColor: { argb: 'ECF0F1' }
+                    tabColor: { argb: '28B463' }
                 },
                 pageSetup: {
                     paperSize: 9, orientation: 'landscape'
@@ -276,215 +295,104 @@ function Reportes5() {
             }
 
             principal.columns.forEach((column) => {
-                column.alignment = { vertical: 'middle', }  //  wrapText: true ajustar texto dentro de la celda
-                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 8, italic: false };
+                column.alignment = { vertical: 'middle', wrapText: true }
+                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 9, italic: false };
             })
-            principal.mergeCells("B1:C5");
-            principal.mergeCells("K1:L5");
+            principal.mergeCells("A1:B5");
 
             const imageId = workbook.addImage({
                 base64: img,
                 extension: 'png',
             })
-            const imageIdGob = workbook.addImage({
-                base64: imgG,
-                extension: 'png',
-            })
-
             let mes1_ = null
             let mes2_ = null
             let gestion_ = null
-            let entidad = null
             listaMes.forEach(e => {
                 if (e.id == mes1.campo) mes1_ = e.nombre
-            })
-            listaMes.forEach(e => {
                 if (e.id == mes2.campo) mes2_ = e.nombre
             })
             listaGestion.forEach(e => {
                 if (e.id == gestion.campo) gestion_ = e.nombre
             })
-
             // CONFIGURACION DE LOS TIRULOS, NOMBRE HOSPITAL, MESES Y GESTION
-            principal.addImage(imageId, { tl: { col: 1.1, row: 0.1 }, ext: { width: 100, height: 95 } })
-            principal.addImage(imageIdGob, { tl: { col: 10.6, row: 0.1 }, ext: { width: 100, height: 100 } })
-            principal.mergeCells('D2:J2');
-            principal.getCell('D2').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
-            principal.getCell('D2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+            principal.addImage(imageId, { tl: { col: 0.5, row: 0.5 }, ext: { width: 100, height: 100 } })
+            principal.mergeCells('C2:H2');
+            principal.getCell('C2').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('C2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS I NIVEL SEDES CHUQUISACA'
+            principal.mergeCells('C3:H3');
+            principal.getCell('C3').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('C3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 2-4/2020)'
+            principal.mergeCells('C4:H4');
+            principal.getCell('C4').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('C4').value = 'INFORME EST. ' + localStorage.getItem('est')
+            principal.getCell('C4').font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 8, italic: false };
 
-            principal.mergeCells('D3:J3');
-            principal.getCell('D3').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
-            principal.getCell('D3').font = { bold: 600, color: { argb: '595959' }, italic: false }
-
-
-            principal.mergeCells('E5:I5');
-            principal.getCell('E5').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('E5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
-            principal.getCell('E5').font = { bold: 600, color: { argb: '595959' }, italic: false }
-
-
-            // principal.mergeCells('D4:H4');
-
-            principal.mergeCells('B6:F6');
-            principal.getCell('B6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.mergeCells('A6:D6');
+            principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('A6').value = 'MES REPORTADO: ' + mes1_ + ' - ' + mes2_
+            principal.mergeCells('E6:F6');
+            principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
 
 
-            principal.getCell('B6').value = 'ESTABLECIEMIENTO : ' + localStorage.getItem('est')
-            principal.getCell('B6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            //IMPLEMENTACION DE LAS CABECERAS INDICADORES Y LOS DATOS EN EL CUERPO DE LA HOJA
 
+            let x = 0
+            // for (let i = 7; i <= listaIndicadores.length + cabecera.length + grupoSeleccionados.length; i++) {
+            // const fila = principal.getRow(i)
 
-            principal.mergeCells('G6:H6');
-            principal.getCell('G6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('G6').value = 'GESTIÓN: ' + gestion_
-            principal.getCell('G6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            let i = 7
+            var fila = null
+            grupoSeleccionados.forEach(g => {
+                axios.post(URL + '/reportes2/maxorden', { id: g }).then(json => {
+                    if (json.data.ok) {
+                        let ultimo = json.data.data
+                        let body = []
+                        fila = principal.getRow(i)
 
-            principal.mergeCells('I6:K6');
-            principal.getCell('I6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('I6').value = 'MES REPORTADO: ' + mes1_ + ' - ' + mes2_
-            principal.getCell('I6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+                        let numIni = 5
+                        cabecera.forEach(c => {
 
-            let numero_fila = 6
-            let inicio_fila_titulo = 6
-            let fin_fila_titulo = 6
-            listaGrupo.forEach(lg => {
-                grupoSeleccionados.forEach(gs => {
-                    if (parseInt(lg.id) === parseInt(gs)) {
-                        numero_fila = numero_fila + 1
-                        inicio_fila_titulo = inicio_fila_titulo + 1
-                        fin_fila_titulo = fin_fila_titulo + 1
-                        let numero_columna_1 = 7
-                        let numero_columna_2 = 7
-                        let numero_columna_3 = 7
-                        let aumento_1 = true
-                        let aumento_2 = true
-                        let aumento_ini = 0
-                        for (let c of cabecera) {
+                            if (parseInt(g) === parseInt(c.variable)) {
 
-                            if (parseInt(c.variable) === parseInt(gs)) {
+                                if (c.nivel === 1) {
+                                    let ini = fila.getCell(parseInt(numIni))._address  // NOMBRE DE LA CELDA
+                                    let numFinal = numIni + c.span - 1
 
-                                if (parseInt(c.nivel) == 1) {
-                                    aumento_1 = true
-                                    aumento_2 = true
-                                    let fila_nivel1 = principal.getRow(numero_fila)
-                                    let ini = fila_nivel1.getCell(parseInt(numero_columna_1))._address  // NOMBRE DE LA CELDA
-                                    let numFinal_columna = numero_columna_1 + c.span - 1
-                                    let fin = fila_nivel1.getCell(numFinal_columna)._address
-                                    principal.mergeCells(`${ini + ':' + fin}`);
-                                    principal.getCell(`${ini}`).value = c.input
-                                    principal.getCell(`${ini}`).alignment = { vertical: 'center', horizontal: c.span > 1 ? 'center' : null }
-                                    principal.getCell(`${ini}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
-                                    principal.getCell(`${ini}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                                    numero_columna_1 = numFinal_columna + 1
+                                    // console.log(numIni, numFinal, 'numero inicial con incremento', c.nivel, grupoSeleccionados)
+                                    let fin = fila.getCell(numFinal)._address
+                                    let convi = JSON.stringify(ini + ":" + fin)
+                                    console.log(`${ini.split(0) + ini.split(1) + ':' + fin.split(0) + fin.split(1)}`, 'string convinado jsonstrinfy', ini, fin)
+                                    principal.mergeCells(`${ini.split(0) + ini.split(1) + ':' + fin.split(0) + fin.split(1)}`);
+                                    principal.getCell(JSON.stringify(ini)).value = 'Este es una cabecera'
+                                    numIni = numFinal + 1
 
-                                }
-                                if (parseInt(c.nivel) == 2) {
-                                    aumento_2 = true
-                                    if (aumento_1) {
-                                        aumento_1 = false;
-                                        numero_fila = numero_fila + 1;
-                                        inicio_fila_titulo = inicio_fila_titulo + 1;
-                                        aumento_ini++
-                                        fin_fila_titulo++
-                                    }
-                                    let fila_nivel1 = principal.getRow(numero_fila)
-                                    let ini = fila_nivel1.getCell(parseInt(numero_columna_2))._address  // NOMBRE DE LA CELDA
-                                    let numFinal_columna = numero_columna_2 + c.span - 1
-                                    let fin = fila_nivel1.getCell(numFinal_columna)._address
-                                    principal.mergeCells(`${ini + ':' + fin}`);
-                                    principal.getCell(`${ini}`).value = c.input
-                                    principal.getCell(`${ini}`).alignment = { vertical: 'center', horizontal: c.span > 1 ? 'center' : null }
-                                    principal.getCell(`${ini}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
-                                    principal.getCell(`${ini}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-
-                                    numero_columna_2 = numFinal_columna + 1
-                                }
-                                if (parseInt(c.nivel) == 3) {
-                                    if (aumento_2) {
-                                        aumento_2 = false;
-                                        numero_fila = numero_fila + 1;
-                                        inicio_fila_titulo = inicio_fila_titulo + 1;
-                                        fin_fila_titulo++
-                                        aumento_ini++
-                                    }
-
-                                    let fila_nivel1 = principal.getRow(numero_fila)
-                                    let ini = fila_nivel1.getCell(parseInt(numero_columna_3))._address  // NOMBRE DE LA CELDA
-                                    let numFinal_columna = numero_columna_3 + c.span - 1
-                                    let fin = fila_nivel1.getCell(numFinal_columna)._address
-                                    principal.mergeCells(`${ini + ':' + fin}`);
-                                    principal.getCell(`${ini}`).value = c.input
-                                    principal.getCell(`${ini}`).alignment = { vertical: 'center', horizontal: 'center' }
-                                    principal.getCell(`${ini}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
-                                    principal.getCell(`${ini}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-
-                                    numero_columna_3 = numFinal_columna + 1
                                 }
                             }
-                        }
-                        let ini_titulo = principal.getRow(inicio_fila_titulo - aumento_ini).getCell(2)._address
-                        let fin_titulo = principal.getRow(fin_fila_titulo).getCell(6)._address
-                        principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
-                        principal.getCell(`${ini_titulo}`).value = lg.nombre
-                        principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
-                        principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                        })
 
-                        numero_fila = numero_fila + 1
-                        inicio_fila_titulo = inicio_fila_titulo + 1
-                        fin_fila_titulo = fin_fila_titulo + 1
-                        for (let ind of listaIndicadores) {
-                            if (parseInt(ind.variable) === parseInt(gs)) {
-                                let contador_columna = 7
-                                if (variablesSeleccionado.length > 0) {
-                                    variablesSeleccionado.forEach(vs => {
-                                        if (parseInt(ind.id) === parseInt(vs)) {
-                                            let fila = principal.getRow(numero_fila)
-                                            let ini_titulo = fila.getCell(2)._address
-                                            let fin_titulo = fila.getCell(6)._address
-                                            principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
-                                            principal.getCell(`${ini_titulo}`).value = ind.indicador
-                                            principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-
-                                            data.forEach(d => {
-                                                if (parseInt(ind.id) === parseInt(d.indicador)) {
-                                                    let ini_titulo = fila.getCell(contador_columna)._address
-                                                    principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
-                                                    principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
-                                                    principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                                                    contador_columna++
-                                                }
-                                            })
-                                        }
-                                    })
-                                } else {
-                                    let fila = principal.getRow(numero_fila)
-                                    let ini_titulo = fila.getCell(2)._address
-                                    let fin_titulo = fila.getCell(6)._address
-                                    principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
-                                    principal.getCell(`${ini_titulo}`).value = ind.indicador
-                                    principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-
-                                    data.forEach(d => {
-                                        if (parseInt(ind.id) === parseInt(d.indicador)) {
-                                            let ini_titulo = fila.getCell(contador_columna)._address
-                                            principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
-                                            principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
-                                            principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                                            contador_columna++
-                                        }
-                                    })
-                                }
-                                numero_fila = numero_fila + 1
-                                inicio_fila_titulo = inicio_fila_titulo + 1
-                                fin_fila_titulo = fin_fila_titulo + 1
-                            }
-                        }
-
-
+                        fila.values = body
+                        i++
                     }
+                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                 })
+
+
             })
+
+
+            // principal.mergeCells(`A` + i + `:D` + i);
+            // principal.getCell(`A` + i).value = 'INDICADR' + x
+            // x++
+
+            // }
+
+
+
+
+
+
+
             workbook.xlsx.writeBuffer().then(data => {
                 const blob = new Blob([data], {
                     type: "aplication/vnd.openxmlformats-officedocumets.spreadshhed.sheed",
@@ -492,13 +400,10 @@ function Reportes5() {
                 const url = window.URL.createObjectURL(blob);
                 const anchor = document.createElement('a');
                 anchor.href = url;
-                anchor.download = 'FORMULARIO ADICIONAL 301C ' + gestion_ + '_' + mes1_ + '-' + mes2_ + '- est.' + localStorage.getItem('est') + '.xlsx';
-                // 'FORMULARIO ADICIONAL 301C 2023_ABRIL-NOVIEMBRE_SAN ROQUE'
+                anchor.download = 'REPORTE SDIS-VE.xlsx';
                 anchor.click();
                 window.URL.revokeObjectURL(url);
             })
-
-
         }
 
 
@@ -510,8 +415,9 @@ function Reportes5() {
                 {ventana === 0 ?
                     <div className="container_reportes">
                         <div className='header-reportes'>
-                            <p className='titulo'>reportes estadísticos </p>
-                            <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#595959', textAlign: 'center', marginBottom: '0' }} className='text-center'>{'ESTABLECIMIENTO: ' + localStorage.getItem('est')}  </p>
+                            {/* <img src='img/sedes22.png' className='icono-partido' alt='sdis-ve' /> */}
+                            <p className='titulo'>reporte estadístico SDIS-VE</p>
+                            <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#595959', textAlign: 'center', marginBottom: '0' }} className='text-center'>SEDES CHUQUISACA </p>
 
                         </div>
                         <div className='separador mb-3 mb-sm-0 mb-md-0 mb-lg-0'>
@@ -519,52 +425,66 @@ function Reportes5() {
                                 PARÁMETROS DE SELECCION::
                             </span>
                         </div>
-                        <p className='texto-mov' style={{ marginBottom: '0', fontSize: '14px', fontWeight: 'bold' }}>{''}</p>
+                        <p className='texto-mov' style={{ marginBottom: '0', fontSize: '12px' }}>{''}</p>
                         <div className='p-0 p-sm-2 p-md-3 p-lg-3 pb-0 pt-0 pt-lg-0 pt-md-0 pb-lg-0'>
                             <div className='orden-tiempo '>
-                                <div className='row pb-2'>
-                                    <div className='col-4 col-sm-2 col-md-2 col-lg-2 p-1' >
-                                        <SelectSM
-                                            estado={gestion}
-                                            cambiarEstado={setGestion}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={listaGestion}
-                                            etiqueta={'Gestion'}
-                                            funcion={listarGrupos}
-                                            msg='Seleccione una opcion'
-                                        />
-                                    </div>
-                                    <div className='col-4 col-sm-3 col-md-3 col-lg-3 p-1' onClick={() => { listarMes() }} >
-                                        <SelectSM
-                                            estado={mes1}
-                                            cambiarEstado={setMes1}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={listaMes}
-                                            etiqueta={'de:'}
-                                            msg='Seleccione una opcion'
-                                        />
-                                    </div>
-                                    <div className='col-4 col-sm-3 col-md-3 col-lg-3 p-1' onClick={() => { listarMes() }} >
-                                        <SelectSM
-                                            estado={mes2}
-                                            cambiarEstado={setMes2}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={listaMes}
-                                            etiqueta={'a:'}
-                                            msg='Seleccione una opcion'
-                                        />
-                                    </div>
+                                    <div className='col-12'>
+                                        <div className='row pb-2 '>
+                                            <div className='col-3 col-sm-4 col-md-4 col-lg-4 p-1' >
+                                                <SelectSM
+                                                    estado={ss}
+                                                    cambiarEstado={setSs}
+                                                    ExpresionRegular={INPUT.ID}
+                                                    lista={listaSs}
+                                                    etiqueta={'Sub-Sector'}
+                                                    msg='Seleccione una opcion'
+                                                    fn={[listarTodosGrupos, listarGrupos]}
+                                                />
+                                            </div>
+                                            <div className='col-3 col-sm-4 col-md-4 col-lg-4 p-1' >
+                                                <SelectSM
+                                                    estado={gestion}
+                                                    cambiarEstado={setGestion}
+                                                    ExpresionRegular={INPUT.ID}
+                                                    lista={listaGestion}
+                                                    etiqueta={'Gestion'}
+                                                    // funcion={listarGrupos}
+                                                    msg='Seleccione una opcion'
+                                                />
+                                            </div>
 
-                                </div>
-                                {window.innerWidth < 500 && <div className='col-12' >
-                                    <div className='col-12 col-sm-10 col-md-4 col-lg-3  m-auto row mt-1'>
-                                        <div className='col-4'><p className='blue1'></p></div>
-                                        <div className='col-4'><p className='red1'></p></div>
-                                        <div className='col-4'><p className='blue2'></p></div>
+                                            <div className='col-3 col-sm-2 col-md-2 col-lg-2 p-1' onClick={() => { listarMes() }} >
+                                                <SelectSM
+                                                    estado={mes1}
+                                                    cambiarEstado={setMes1}
+                                                    ExpresionRegular={INPUT.ID}
+                                                    lista={listaMes}
+                                                    etiqueta={'de:'}
+                                                    msg='Seleccione una opcion'
+                                                />
+                                            </div>
+                                            <div className='col-3 col-sm-2 col-md-2 col-lg-2 p-1' onClick={() => { listarMes() }} >
+                                                <SelectSM
+                                                    estado={mes2}
+                                                    cambiarEstado={setMes2}
+                                                    ExpresionRegular={INPUT.ID}
+                                                    lista={listaMes}
+                                                    etiqueta={'a:'}
+                                                    msg='Seleccione una opcion'
+                                                />
+                                            </div>
+
+                                        </div>
                                     </div>
+                                    {window.innerWidth < 500 &&  <div className='col-12'>
+                                        <div className=' row mt-3'>
+                                            <div className='col-4'><p className='blue1'></p></div>
+                                            <div className='col-4'><p className='red1'></p></div>
+                                            <div className='col-4'><p className='blue2'></p></div>
+                                        </div>
+                                    </div>
+                                    }
                                 </div>
-                                }
-                            </div>
                         </div>
                         <div className='cajaprimario-reportes m-0 m-sm-2 m-md-3 m-lg-3 mt-0 mt-lg-0 '>
                             <div className='contenedor cajareportes p-3 p-sm-3 p-md-4 p-lg-4  pt-2 pb-2'>
@@ -642,8 +562,8 @@ function Reportes5() {
                                             />}
                                         </div>
                                     </div>
-                                    <div className='botonModal'>
-                                        <button className='botonProcesar' onClick={() => procesar()}>Generar</button>
+                                    <div className='botonModal mt-1'>
+                                        <button className='botonProcesar' onClick={() => procesar()}>GENERAR</button>
                                     </div>
                                 </div>
                             </div>
@@ -652,16 +572,19 @@ function Reportes5() {
                     :
                     <div className="container_reportes m-auto" style={{ width: '97%' }}>
 
-                        <p className='titulo-reportes_1' style={{ marginBottom: '0px' }} onClick={() => console.log(data, 'datso del valores')} > FORMULARIO ADICIONAL 301c</p>
-                        <p className='titulo-reportes_1' style={{ marginBottom: '0px' }}>GESTION {' ' + año}</p>
+                        <p className='titulo-reportes' style={{ marginBottom: '0px' }} > FORMULARIO ADICIONAL 301c</p>
+                        <p className='titulo-reportes' style={{ marginBottom: '0px' }}>GESTION {' ' + año}</p>
                         <div className='row'>
                             <div className='col-6'>
-                                <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
-                                    {'ESTABLECIMIENTO: ' + localStorage.getItem('est')} </p>
+                                <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
+                                     'SEDES CHUQUISACA'
+                                }  </p>
 
                             </div>
                             <div className='col-6'>
-                                <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + localStorage.getItem('ss')} </p>
+                                {listaSs.map(e => (
+                                    ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
+                                ))}
                             </div>
                         </div>
 
@@ -679,13 +602,14 @@ function Reportes5() {
                                     ))
                                 }
                             </p>
-
                         </div>
                         <div className='p-2'>
+
                             {listaGrupo.map(lg => (
                                 grupoSeleccionados.map(gs => (
                                     parseInt(lg.id) === parseInt(gs) && <div key={gs}>
-                                        <p style={{ fontSize: '12.5px', marginBottom: '0', fontWeight: 'bold' }}>{lg.nombre}  </p>
+                                        <p style={{ fontSize: '13px', marginBottom: '0', fontWeight: 'bold' }}>{lg.nombre}  </p>
+                                        
                                         <div className="table table-responsive custom" style={{ height: 'auto', padding: "0.0rem 0.0rem", marginBottom: '0' }}>
                                             <Table className=' table-sm' style={{ border: "1px solid #000040", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
                                                 {cabecera.length > 0 &&
@@ -763,7 +687,7 @@ function Reportes5() {
                                                                 <td className="col-3 mincelda TituloSecundario" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }}>{ind.indicador}</td>
                                                                 {
                                                                     data.map(d => (
-                                                                        parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center "
+                                                                        parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center"
                                                                             style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
                                                                             <div style={{ height: '29px' }}  >{d.valor}</div>
                                                                         </td>
@@ -779,7 +703,7 @@ function Reportes5() {
                             ))}
 
                             <div className='botonModal p-1'>
-                                <button className='botonVolverReportes' onClick={() => window.location.href = '/reportes5'}>  VOLVER</button>
+                                <button className='botonVolversm' onClick={() => window.location.href = '/mireportes3'}>Volver</button>
                                 <button className='botonExcel' onClick={() => excel()} >EXCEL</button>
                             </div>
                         </div>
@@ -794,4 +718,4 @@ function Reportes5() {
     }
 
 }
-export default Reportes5;
+export default Mireportes2;

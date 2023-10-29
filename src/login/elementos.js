@@ -45,7 +45,7 @@ const InputUsuario = ({ estado, cambiarEstado, name, placeholder, tipo = 'text',
     return (
         <div >
             {/* <div className=" field" style={{ position: 'relative', paddingBottom: '0px' }}> */}
-            <p className='nombreentradas'>{important ? etiqueta + '   *' : etiqueta +' (Opcional)'}
+            <p className='nombreentradas'>{important ? etiqueta + '   *' : etiqueta +''}
                 <Input
                     type={tipo}
                     className="form-control form-control-sm"

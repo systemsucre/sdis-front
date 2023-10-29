@@ -14,7 +14,7 @@ import { imgG } from '../reportes/gobernacion';
 const ExcelJS = require('exceljs')
 
 
-function Opeinf2() {
+function Opeinf6() {
     const auth = useAuth()
     let today = new Date()
     let fecha_ = today.toLocaleDateString()
@@ -65,7 +65,7 @@ function Opeinf2() {
         )
 
         const listarGestion = async () => {
-            axios.post(URL + '/opeinf2/listargestion').then(json => {
+            axios.post(URL + '/opeinf6/listargestion').then(json => {
                 if (json.data.hasOwnProperty("sesion")) {
                     auth.logout()
                     alert('LA SESION FUE CERRADO DESDE EL SERVIDOR, VUELVA A INTRODODUCIR SUS DATOS DE INICIO')
@@ -80,7 +80,7 @@ function Opeinf2() {
         }
         const listarMes = async (id = null) => {
             if (gestion.valido === 'true' || id) {
-                axios.post(URL + '/opeinf2/listarmes', { id: id ? id : gestion.campo, fecha: fecha + ' ' + horafinal }).then(json => {
+                axios.post(URL + '/opeinf6/listarmes', { id: id ? id : gestion.campo, fecha: fecha + ' ' + horafinal }).then(json => {
                     if (json.data.ok) {
                         setListaMes(json.data.data)
                         let mesActual = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(new Date());
@@ -104,7 +104,7 @@ function Opeinf2() {
             // console.log(grupoSeleccionados, 'grupos seleccinados')
             if (mes1.valido === 'true' && gestion.valido === 'true')
 
-                axios.post(URL + '/opeinf2/listardatos', { gestion: gestion.campo, mes1: mes1.campo }).then(json => {
+                axios.post(URL + '/opeinf6/listardatos', { gestion: gestion.campo, mes1: mes1.campo }).then(json => {
                     if (json.data.ok) {
                         json.data.data[1].forEach(h => {
 
@@ -356,4 +356,4 @@ function Opeinf2() {
     }
 
 }
-export default Opeinf2;
+export default Opeinf6;

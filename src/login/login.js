@@ -43,6 +43,8 @@ export default function Login() {
                     localStorage.setItem('est', json.data.establecimiento)
                     localStorage.setItem('red', json.data.red)
                     localStorage.setItem('mun', json.data.municipio)
+                    localStorage.setItem('ss', json.data.ssector)
+                    localStorage.setItem('area', json.data.area)
                     auth.login('ok')
 
                 }
@@ -96,18 +98,15 @@ export default function Login() {
                             className=" mb-3 btn btn-primary btn-block btn-iniciar col-12 mb-4"
                         >Ingresar
                         </button>
-                        <div className='row mt-4 pb-4'>
+                        {/* <div className='row mt-4 pb-4'>
 
 
                                 <div className='botonModal'>
-                                    <a style={{textDecoration:'none'}} href='/registrarme'>
+                                    <a style={{textDecoration:'none'}} href='/sdis1/registrarme'>
                                     <span style={{paddingRight:'15px', fontSize:'16px'}}> Registrarme</span>  <FontAwesomeIcon style={{fontSize:'18px', paddingRight:'3px'}} icon={faSignIn} />
                                     </a>
                                 </div>
-
-
-
-                        </div>
+                        </div> */}
 
                     </div>
                 </div>

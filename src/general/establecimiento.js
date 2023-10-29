@@ -20,6 +20,7 @@ function Establecimiento() {
     const auth = useAuth()
 
     const [lista, setLista] = useState([]);
+    const [ssector, setSsector] = useState([]);
     const [cantidad_, setCantidad] = useState(0);
     const [listaMunicipio, setListaMunicipio] = useState([]);
     const [municipio, setMunicipio] = useState({ campo: null, valido: null });
@@ -33,6 +34,7 @@ function Establecimiento() {
     const [inputBuscar, setInputBuscar] = useState({ campo: null, valido: null })
     const [eliminado, setEliminado] = useState([{ id: 2, nombre: 'BAJA' }, { id: 1, nombre: 'ALTA' },]);
     const [eli, setEli] = useState({ campo: null, valido: null });
+    const [ss, setSs] = useState({ campo: null, valido: null });
 
     let today = new Date()
     let fecha_ = today.toLocaleDateString()
@@ -76,7 +78,8 @@ function Establecimiento() {
         const listarMunic = async () => {
             axios.post(URL + '/est/listarMunic').then(json => {
                 if (json.data.ok) {
-                    setListaMunicipio(json.data.data)
+                    setListaMunicipio(json.data.data[0])
+                    setSsector(json.data.data[1])
 
                 } else alert2({ icono: 'warning', titulo: 'Operacion fallida o acceso denegado', boton: 'ok', texto: json.data.msg })
             }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
@@ -101,13 +104,14 @@ function Establecimiento() {
 
 
         const insertar = async () => {
-            if (municipio.valido === 'true' && hospital.valido === 'true' && estado === 0) {
+            if (municipio.valido === 'true' && hospital.valido === 'true' && estado === 0 && ss.valido ==='true') {
                 setEstado(1)
                 setTexto('Guardando...')
                 setModalInsertar(false)
                 axios.post(URL + '/est/insertar', {
                     esta: hospital.campo,
                     municipio: municipio.campo,
+                    ssector: ss.campo,
                     creado: fecha + ' ' + horafinal,
                     cantidad: auth.cantidad
                 }).then(json => {
@@ -116,6 +120,7 @@ function Establecimiento() {
                         setEstado(0)
                         setLista(json.data.data[0])
                         setCantidad(json.data.data[1])
+                        setSs({ campo: null, valido: null })
 
                         setHospital({ campo: null, valido: null })
                         setMunicipio({ campo: null, valido: null })
@@ -126,7 +131,7 @@ function Establecimiento() {
 
 
         const actualizar = async (e) => {
-            if (municipio.valido === 'true' && hospital.valido === 'true' && id.valido === 'true') {
+            if (municipio.valido === 'true' && hospital.valido === 'true' && id.valido === 'true' && ss.valido ==='true') {
                 let accion = await confirmarActualizar({ titulo: 'Actualizar Registro ?', boton: 'ok', texto: 'Ok para continuar.' })
                 if (accion.isConfirmed) {
                     setEstado(1)
@@ -136,15 +141,17 @@ function Establecimiento() {
                         id: id.campo,
                         esta: hospital.campo,
                         municipio: municipio.campo,
+                        ssector: ss.campo,
                         modificado: fecha + ' ' + horafinal,
                         cantidad: auth.cantidad,
-                        estado: eli.campo===2?1:0
+                        estado: eli.campo === 2 ? 1 : 0
                     }).then(json => {
                         if (json.data.ok) {
                             alert2({ icono: 'success', titulo: 'Operacion exitoso', boton: 'ok', texto: json.data.msg })
                             setLista(json.data.data[0])
                             setCantidad(json.data.data[1])
                             setId({ campo: null, valido: null })
+                            setSs({ campo: null, valido: null })
 
                             setHospital({ campo: null, valido: null })
                             setMunicipio({ campo: null, valido: null })
@@ -154,28 +161,6 @@ function Establecimiento() {
                 }
             } else toast.error('Formulario incompleto!')
         }
-
-        // const eliminar = async (e) => {
-        //     if (e) {
-        //         let accion = await confirmarEliminar({ titulo: 'Eliminar Registro ? Esta accion quitará al establecimiento del sistema. Los usuarios de este establecimiento ya no podran acceder al sistema.', boton: 'ok', texto: 'Ok para continuar.' })
-        //         if (accion.isConfirmed) {
-        //             let accion = await confirmarEliminar({ titulo: 'QUITAR ESTABLECIMIENTO.', boton: 'ok', texto: 'Ok para continuar.' })
-        //             if (accion.isConfirmed) {
-        //                 setEstado(1)
-        //                 setTexto('Eliminando...')
-        //                 axios.post(URL + '/est/eliminar', { id: e, cantidad: auth.cantidad, modificado: fecha + ' ' + horafinal, }).then(json => {
-        //                     if (json.data.ok) {
-        //                         alert2({ icono: 'success', titulo: 'Operaccion Exitoso', boton: 'ok', texto: json.data.msg })
-        //                         setLista(json.data.data[0])
-        //                         setCantidad(json.data.data[1])
-        //                         setEstado(0)
-        //                     } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
-        //                 }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-        //             }
-        //         }
-        //     }
-        // }
 
         const buscar = () => {
             let dir = URL + '/est/buscar'
@@ -233,7 +218,7 @@ function Establecimiento() {
 
                         <div className='contenedor-cabecera row'>
                             <span className='titulo'>
-                                GESTIONAR ESTABLECIMIENTOS
+                                CREAR ESTABLECIMIENTOS
                             </span>
                         </div>
 
@@ -263,16 +248,19 @@ function Establecimiento() {
                             <table className="table table-sm" >
                                 <thead >
                                     <tr >
-                                        <th className="col-5 ">ESTABLECIMIENTO</th>
+                                        <th className="col-4 ">ESTABLECIMIENTO</th>
+                                        <th className="col-1 ">CODIGO</th>
                                         <th className="col-2 ">ESTADO</th>
                                         <th className="col-3 ">MUNICIPIO</th>
+                                        <th className="col-2 ">SUB-SECTOR</th>
                                         {/* <th className="col-1  "></th> */}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {lista.map((a) => (
                                         <tr key={a.id}>
-                                            <td className="col-5 ">{a.establecimiento}</td>
+                                            <td >{a.establecimiento}</td>
+                                            <td >{a.cod}</td>
                                             <td >
                                                 <div className='row'>
                                                     <div className='col-auto'>
@@ -286,7 +274,8 @@ function Establecimiento() {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="col-3 " >{a.municipio}</td>
+                                            <td  >{a.municipio}</td>
+                                            <td >{a.ssector}</td>
                                             <td className="col-1 largTable">
                                                 {/* <FontAwesomeIcon icon={faTrashAlt} onClick={() => eliminar(a.id)} className='botonEliminar' /> */}
                                                 <FontAwesomeIcon icon={faCog} className='botonEditar'
@@ -295,7 +284,8 @@ function Establecimiento() {
                                                         setId({ campo: a.id, valido: 'true' });
                                                         setHospital({ campo: a.establecimiento, valido: 'true' });
                                                         setMunicipio({ campo: a.idmunicipio, valido: 'true' });
-                                                        setEli({ campo: a.eliminado?2:1, valido: 'true' })
+                                                        setEli({ campo: a.eliminado ? 2 : 1, valido: 'true' })
+                                                        setSs({ campo: a.idssector, valido: 'true' })
                                                         setModalEditar(true)
                                                     }} />
                                             </td>
@@ -339,6 +329,15 @@ function Establecimiento() {
                             etiqueta={'Municipio'}
                             msg='Seleccione una opcion'
                         />
+                        <Select1
+                            estado={ss}
+                            cambiarEstado={setSs}
+                            ExpresionRegular={INPUT.ID}
+                            lista={ssector}
+                            etiqueta={'Sub-sector'}
+                            msg='Seleccione una opcion'
+                        />
+
 
                         <InputUsuario
                             estado={hospital}
@@ -346,7 +345,7 @@ function Establecimiento() {
                             name="clasificacion"
                             placeholder="ESTABLECIMIENTO"
                             ExpresionRegular={INPUT.ESTABLECIMIENTO}  //expresion regular  
-                            etiqueta='Establecimiento'
+                            etiqueta='Nombre'
                             msg={'Este campo acepta letras, numero y algunos caracteres'}
                         />
                     </ModalBody>
@@ -374,13 +373,22 @@ function Establecimiento() {
                             etiqueta={'Municipio'}
                             msg='Seleccione una opcion'
                         />
+                            <Select1
+                            estado={ss}
+                            cambiarEstado={setSs}
+                            ExpresionRegular={INPUT.ID}
+                            lista={ssector}
+                            etiqueta={'Sub-sector'}
+                            msg='Seleccione una opcion'
+                        />
+
                         <InputUsuario
                             estado={hospital}
                             cambiarEstado={setHospital}
                             name="clasificacion"
-                            placeholder="Clasificacion"
+                            placeholder="ESTABLECIMIENTO"
                             ExpresionRegular={INPUT.CLASIFICACION}  //expresion regular  
-                            etiqueta='Hospital'
+                            etiqueta='nombre'
                             msg={'Este campo acepta letras, numero y algunos caracteres'}
                         />
                         <Select1

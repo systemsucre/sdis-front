@@ -90,7 +90,7 @@ function Menu() {
 
 
     const actualizar = async (e) => {
-        if (nombre.valido === 'true' && ape1.valido === 'true' ) {
+        if (nombre.valido === 'true' && ape1.valido === 'true') {
             let accion = await confirmarActualizar({ titulo: 'Actualizar Registro ?', boton: 'ok', texto: 'Ok para continuar.' })
             if (accion.isConfirmed) {
                 axios.post(URL + '/miPerfil/actualizarMiPerfil', {
@@ -128,7 +128,15 @@ function Menu() {
                                 <span style={{ textTransform: 'lowercase' }}>{' (' + localStorage.getItem('username') + ')'}</span></a>
                         </li>
                         <li className='rolperfil' >
-                            <a>{localStorage.getItem('est')}</a>
+                            {parseInt(localStorage.getItem('numRol')) == 1 && <a>ADMIN</a>}
+                            {parseInt(localStorage.getItem('numRol')) == 2 && <a>SEDES</a>}
+                            {parseInt(localStorage.getItem('numRol')) == 3 && <a>{localStorage.getItem('red')}</a>}
+                            {parseInt(localStorage.getItem('numRol')) == 4 && <a>{localStorage.getItem('mun')}</a>}
+                            {parseInt(localStorage.getItem('numRol')) == 5 && <a>{localStorage.getItem('est') + '(' + localStorage.getItem('ss') + ')'}</a>}
+                            {parseInt(localStorage.getItem('numRol')) == 6 && <a className='tooltip_' style={{ color: 'white', cursor: 'pointer', textDecoration: 'none', width: '100%' }}>
+                                <p className="tooltiptext_">{
+                                    localStorage.getItem('area')
+                                }</p> {'USUARIO AREA'}</a>}
                         </li>
                     </ul>
                 </ul>
@@ -165,18 +173,28 @@ function Menu() {
 
                     {parseInt(localStorage.getItem('numRol')) === 2 &&
                         <>
-                            <li className='menu__item hidden_from_formulario'>
-                                <a href='/reportes2' className='menu__link'>REPORTES</a>
-                            </li>
-
                             <li className='menu__item menu__item--show'>
-                                <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <a href='#' className='menu__link'>REPORTES <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
                                 <ul className='menu__nesting'>
-                                    <li className='menu__inside hidden_from_g_usuarios'>
-                                        <a href='/oportunidad-de-informacion-sedes' className='menu__link menu_link--inside'>Oportunidad de información</a>
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/reportes-por-sedes' className='menu__link menu_link--inside'>{'DEPARTAMENTAL'}</a>
                                     </li>
-                                    <li className='menu__inside hidden_from_mes'>
-                                        <a href='/meses' className='menu__link menu_link--inside '>Meses</a>
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/reportes-por-formulario-sedes' className='menu__link menu_link--inside'>{'POR FORMULARIOS'}</a>
+                                    </li>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='/oportunidad-de-informacion-sedes' className='menu__link menu_link--inside'>OPORTUNIDAD DE INFORMACIÓN</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li className='menu__item menu__item--show'>
+                                <a href='#' className='menu__link'>MI FORMULARIO <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <ul className='menu__nesting'>
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/formulario2' className='menu__link menu_link--inside'>FORMULARIO</a>
+                                    </li>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='/mireportes2' className='menu__link menu_link--inside'>REPORTE</a>
                                     </li>
                                 </ul>
                             </li>
@@ -184,19 +202,31 @@ function Menu() {
                     }
                     {parseInt(localStorage.getItem('numRol')) === 3 &&
                         <>
-                            <li className='menu__item hidden_from_formulario'>
-                                <a href='/reportes3' className='menu__link'>REPORTES</a>
-                            </li>
-
                             <li className='menu__item menu__item--show'>
-                                <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <a href='#' className='menu__link'>REPORTES <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
                                 <ul className='menu__nesting'>
-                                    <li className='menu__inside hidden_from_g_usuarios'>
-                                        <a href='/oportunidad-de-informacion-redes' className='menu__link menu_link--inside'>Oportunidad de información</a>
+
+
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/reportes-por-red' className='menu__link menu_link--inside'>{'POR RED'}</a>
                                     </li>
 
                                     <li className='menu__inside hidden_from_formulario'>
-                                        <a href='/formulario' className='menu__link menu_link--inside'>Formulario</a>
+                                        <a href='/reportes-por-formulario-red' className='menu__link menu_link--inside'>{'POR FORMULARIOS'}</a>
+                                    </li>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='/oportunidad-de-informacion-redes' className='menu__link menu_link--inside'>OPORTUNIDAD DE INFORMACIÓN</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li className='menu__item menu__item--show'>
+                                <a href='#' className='menu__link'>MI FORMULARIO <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <ul className='menu__nesting'>
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/formulario3' className='menu__link menu_link--inside'>FORMULARIO</a>
+                                    </li>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='/mireportes3' className='menu__link menu_link--inside'>REPORTE</a>
                                     </li>
                                 </ul>
                             </li>
@@ -204,19 +234,32 @@ function Menu() {
                     }
                     {parseInt(localStorage.getItem('numRol')) === 4 &&
                         <>
-                            <li className='menu__item hidden_from_formulario'>
-                                <a href='/reportes4' className='menu__link'>REPORTES</a>
-                            </li>
-
                             <li className='menu__item menu__item--show'>
-                                <a href='#' className='menu__link'>ADMINISTRACION <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <a href='#' className='menu__link'>REPORTES <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
                                 <ul className='menu__nesting'>
-                                    <li className='menu__inside hidden_from_g_usuarios'>
-                                        <a href='/oportunidad-de-informacion-municipios' className='menu__link menu_link--inside'>Oportunidad de información</a>
+
+
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/reportes-por-municipio' className='menu__link menu_link--inside'>{'POR MUNICIPIO'}</a>
                                     </li>
 
                                     <li className='menu__inside hidden_from_formulario'>
-                                        <a href='/formulario' className='menu__link menu_link--inside'>Formulario</a>
+                                        <a href='/reportes-por-formulario' className='menu__link menu_link--inside'>{'POR FORMULARIOS'}</a>
+                                    </li>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='/oportunidad-de-informacion-municipios' className='menu__link menu_link--inside'>OPORTUNIDAD DE INFORMACIÓN</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li className='menu__item menu__item--show'>
+                                <a href='#' className='menu__link'>MI FORMULARIO <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <ul className='menu__nesting'>
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/formulario4' className='menu__link menu_link--inside'>FORMULARIO</a>
+                                    </li>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='/mireportes4' className='menu__link menu_link--inside'>REPORTE</a>
                                     </li>
                                 </ul>
                             </li>
@@ -225,13 +268,43 @@ function Menu() {
 
                     {parseInt(localStorage.getItem('numRol')) === 5 && <>
                         <li className='menu__item hidden_from_formulario'>
-                            <a href='/formulario' className='menu__link'>FORMULARIO</a>
+                            <a href='/formulario5' className='menu__link'>FORMULARIO</a>
                         </li>
 
                         <li className='menu__item hidden_from_formulario'>
                             <a href='/reportes5' className='menu__link'>REPORTES</a>
                         </li>
                     </>
+                    }
+
+
+                    {parseInt(localStorage.getItem('numRol')) === 6 &&
+                        <>
+                            <li className='menu__item menu__item--show'>
+                                <a href='#' className='menu__link'>REPORTES <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <ul className='menu__nesting'>
+
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/reportes-por-formulario-area' className='menu__link menu_link--inside'>{'POR FORMULARIOS'}</a>
+                                    </li>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='/oportunidad-de-informacion-area' className='menu__link menu_link--inside'>OPORTUNIDAD DE INFORMACIÓN</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li className='menu__item menu__item--show'>
+                                <a href='#' className='menu__link'>MI FORMULARIO <img src="./img/arrow.png" alt='Menus' className='menu__arrow' /></a>
+                                <ul className='menu__nesting'>
+                                    <li className='menu__inside hidden_from_formulario'>
+                                        <a href='/formulario6' className='menu__link menu_link--inside'>FORMULARIO</a>
+                                    </li>
+                                    <li className='menu__inside hidden_from_g_usuarios'>
+                                        <a href='/mireportes6' className='menu__link menu_link--inside'>REPORTE</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </>
                     }
 
                     <br />
@@ -261,14 +334,30 @@ function Menu() {
                 <ModalBody>
                     {usuario.length > 0 && <>
                         {usuario[0].estado == 0 && <p style={{ fontSize: '18px', color: '#f54021' }}>USUARIO SIN VALIDAR</p>}
-                        <div className='row p-2 mb-1'>
+                        {usuario[0].idrol == 5 && <div className='row p-1 mb-1'>
                             <div className='encabezado col-6'>Establecimiento</div>
-                            <div className='contenido col-6'>{usuario[0].establecimiento}</div>
-                        </div>
-                        <div className='row p-2 mb-1'>
+                            <div className='contenido col-6' >{usuario[0].establecimiento}</div>
+                        </div>}
+                        {usuario[0].idrol == 4 && <div className='row p-1 mb-1'>
+                            <div className='encabezado col-6'>Municipio</div>
+                            <div className='contenido col-6' >{usuario[0].municipio}</div>
+                        </div>}
+                        {usuario[0].idrol == 3 && <div className='row p-1 mb-1'>
+                            <div className='encabezado col-6'>Red</div>
+                            <div className='contenido col-6' >{usuario[0].red}</div>
+                        </div>}
+                        {usuario[0].idrol == 6 &&
+                            <div className='row p-1 mb-1'>
+                                <div className='encabezado col-6'>Area</div>
+                                <div className='contenido col-6'>{usuario[0].variable}</div>
+                            </div>
+                        }
+                        <div className='row p-1 mb-1'>
                             <div className='encabezado col-6'>Rol Usuario</div>
                             <div className='contenido col-6'>{usuario[0].rol ? usuario[0].rol : 'NO TIENE'}</div>
                         </div>
+
+
                         <div className='row p-2'>
                             <div className='encabezado col-6'>Nombre de Usuario</div>
                             <div className='contenido col-6'>{usuario[0].username}</div>
@@ -299,7 +388,7 @@ function Menu() {
                 </ModalBody>
                 <div className='botonModal'>
                     <button className="btn-eliminar col-auto" onClick={() => setModalRecet(true)} >
-                        <FontAwesomeIcon className='btn-icon-nuevo' icon={faLock} />Reiniciar Contraseña
+                        <FontAwesomeIcon className='btn-icon-nuevo' icon={faLock} />Cambiar Contraseña
                     </button>
                     <button className="btn-editar col-auto" onClick={() => rellenar()} >
                         <FontAwesomeIcon className='btn-icon-nuevo' icon={faEdit} />ACTUALIZAR
@@ -345,7 +434,7 @@ function Menu() {
                 </ModalBody>
                 <div className='botonModal'>
                     <button className="btn-eliminar col-auto" onClick={() => recet_()} >
-                        <FontAwesomeIcon className='btn-icon-nuevo' icon={faRefresh} />Reiniciar Contraseña
+                        <FontAwesomeIcon className='btn-icon-nuevo' icon={faRefresh} />Cambiar Contraseña
                     </button>
                 </div>
             </Modal>

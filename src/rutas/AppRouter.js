@@ -5,27 +5,61 @@ import { useEffect } from "react";
 import React from 'react';
 import Login from '../login/login'
 import Menu from '../menu/menu'
+import E500 from './e500'
+import useAuth from "../Auth/useAuth";
+import { TIEMPO_INACTIVO } from "../Auth/config";
+
+
+// ADMIN
+import Variable from '../proyecto/variables';
 import Establecimiento from '../general/establecimiento';
 import Gestion from '../general/gestion';
 import Mes from '../general/mes';
-import Formulario from '../proyecto/formulario';
-
-
-
-import E500 from './e500'
-
-import useAuth from "../Auth/useAuth";
-import { TIEMPO_INACTIVO } from "../Auth/config";
 import Usuario from '../general/usuarios';
 import Registro from '../general/registrarme';
-import Variable from '../proyecto/variables';
+
+
+// ESTABLECIMIENTO
+import Formulario5 from '../proyecto/formulario5';
 import Reportes5 from '../proyecto/reportes/reprtes5';
-import Reportes4 from '../proyecto/reportes/reprtes4';
+
+// MUNICIPIO
+import Formulario4 from '../proyecto/formulario4';
+import ReportesMunicipio from '../proyecto/reportes/4rptmunicipio';
+import ReportesFormulario from '../proyecto/reportes/4rptformulario';
+import Mireportes4 from '../proyecto/reportes/4mireprtes';
 import Opeinf4 from '../proyecto/opeinf/opeinf4';
-import Reportes3 from '../proyecto/reportes/reprtes3';
+
+// RED
+import Formulario3 from '../proyecto/formulario3';
+import ReportesRed from '../proyecto/reportes/3rptred';
+import ReportesFormularioRed from '../proyecto/reportes/3rptformulario';
+import Mireportes3 from '../proyecto/reportes/3mireprtes';
 import Opeinf3 from '../proyecto/opeinf/opeinf3';
-import Reportes2 from '../proyecto/reportes/reprtes2';
+
+
+//AREA 
+import Formulario6 from '../proyecto/formulario6';
+import Mireportes6 from '../proyecto/reportes/6mireprtes';
+import ReportesFormularioArea from '../proyecto/reportes/6rptformulario';
+import Opeinf6 from '../proyecto/opeinf/opeinf6';
+
+
+
+// SEDES
+import Formulario2 from '../proyecto/formulario2';
+import Mireportes2 from '../proyecto/reportes/2mireprtes';
+import ReportesFormularioSedes from '../proyecto/reportes/2rptformulario';
+import ReportesSedes from '../proyecto/reportes/2rptsedes';
+
+
 import Opeinf2 from '../proyecto/opeinf/opeinf2';
+
+
+
+
+
+
 
 
 export default function AppRouter() {
@@ -79,31 +113,57 @@ export default function AppRouter() {
           <Switch>
             <PublicRoute exact path="/" component={Login} />
             <PublicRoute exact path="/registrarme" component={Registro} />
+
+            {/* ADMIN */}
             <Check exact path='/establecimiento' component={Establecimiento} />
             <Check exact path='/Gestion' component={Gestion} />
             <Check exact path='/meses' component={Mes} />
             <Check exact path='/usuarios' component={Usuario} />
             <Check exact path='/variables' component={Variable} />
-            <Check exact path='/formulario' component={Formulario} />
-            
+
+            {/* ESTABLECIMIENTO */}
+            <Check exact path='/formulario5' component={Formulario5} />
             <Check exact path='/reportes5' component={Reportes5} />
-            <Check exact path='/reportes4' component={Reportes4} />
+
+
+            {/* MUNICIPIO */}
+            <Check exact path='/formulario4' component={Formulario4} />
+            <Check exact path='/mireportes4' component={Mireportes4} />
+            <Check exact path='/reportes-por-municipio' component={ReportesMunicipio} />
+            <Check exact path='/reportes-por-formulario' component={ReportesFormulario} />
             <Check exact path='/oportunidad-de-informacion-municipios' component={Opeinf4} />
-           
-            <Check exact path='/reportes3' component={Reportes3} />
+
+            {/* RED */}
+            <Check exact path='/formulario3' component={Formulario3} />
+            <Check exact path='/mireportes3' component={Mireportes3} />
+            <Check exact path='/reportes-por-red' component={ReportesRed} />
+            <Check exact path='/reportes-por-formulario-red' component={ReportesFormularioRed} />
             <Check exact path='/oportunidad-de-informacion-redes' component={Opeinf3} />
-            
-            <Check exact path='/reportes2' component={Reportes2} />
+
+
+            {/* AREA */}
+            <Check exact path='/formulario6' component={Formulario6} />
+            <Check exact path='/mireportes6' component={Mireportes6} />
+            <Check exact path='/reportes-por-formulario-area' component={ReportesFormularioArea} />
+            <Check exact path='/oportunidad-de-informacion-area' component={Opeinf6} />
+
+
+
+            {/* SEDES */}
+            <Check exact path='/formulario2' component={Formulario2} />
+            <Check exact path='/mireportes2' component={Mireportes2} />
+            <Check exact path='/reportes-por-sedes' component={ReportesSedes} />
+            <Check exact path='/reportes-por-formulario-sedes' component={ReportesFormularioSedes} />
             <Check exact path='/oportunidad-de-informacion-sedes' component={Opeinf2} />
 
-            <Route exact path="*" component={E500} />
+            <Route exact path="/*" component={E500} />
           </Switch>
         </div>
       </BrowserRouter>
 
     )
   } catch (error) {
-    alert('arror')
+    alert('error')
   }
 }
 

@@ -19,7 +19,7 @@ const ExcelJS = require('exceljs')
 
 
 
-function Reportes4() {
+function Mireportes3() {
     const auth = useAuth()
 
     let today = new Date()
@@ -39,7 +39,8 @@ function Reportes4() {
     const [ventana, setVentana] = useState(0)
     const [estado, setEstado] = useState(0)
     const [texto, setTexto] = useState(null);
-
+    const [listaSs, setListaSs] = useState([]);
+    const [ss, setSs] = useState({ campo: null, valido: null })
     const [grupoSeleccionados, setGruposSeleccionado] = useState([])
     const [variablesSeleccionado, setVariablesSeleccionados] = useState([])
 
@@ -73,7 +74,6 @@ function Reportes4() {
             if (listaGestion.length < 1) {
                 document.title = 'REPORTES'
                 listarGestion()
-                listarGrupoInicio()
             }
         }, [])
 
@@ -90,54 +90,76 @@ function Reportes4() {
         )
 
         const listarGestion = async () => {
-            axios.post(URL + '/reportes4/listargestion').then(json => {
+            axios.post(URL + '/reportes3/listargestion').then(json => {
                 if (json.data.hasOwnProperty("sesion")) {
                     auth.logout()
                     alert('LA SESION FUE CERRADO DESDE EL SERVIDOR, VUELVA A INTRODODUCIR SUS DATOS DE INICIO')
                 }
                 if (json.data.ok) {
-                    setListaGestion(json.data.data)
-                    setGestion({ campo: json.data.data.length > 0 ? json.data.data[0].id : null, valido: json.data.data.length > 0 ? 'true' : null })
+                    // console.log(json.data.data, 'lista gestion')
+                    setListaGestion(json.data.data[0])
+                    listarMes(json.data.data[0][0].id)
+                    listarTodosGrupos(json.data.data[0][0].id)
+                    json.data.data[1].unshift({ id: 1000, nombre: 'TODOS' })
+                    setSs({ campo: 1000, valido: 'true' })
+                    setListaSs(json.data.data[1])
+                    setGestion({ campo: json.data.data[0].length > 0 ? json.data.data[0][0].id : null, valido: json.data.data[0].length > 0 ? 'true' : null })
                 } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
         }
-        const listarMes = async () => {
-            if (gestion.valido === 'true') {
-                axios.post(URL + '/reportes4/listarmes', { id: gestion.campo, fecha: fecha + ' ' + horafinal }).then(json => {
+        const listarMes = async (id = null) => {
+            if (gestion.valido === 'true' || id) {
+                axios.post(URL + '/reportes3/listarmes', { id: id ? id : gestion.campo, fecha: fecha + ' ' + horafinal }).then(json => {
                     if (json.data.ok) {
+                        // console.log(json.data.data, 'lista de meses')
                         setListaMes(json.data.data)
+                        let mesActual = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(new Date());
+                        json.data.data.forEach(e => {
+                            // console.log('llamada a mlistarmes', e.nombre, mesActual)
+                            if (e.nombre.toLowerCase() == mesActual && id) {
+                                setMes1({ campo: e.id, valido: 'true' })
+                                setMes2({ campo: e.id, valido: 'true' })
+                            }
+                        })
 
                     } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
                 }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
             }
         }
-
-
-        const listarGrupoInicio = async () => {
-            axios.post(URL + '/reportes4/listarvariableinicio').then(json => {
-                if (json.data.ok) {
-                    setListaGrupo(json.data.data)
-                } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
-            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-        }
-
-        const listarGrupos = async () => {
-            if (gestion.valido === 'true') {
-                axios.post(URL + '/reportes4/listarvariable', { id: gestion.campo }).then(json => {
+        const listarTodosGrupos = async (id = null) => {
+            console.log('todos los grupos')
+            if (gestion.valido === 'true' || id) {
+                axios.post(URL + '/reportes3/listartodosvariableR', { id: id ? id : gestion.campo, }).then(json => {
                     if (json.data.ok) {
                         setListaGrupo(json.data.data)
                         // console.log(json.data.data,'data de la bd')
                     } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
                 }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-            }
+            } else toast.error('Seleccione la gestion ')
         }
 
 
+
+        const listarGrupos = async () => {
+            console.log('listar grupos especificos')
+            if (gestion.valido === 'true') {
+                axios.post(URL + '/reportes3/listarvariableR', { id: gestion.campo, ssector: ss.campo }).then(json => {
+                    if (json.data.ok) {
+                        setListaGrupo(json.data.data)
+                        // console.log(json.data.data,'data de la bd')
+                    } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
+                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+            } else toast.error('Seleccione la gestion ')
+        }
+
+
+
         const listarVariables = async (id) => {
+
             setListaVariable([])
             setEstado(1)
             setTexto('Cargando...')
-            axios.post(URL + '/reportes4/listarindicadores', { variable: id }).then(json => {
+            axios.post(URL + '/reportes3/listarindicadores', { variable: id }).then(json => {
                 if (json.data.ok) {
                     setListaVariable(json.data.data)
                     setEstado(0)
@@ -161,22 +183,27 @@ function Reportes4() {
                     setTexto('Espere unos segundos, se esta procesando la informacion...')
                     if (variablesSeleccionado.length > 0) {
                         let data_ = []
-                        axios.post(URL + '/reportes4/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
+                        axios.post(URL + '/reportes3/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
                             if (json.data.ok)
                                 setCabecera(json.data.data)
                             else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                         }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        axios.post(URL + '/reportes4/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
+                        axios.post(URL + '/reportes3/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
                             if (json.data.ok)
                                 setListaIndicadores(json.data.data)
                             else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                         }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
                         variablesSeleccionado.forEach(e => {
 
-                            axios.post(URL + '/reportes4/indicadorespecifico', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                            axios.post(URL + '/reportes3/indicadorespecificoR', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
                                 if (json.data.ok)
-                                    json.data.data.forEach(e => {
-                                        data_.push(e)
+                                    json.data.data[1].forEach(e1 => {
+                                        json.data.data[0].forEach(e2 => {
+                                            if (parseInt(e1.input) === parseInt(e2.idinput)) {
+                                                e1.valor = e2.valor
+                                            }
+                                        })
+                                        data_.push(e1)
                                     })
                                 else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
@@ -194,7 +221,7 @@ function Reportes4() {
                         let dataInd_ = []
                         let data_ = []
                         grupoSeleccionados.forEach(e => {
-                            axios.post(URL + '/reportes4/listarcabeceras', { variable: e }).then(json => {
+                            axios.post(URL + '/reportes3/listarcabeceras', { variable: e }).then(json => {
                                 if (json.data.ok)
                                     json.data.data.forEach(e => {
                                         dataCabeceras.push(e)
@@ -202,7 +229,7 @@ function Reportes4() {
                                 else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
 
-                            axios.post(URL + '/reportes4/listarindicadores', { variable: e }).then(json => {
+                            axios.post(URL + '/reportes3/listarindicadores', { variable: e }).then(json => {
                                 if (json.data.ok)
                                     json.data.data.forEach(e => {
                                         dataInd_.push(e)
@@ -210,10 +237,15 @@ function Reportes4() {
                                 else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
 
-                            axios.post(URL + '/reportes4/unavariable', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                            axios.post(URL + '/reportes3/unavariableR', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
                                 if (json.data.ok)
-                                    json.data.data.forEach(e => {
-                                        data_.push(e)
+                                    json.data.data[1].forEach(e1 => {
+                                        json.data.data[0].forEach(e2 => {
+                                            if (parseInt(e1.input) === parseInt(e2.idinput)) {
+                                                e1.valor = e2.valor
+                                            }
+                                        })
+                                        data_.push(e1)
                                     })
                                 else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                             }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
@@ -232,7 +264,7 @@ function Reportes4() {
                         }, 4000)
                     }
                     setVentana(1)
-                } else alert2({ icono: 'question', titulo: 'selecione una o mas opciones del cuaderno', boton: 'ok' })
+                } else alert2({ icono: 'question', titulo: 'selecione una o mas formularios', boton: 'ok' })
             else alert2({ icono: 'question', titulo: 'selecione los parametros año, mes1 y mes2', boton: 'ok' })
 
         }
@@ -313,7 +345,7 @@ function Reportes4() {
             let i = 7
             var fila = null
             grupoSeleccionados.forEach(g => {
-                axios.post(URL + '/reportes4/maxorden', { id: g }).then(json => {
+                axios.post(URL + '/reportes3/maxorden', { id: g }).then(json => {
                     if (json.data.ok) {
                         let ultimo = json.data.data
                         let body = []
@@ -373,10 +405,6 @@ function Reportes4() {
                 anchor.click();
                 window.URL.revokeObjectURL(url);
             })
-
-
-
-
         }
 
 
@@ -388,57 +416,80 @@ function Reportes4() {
                 {ventana === 0 ?
                     <div className="container_reportes">
                         <div className='header-reportes'>
-                            <img src='img/sedes22.png' className='icono-partido' alt='sdis-ve' /><span className='titulo'>reportes estadísticos </span>
+                            {/* <img src='img/sedes22.png' className='icono-partido' alt='sdis-ve' /> */}
+                            <p className='titulo'>reporte estadístico SDIS-VE</p>
+                            <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#595959', textAlign: 'center', marginBottom: '0' }} className='text-center'>{ localStorage.getItem('red')}  </p>
+
                         </div>
                         <div className='separador mb-3 mb-sm-0 mb-md-0 mb-lg-0'>
                             <span onClick={() => console.log(data, 'datos', cabecera, 'cabeceras')}>
                                 PARÁMETROS DE SELECCION::
                             </span>
                         </div>
-                        <p className='texto-mov' style={{ marginBottom: '0', fontSize: '12px' }}>{'MUNICIPIO :: '+localStorage.getItem('mun')}</p>
+                        <p className='texto-mov' style={{ marginBottom: '0', fontSize: '12px' }}>{''}</p>
                         <div className='p-0 p-sm-2 p-md-3 p-lg-3 pb-0 pt-0 pt-lg-0 pt-md-0 pb-lg-0'>
                             <div className='orden-tiempo '>
-                                <div className='row '>
-                                    <div className='col-2 col-sm-2 col-md-2 col-lg-2 m-1' >
-                                        <SelectSM
-                                            estado={gestion}
-                                            cambiarEstado={setGestion}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={listaGestion}
-                                            etiqueta={'Gestion'}
-                                            funcion={listarGrupos}
-                                            msg='Seleccione una opcion'
-                                        />
-                                    </div>
-                                    <div className='col-3 col-sm-3 col-md-3 col-lg-3 m-1' onClick={() => { listarMes() }} >
-                                        <SelectSM
-                                            estado={mes1}
-                                            cambiarEstado={setMes1}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={listaMes}
-                                            etiqueta={'Desde'}
-                                            msg='Seleccione una opcion'
-                                        />
-                                    </div>
-                                    <div className='col-3 col-sm-3 col-md-3 col-lg-3 m-1' onClick={() => { listarMes() }} >
-                                        <SelectSM
-                                            estado={mes2}
-                                            cambiarEstado={setMes2}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={listaMes}
-                                            etiqueta={'hasta'}
-                                            msg='Seleccione una opcion'
-                                        />
-                                    </div>
-                                    <div className='col-2 col-sm-3 col-md-3 col-lg-3 m-1 ml-0 mr-0' >
-                                        <div className='col-12 col-sm-10 col-md-4 col-lg-3  m-auto row mt-3'>
-                                            <div className='col-3'><p className='blue1'></p></div>
-                                            <div className='col-3'><p className='red1'></p></div>
-                                            <div className='col-3'><p className='blue2'></p></div>
+                                    <div className='col-12'>
+                                        <div className='row pb-2 '>
+                                            <div className='col-3 col-sm-4 col-md-4 col-lg-4 p-1' >
+                                                <SelectSM
+                                                    estado={ss}
+                                                    cambiarEstado={setSs}
+                                                    ExpresionRegular={INPUT.ID}
+                                                    lista={listaSs}
+                                                    etiqueta={'Sub-Sector'}
+                                                    msg='Seleccione una opcion'
+                                                    fn={[listarTodosGrupos, listarGrupos]}
+                                                    very = {1}
+                                                />
+                                            </div>
+                                            <div className='col-3 col-sm-4 col-md-4 col-lg-4 p-1' >
+                                                <SelectSM
+                                                    estado={gestion}
+                                                    cambiarEstado={setGestion}
+                                                    ExpresionRegular={INPUT.ID}
+                                                    lista={listaGestion}
+                                                    etiqueta={'Gestion'}
+                                                    // funcion={listarGrupos}
+                                                    msg='Seleccione una opcion'
+                                                    very = {1}
+                                                />
+                                            </div>
+
+                                            <div className='col-3 col-sm-2 col-md-2 col-lg-2 p-1' onClick={() => { listarMes() }} >
+                                                <SelectSM
+                                                    estado={mes1}
+                                                    cambiarEstado={setMes1}
+                                                    ExpresionRegular={INPUT.ID}
+                                                    lista={listaMes}
+                                                    etiqueta={'de:'}
+                                                    msg='Seleccione una opcion'
+                                                    very = {1}
+                                                />
+                                            </div>
+                                            <div className='col-3 col-sm-2 col-md-2 col-lg-2 p-1' onClick={() => { listarMes() }} >
+                                                <SelectSM
+                                                    estado={mes2}
+                                                    cambiarEstado={setMes2}
+                                                    ExpresionRegular={INPUT.ID}
+                                                    lista={listaMes}
+                                                    etiqueta={'a:'}
+                                                    msg='Seleccione una opcion'
+                                                    very = {1}
+                                                />
+                                            </div>
+
                                         </div>
                                     </div>
+                                    {window.innerWidth < 500 &&  <div className='col-12'>
+                                        <div className=' row mt-3'>
+                                            <div className='col-4'><p className='blue1'></p></div>
+                                            <div className='col-4'><p className='red1'></p></div>
+                                            <div className='col-4'><p className='blue2'></p></div>
+                                        </div>
+                                    </div>
+                                    }
                                 </div>
-                            </div>
                         </div>
                         <div className='cajaprimario-reportes m-0 m-sm-2 m-md-3 m-lg-3 mt-0 mt-lg-0 '>
                             <div className='contenedor cajareportes p-3 p-sm-3 p-md-4 p-lg-4  pt-2 pb-2'>
@@ -447,7 +498,7 @@ function Reportes4() {
 
                                     <div className='row'  >
                                         <div className='col-12 col-sm-12 col-md-7 col-lg-7' >
-                                            <h5 className='titulo-parametros'>Cuaderno</h5>
+                                            <h5 className='titulo-parametros'>Formularios</h5>
                                             <div className='table table-responsive caja-scroll' style={{ marginBottom: '.1rem' }}>
                                                 <Table className="table table-sm" >
                                                     <tbody >
@@ -516,8 +567,8 @@ function Reportes4() {
                                             />}
                                         </div>
                                     </div>
-                                    <div className='botonModal'>
-                                        <button className='botonProcesar' onClick={() => procesar()}>Procesar</button>
+                                    <div className='botonModal mt-1'>
+                                        <button className='botonProcesar' onClick={() => procesar()}>GENERAR</button>
                                     </div>
                                 </div>
                             </div>
@@ -526,32 +577,51 @@ function Reportes4() {
                     :
                     <div className="container_reportes m-auto" style={{ width: '97%' }}>
 
-                        <p className='titulo-reportes' style={{ marginBottom: '0px' }} > FORMULARIO ADICIONAL 301c</p>
-                        <p className='titulo-reportes' style={{ marginBottom: '0px' }}>GESTION {' ' + año}</p>
-                        <p className='titulo-reportes' style={{ textAlign: 'left', paddingLeft: '8px', marginBottom: '0', fontSize: '11px' }}>ESTABLECIMIENTO : {localStorage.getItem('est')}</p>
+                        <p className='titulo-reportes_1' style={{ marginBottom: '0px' }} > FORMULARIO ADICIONAL 301c</p>
+                        <p className='titulo-reportes_1' style={{ marginBottom: '0px' }}>GESTION {' ' + año}</p>
+                        <div className='row'>
+                            <div className='col-6'>
+                                <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
+                                     localStorage.getItem('red')
+                                }  </p>
+
+                            </div>
+                            <div className='col-6'>
+                                {listaSs.map(e => (
+                                    ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className='col-6'>
+                            <p className='titulo-reportes'
+                                style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
+                                {
+                                    listaMes.map(e => (
+                                        mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
+                                    ))
+                                }
+                                {
+                                    listaMes.map(e => (
+                                        mes2.campo == e.id && <span >{e.nombre} </span>
+                                    ))
+                                }
+                            </p>
+                        </div>
                         <div className='p-2'>
 
-
-
-
-                            {/* <div className="table table-responsive custom" style={{ height: 'auto', padding: "0.0rem 0.0rem", marginBottom: '0' }}>
-                            
-                                <Table id='table-sdis-ve' className=' table-sm' style={{
-                                    border: "1px solid #000040", borderRight: 'none', borderTop: '1px solid white',
-                                    borderSpacing: '0px', padding: '0px'
-                                }} >
-
-
-                                    {listaGrupo.map(lg => (
-                                        grupoSeleccionados.map(gs => (
-                                            parseInt(lg.id) === parseInt(gs) &&
-                                            <div key={gs}>
+                            {listaGrupo.map(lg => (
+                                grupoSeleccionados.map(gs => (
+                                    parseInt(lg.id) === parseInt(gs) && <div key={gs}>
+                                        <p style={{ fontSize: '13px', marginBottom: '0', fontWeight: 'bold' }}>{lg.nombre}  {
+                                            listaSs.map(e => (parseInt(e.id) == parseInt(ss.campo) && <span style={{fontWeight:'bold'}}>{'/ Sub-Sector: ' + e.nombre}</span>
+                                            ))
+                                        } </p>
+                                        
+                                        <div className="table table-responsive custom" style={{ height: 'auto', padding: "0.0rem 0.0rem", marginBottom: '0' }}>
+                                            <Table className=' table-sm' style={{ border: "1px solid #000040", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
                                                 {cabecera.length > 0 &&
                                                     <thead className='cab-form'>
-                                                        <tr >
-                                                            <p style={{ fontSize: '12.5px', marginBottom: '0', marginTop: '1rem' }}>{lg.nombre + 'una sola tabla'}   </p>
-                                                        </tr>
-
                                                         <tr  >
                                                             <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>VARIABLE</th>
                                                             {cabecera.map(cb => (
@@ -559,7 +629,7 @@ function Reportes4() {
                                                                 <th className='text-center nivel1F' style={{
                                                                     background: 'AliceBlue',
                                                                     borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52'
+                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
                                                                 }} colSpan={cb.span}
                                                                     key={cb.id} >{cb.input}
                                                                 </th>
@@ -572,116 +642,7 @@ function Reportes4() {
                                                                 <th className='text-center nivel1F' style={{
                                                                     background: 'AliceBlue',
                                                                     borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52'
-                                                                }} colSpan={cb.span}
-                                                                    key={cb.id} >{cb.input}
-                                                                </th>
-                                                            ))}
-                                                        </tr>
-                                                        <tr style={{ borderTop: '1px solid #595959' }} >
-                                                            <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
-                                                            {cabecera.map(cb => (
-                                                                parseInt(cb.variable) === parseInt(gs) && parseInt(cb.nivel) == 3 &&
-                                                                <th className='text-center nivel1F' style={{
-                                                                    background: 'AliceBlue',
-                                                                    borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52'
-                                                                }} colSpan={cb.span}
-                                                                    key={cb.id} >{cb.input}
-                                                                </th>
-                                                            ))}
-                                                        </tr>
-                                                    </thead>
-                                                }
-
-                                                {variablesSeleccionado.length > 0 ?
-                                                    <tbody style={{ borderBottom: '1px solid #000040', }} >
-                                                        {listaIndicadores.map((ind) => (
-                                                            parseInt(ind.variable) === parseInt(gs) &&
-                                                            <div key={ind.id}>{
-                                                                variablesSeleccionado.map(vs => (
-                                                                    parseInt(ind.id) === parseInt(vs) &&
-                                                                    <tr key={ind.id} style={{ borderRight: '1px solid #000040', }}>
-                                                                        <td className="col-3 mincelda TituloSecundario" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }}>{ind.indicador}</td>
-                                                                        {
-                                                                            data.map(d => (
-                                                                                parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center"
-                                                                                    style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', background: 'white', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
-                                                                                    <div style={{ border: '0.0px solid #ABB2B9', height: '29px' }}  >{d.valor}</div>
-                                                                                </td>
-                                                                            ))
-                                                                        }
-                                                                    </tr>
-                                                                ))
-                                                            }</div>
-                                                        ))}
-                                                    </tbody> : <tbody  >
-                                                        {listaIndicadores.map((ind) => (
-                                                            parseInt(ind.variable) === parseInt(gs) &&
-                                                            <tr key={ind.id} style={{ borderRight: '1px solid #000040', }}>
-                                                                <td className="col-3 mincelda TituloSecundario" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }}>{ind.indicador}</td>
-                                                                {
-                                                                    data.map(d => (
-                                                                        parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center"
-                                                                            style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', background: 'white', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
-                                                                            <div style={{ height: '29px' }}  >{d.valor}</div>
-                                                                        </td>
-                                                                    ))
-                                                                }
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>}
-                                            </div>
-                                            // </div>
-                                        ))
-                                    ))}
-                                </Table> 
-                            </div> */}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            {listaGrupo.map(lg => (
-                                grupoSeleccionados.map(gs => (
-                                    parseInt(lg.id) === parseInt(gs) && <div key={gs}>
-                                        <p style={{ fontSize: '12.5px', marginBottom: '0', fontWeight:'bold' }}>{lg.nombre}   </p>
-                                        <div className="table table-responsive custom" style={{ height: 'auto', padding: "0.0rem 0.0rem", marginBottom: '0' }}>
-                                            <Table className=' table-sm' style={{ border: "1px solid #000040", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
-                                                {cabecera.length > 0 &&
-                                                    <thead className='cab-form'>
-                                                        <tr  >
-                                                            <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>VARIABLE</th>
-                                                            {cabecera.map(cb => (
-                                                                parseInt(cb.variable) === parseInt(gs) && parseInt(cb.nivel) == 1 &&
-                                                                <th className='text-center nivel1F' style={{
-                                                                    background: 'AliceBlue',
-                                                                    borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040', 
-                                                                }} colSpan={cb.span}
-                                                                    key={cb.id} >{cb.input}
-                                                                </th>
-                                                            ))}
-                                                        </tr>
-                                                        <tr style={{ borderTop: '1px solid #595959' }}>
-                                                            <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040',}}></th>
-                                                            {cabecera.map(cb => (
-                                                                parseInt(cb.variable) === parseInt(gs) && parseInt(cb.nivel) == 2 &&
-                                                                <th className='text-center nivel1F' style={{
-                                                                    background: 'AliceBlue',
-                                                                    borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040', 
+                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
                                                                 }} colSpan={cb.span}
                                                                     key={cb.id} >{cb.input}
                                                                 </th>
@@ -704,25 +665,25 @@ function Reportes4() {
 
                                                 {variablesSeleccionado.length > 0 ?
                                                     // VARIABLES ESPECIFICOS
-                                                    <tbody style={{borderRight: '1px solid #000040',}}>
+                                                    <tbody style={{ borderRight: '1px solid #000040', }}>
 
                                                         {listaIndicadores.map((ind) => (
                                                             parseInt(ind.variable) === parseInt(gs) &&
                                                             // <div key={ind.id}>{
-                                                                variablesSeleccionado.map(vs => (
-                                                                    parseInt(ind.id) === parseInt(vs) &&
-                                                                    <tr key={ind.id} style={{ borderRight: '1px solid #000040', }}>
-                                                                        <td className="col-3 mincelda TituloSecundario" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }}>{ind.indicador}</td>
-                                                                        {
-                                                                            data.map(d => (
-                                                                                parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center"
-                                                                                    style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', background: 'white', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
-                                                                                    <div style={{ border: '0.0px solid #ABB2B9', height: '29px' }}  >{d.valor}</div>
-                                                                                </td>
-                                                                            ))
-                                                                        }
-                                                                    </tr>
-                                                                ))
+                                                            variablesSeleccionado.map(vs => (
+                                                                parseInt(ind.id) === parseInt(vs) &&
+                                                                <tr key={ind.id} style={{ borderRight: '1px solid #000040', }}>
+                                                                    <td className="col-3 mincelda TituloSecundario" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }}>{ind.indicador}</td>
+                                                                    {
+                                                                        data.map(d => (
+                                                                            parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center"
+                                                                                style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', background: 'white', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
+                                                                                <div style={{ border: '0.0px solid #ABB2B9', height: '29px' }}  >{d.valor}</div>
+                                                                            </td>
+                                                                        ))
+                                                                    }
+                                                                </tr>
+                                                            ))
                                                             // }</div>
                                                         ))}
                                                     </tbody> :
@@ -730,12 +691,12 @@ function Reportes4() {
                                                     <tbody>
                                                         {listaIndicadores.map((ind) => (
                                                             parseInt(ind.variable) === parseInt(gs) &&
-                                                            <tr key={ind.id} style={{ borderRight: '1px solid #000040', }}>
+                                                            <tr key={ind.id} style={{ borderRight: '1px solid #000040', }} className='item'>
                                                                 <td className="col-3 mincelda TituloSecundario" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }}>{ind.indicador}</td>
                                                                 {
                                                                     data.map(d => (
                                                                         parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center"
-                                                                            style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', background: 'white', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
+                                                                            style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
                                                                             <div style={{ height: '29px' }}  >{d.valor}</div>
                                                                         </td>
                                                                     ))
@@ -750,7 +711,7 @@ function Reportes4() {
                             ))}
 
                             <div className='botonModal p-1'>
-                                <button className='botonProcesar' onClick={() => window.location.href = '/reportes4'}>CERRAR</button>
+                                <button className='botonVolversm' onClick={() => window.location.href = '/mireportes3'}>Volver</button>
                                 <button className='botonExcel' onClick={() => excel()} >EXCEL</button>
                             </div>
                         </div>
@@ -765,4 +726,4 @@ function Reportes4() {
     }
 
 }
-export default Reportes4;
+export default Mireportes3;

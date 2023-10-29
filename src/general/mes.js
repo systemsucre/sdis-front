@@ -6,11 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboard, faCog, faCogs, faEdit, faHandPointRight, } from '@fortawesome/free-solid-svg-icons';
 
 import useAuth from "../Auth/useAuth"
-import { InputUsuario, Select1XL, } from '../elementos/elementos';  // componente input que incluye algunas de las funcionalidades como, setInput, validaciones cambio de estados
+import { InputUsuario, Select1, Select1XL, } from '../elementos/elementos';  // componente input que incluye algunas de las funcionalidades como, setInput, validaciones cambio de estados
 import { useState, useEffect } from "react";
 import { URL, INPUT } from '../Auth/config';
 import axios from 'axios';
-import { Toaster } from 'react-hot-toast'
 import '../elementos/estilos.css'
 import { alert2, confirmarActualizar } from '../elementos/alert2'
 import Load from '../elementos/load'
@@ -21,6 +20,8 @@ function Mes() {
 
     const [lista, setLista] = useState([]);
     const [listaGestion, setListaGestion] = useState([]);
+    const [listaEstado, setListaEstado] = useState([{ id: 1, nombre: 'OPORTUNO' }, { id: 2, nombre: 'RETASO' }, { id: 3, nombre: 'FUERA DE PLAZO' }]);
+    const [estadom, setestadom] = useState({ campo: null, valido: null });
     const [fin, setFin] = useState({ campo: null, valido: null });
     const [finH, setFinH] = useState({ campo: null, valido: null });
     const [ini, setIni] = useState({ campo: null, valido: null });
@@ -121,29 +122,33 @@ function Mes() {
 
 
         const actualizar = async (a) => {
-            let accion = await confirmarActualizar({ titulo: 'Actualizar accesos', boton: 'ok', texto: 'Ok para continuar...' })
-            if (accion.isConfirmed) {
-                setEstado(1)
-                setTexto('Actualizando fecha de acceso...')
-                setModalEditar(false)
-                axios.post(URL + '/mes/actualizar', {
-                    id: id.campo,
-                    f1: ini.campo,
-                    h1: iniH.campo,
-                    f2: fin.campo,
-                    h2: finH.campo,
-                    modificado: fecha + ' ' + horafinal
-                }).then(json => {
-                    if (json.data.ok) {
-                        setLista(json.data.data[0])
-                        setCantidad(json.data.data[1])
-                        setEstado(0)
-                        alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
-                    } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
-                }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+            if (estadom.valido === 'true' && id.valido === 'true' && ini.valido === 'true' && iniH.valido === 'true'
+                && fin.valido === 'true' && finH.valido === 'true') {
+                let accion = await confirmarActualizar({ titulo: 'Actualizar accesos', boton: 'ok', texto: 'Ok para continuar...' })
+                if (accion.isConfirmed) {
+                    setEstado(1)
+                    setTexto('Actualizando fecha de acceso...')
+                    setModalEditar(false)
+                    axios.post(URL + '/mes/actualizar', {
+                        id: id.campo,
+                        f1: ini.campo,
+                        h1: iniH.campo,
+                        f2: fin.campo,
+                        h2: finH.campo,
+                        estado:estadom.campo,
+                        modificado: fecha + ' ' + horafinal
+                    }).then(json => {
+                        if (json.data.ok) {
+                            setLista(json.data.data[0])
+                            setCantidad(json.data.data[1])
+                            setEstado(0)
+                            alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
+                        } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                    }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
 
-                setModalEditar(false)
-            }
+                    setModalEditar(false)
+                }
+            }else alert2({ icono: 'question', titulo: 'complete los campos', boton: 'ok'})
         }
 
 
@@ -157,6 +162,7 @@ function Mes() {
             let fnh = f.fin.split(' ')[1]
 
             setIni({ campo: i, valido: "true" })
+            setestadom({ campo: f.estado, valido: "true" })
             setIniH({ campo: ih, valido: "true" })
 
             setFin({ campo: fn, valido: "true" })
@@ -200,7 +206,7 @@ function Mes() {
                             <table className="table table-sm" >
                                 <thead>
                                     <tr >
-                                        <th style={{background:'white', border:'2px solid  #006699 ' , borderBottom:'none'}}  ></th>
+                                        <th style={{ background: 'white', border: '2px solid  #006699 ', borderBottom: 'none' }}  ></th>
                                         <th className="col-6 ">MES</th>
                                         <th className="col-3 ">INICIAL</th>
                                         <th className="col-3">FINAL</th>
@@ -208,10 +214,10 @@ function Mes() {
                                 </thead>
                                 <tbody >
                                     {lista.map((a) => (
-                                        <tr key={a.id} >
+                                        <tr className='item' key={a.id} >
                                             <th className='tooltip_' >
                                                 <span class="tooltiptext_">Modificar fechas</span>
-                                                <button type="button" class="adicionar" onClick={() => rellenar(a)}style={{ cursor: 'pointer' }}>
+                                                <button type="button" class="adicionar" onClick={() => rellenar(a)} style={{ cursor: 'pointer' }}>
                                                     <FontAwesomeIcon icon={faCog} />
                                                 </button>
                                             </th>
@@ -219,6 +225,10 @@ function Mes() {
                                             <td >{a.mes}</td>
                                             <td  >{a.ini}</td>
                                             <td  >{a.fin}</td>
+                                            {a.estado==1 &&<td  >OPORTUNO</td>}
+                                            {a.estado==2 &&<td  >RETRASO</td>}
+                                            {a.estado==3 &&<td  >FUERA DE PLAZO</td>}
+                                            
 
                                         </tr>
                                     ))}
@@ -283,6 +293,15 @@ function Mes() {
                                     msg={'Este campo acepta letras, numero y algunos caracteres'}
                                 />
                             </div>
+
+                            <Select1
+                                estado={estadom}
+                                cambiarEstado={setestadom}
+                                ExpresionRegular={INPUT.ID}
+                                lista={listaEstado}
+                                etiqueta={'Estado'}
+                                msg='Seleccione una opcion'
+                            />
                         </div>
                     </ModalBody>
                     <div className='botonModal'>

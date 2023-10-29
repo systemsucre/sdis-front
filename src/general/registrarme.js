@@ -82,7 +82,7 @@ function Registro() {
                             if (json.data.ok) {
                                 const a = await exito({ titulo: 'Registro Exitoso', boton: 'ok', texto: json.data.msg })
                                 if (a.isConfirmed)
-                                    window.location.href = '/'
+                                    window.location.href = '/sdis1'
                                 else {
                                     setUsername({ campo: null, valido: null })
                                     setPass({ campo: null, valido: null })

@@ -17,7 +17,7 @@ function E500() {
                             </div>
                             <div className="col-sm-6">
                                 <ol className="breadcrumb float-sm-right">
-                                    <li className="breadcrumb-item"><Link to='/'>INICIO</Link></li>
+                                    <li className="breadcrumb-item"><Link to='/sdis1'>INICIO</Link></li>
                                     <li className="breadcrumb-item active">404 Pagina no encontrado</li>
                                 </ol>
                             </div>

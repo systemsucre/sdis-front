@@ -3,10 +3,10 @@ import { Modal, ModalBody, ModalHeader, Table } from 'reactstrap';
 
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCirclePlus, faEdit, faExclamation, faExclamationCircle, faExclamationTriangle, faEye, faHandPointRight, faPause, faPlay, faPlus, faPlusCircle, faPlusSquare, faRecycle, faSave, faStop, faTrashAlt, faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faEye, faPlay, faPlus, faPlusCircle, faSave, faStop, faTrashAlt, } from '@fortawesome/free-solid-svg-icons';
 
 import useAuth from "../Auth/useAuth"
-import { InputUsuario, Select1, } from '../elementos/elementos';  // componente input que incluye algunas de las funcionalidades como, setInput, validaciones cambio de estados
+import { InputUsuario, Select1, ComponenteCheckMTM } from '../elementos/elementos';  // componente input que incluye algunas de las funcionalidades como, setInput, validaciones cambio de estados
 import { useState, useEffect } from "react";
 import { URL, INPUT } from '../Auth/config';
 import axios from 'axios';
@@ -15,6 +15,7 @@ import '../elementos/estilos.css'
 import { alert2, confirmarActualizar, confirmarEliminar, confirmarGuardar } from '../elementos/alert2'
 import Load from '../elementos/load'
 import { InputDinamico } from '../elementos/stylos';
+import { setSelectionRange } from '@testing-library/user-event/dist/utils';
 
 
 function Variable() {
@@ -37,6 +38,10 @@ function Variable() {
     const [ventana, setVentana] = useState(0);
     const [lista, setLista] = useState([]);
     const [listaRol, setListaRol] = useState([]);
+    const [ssector, setSsector] = useState([]);
+    const [seleccion, setSeleccion] = useState([])
+
+
     const [listaGestion, setListaGestion] = useState([]);
     const [variable, setVariable] = useState({ campo: null, valido: null });
     const [id, setId] = useState({ campo: null, valido: null })
@@ -55,13 +60,13 @@ function Variable() {
     const [modalCabecera, setModalCabecera] = useState(false);
     const [modalEditarCabecera, setModalEditarCabecera] = useState(false);
 
-
+    const [ss, setSs] = useState({ campo: null, valido: null });
     const [estadoVar, setEstadoVar] = useState(0);
     const [idVarForm, setIdVarForm] = useState(0);
 
     const [estado, setEstado] = useState(0);
     const [texto, setTexto] = useState(0);
-
+    const [maxOrden, setMaxOrden] = useState(0);
 
     //INDICADORES
     const [idVariable, setIdVariable] = useState({ campo: null, valido: null })
@@ -84,17 +89,12 @@ function Variable() {
     const [codigo, setCodigo] = useState(null)
     const [estadoPadre, setEstadoPadre] = useState(null)
 
-
     const [listaIndicador, setListaIndicador] = useState([]);
     const [listaInput, setListaInput] = useState([]);
+    const [dataInput, setDataInput] = useState([]);
+    const [cabecera, setCabecera] = useState([]);
     const [cantidadIndicador, setCantidadIndicador] = useState(0);
     const [cantidadInput, setCantidadInput] = useState(0);
-
-
-
-
-
-
 
 
 
@@ -125,6 +125,7 @@ function Variable() {
                         setCodigo(null)
                         setListaInput([])
                         setIdIndicadores([])
+
                         console.log(gestion, año, idRol, 'gestion, año, idrol')
                         if ((gestion.valido === 'true' || año) && idRol.valido === 'true') {
                             listar()
@@ -149,7 +150,6 @@ function Variable() {
             }
         )
 
-
         const listarGestion = async () => {
             axios.post(URL + '/variable/listargestion').then(json => {
                 if (json.data.hasOwnProperty("sesion")) {
@@ -157,16 +157,68 @@ function Variable() {
                     alert('LA SESION FUE CERRADO DESDE EL SERVIDOR, VUELVA A INTRODODUCIR SUS DATOS DE INICIO')
                 }
                 if (json.data.ok) {
-                    // console.log(json.data.data[1], 'lista rol')
+                    // console.log(json.data.data,'lista datos inicio ')
                     setListaGestion(json.data.data[0])
                     setListaRol(json.data.data[1])
+                    let year = json.data.data[0][0].id
+                    let cr = 0
+                    let rol = null
+                    json.data.data[1].forEach(r => {
+                        if (r.nombre == 'ESTABLECIMIENTO') { setIdRol({ campo: r.id, valido: 'true' }); rol = r.id; }
+                        cr++
+                        if (cr == json.data.data[1].length) {
+                            axios.post(URL + '/variable/listarrelacioninsertar').then(json => {
+                                if (json.data.ok) {
+                                    setSs({ campo: json.data.data[0].id, valido: 'true' })
+                                    listar(year, rol, json.data.data[0].id)
+                                }
+                            })
+                        }
+                    })
+
+                    setGestion({ campo: json.data.data[0].length > 0 ? json.data.data[0][0].id : null, valido: json.data.data[0].length > 0 ? 'true' : null })
+
+
+                    setSsector(json.data.data[2])
+                    setSs({ campo: json.data.data[2][0].id, valido: 'true' })
+                } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json.data.msg })
+            }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+        }
+        const listarRelacionInsertar = async () => {
+            axios.post(URL + '/variable/listarrelacioninsertar').then(json => {
+
+                if (json.data.ok) {
+                    setSsector(json.data.data)
+                    let c = 0
+                    json.data.data.forEach((x) => {
+                        seleccion.push(parseInt(x.id))
+                        c++
+                        if (c == json.data.data.length) setModalRegistrar(true)
+                    })
+
                 } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json.data.msg })
             }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
         }
 
-        const listar = async () => {
 
-            if ((gestion.valido === 'true' || año) && idRol.valido === 'true') {
+        const listarRelacion = async (id) => {
+            axios.post(URL + '/variable/listarrelacion', { id: id }).then(json => {
+
+                if (json.data.ok) {
+                    let c = 0
+                    json.data.data.forEach((x) => {
+                        seleccion.push(parseInt(x.id))
+                        c++
+                        if (c == json.data.data.length) setModalEditar(true)
+                    })
+
+                } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json.data.msg })
+            }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+        }
+
+        const listar = async (id = null, rol = null, sector = null) => {
+
+            if ((gestion.valido === 'true' || id) && (idRol.valido === 'true' || rol) && (ss.valido === 'true' || sector)) {
                 setEstado(1)
                 setTexto('Cargando...')
                 listaGestion.forEach(e => {
@@ -174,8 +226,9 @@ function Variable() {
                         setAño(e.nombre)
                 })
                 axios.post(URL + '/variable/listar', {
-                    gestion: gestion.campo ? gestion.campo : año,
-                    rol_: idRol.campo
+                    gestion: gestion.campo ? gestion.campo : id,
+                    rol_: idRol.campo ? idRol.campo : rol,
+                    ssector: ss.campo ? ss.campo : sector,
                 }).then(json => {
                     if (json.data.ok) {
                         setLista(json.data.data[0])
@@ -184,65 +237,75 @@ function Variable() {
                     } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json.data.msg })
 
                 }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); setEstado(0) });
-            } else { toast.error('Seleccione la gestion y el rol'); }
+            } else { toast.error('Seleccione la gestion, sub-sector y rol'); }
         }
-
-
 
         const registrar = async (a) => {
-            if ((gestion.valido === 'true' || año !== null) && variable.valido === 'true' && estado === 0) {
-                let accion = await confirmarGuardar({ titulo: 'Registrar nombre de formulario', boton: 'ok', texto: 'Ok para continuar...' })
-                if (accion.isConfirmed) {
-                    setEstado(1)
-                    setTexto('Guardando...')
-                    axios.post(URL + '/variable/insertar', {
-                        variable1: variable.campo,
-                        gestion: gestion.campo ? gestion.campo : año,
-                        rol_: idRol.campo,
-                        creado: fecha + ' ' + horafinal
-                    }).then(json => {
-                        if (json.data.ok) {
-                            setLista(json.data.data[0])
-                            setCantidad(json.data.data[1])
-                            setModalRegistrar(false)
-                            setVariable({ campo: null, valido: null })
-                            setEstado(0)
-                            alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
-                        } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
-                    }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                }
-            } else toast.error('Complete el campo variable')
+            if (gestion.valido === 'true' && variable.valido === 'true' && idRol.valido === 'true' && estado === 0 && ss.valido === 'true') {
+                if (seleccion.length > 0) {
+                    let accion = await confirmarGuardar({ titulo: 'Registrar nombre de formulario', boton: 'ok', texto: 'Ok para continuar...' })
+                    if (accion.isConfirmed) {
+                        setEstado(1)
+                        setTexto('Guardando...')
+                        axios.post(URL + '/variable/insertar', {
+                            variable1: variable.campo,
+                            gestion: gestion.campo ? gestion.campo : año,
+                            rol_: idRol.campo,
+                            lista: seleccion,
+                            ssector: ss.campo,
+                            creado: fecha + ' ' + horafinal
+                        }).then(json => {
+                            if (json.data.ok) {
+                                setLista(json.data.data[0])
+                                setCantidad(json.data.data[1])
+                                setModalRegistrar(false)
+                                setVariable({ campo: null, valido: null })
+                                setEstado(0)
+                                setSeleccion([])
+                                listar()
+                                alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
+                            } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                        }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                    }
+                } else toast.error('Seleccione al menos un SUB-SECTOR')
+            } else toast.error('Debe rellenar todos los campos solicitado')
         }
 
-
         const actualizar = async () => {
-            if (id.valido === 'true' && (gestion.valido === 'true' || año !== null) && variable.valido === 'true') {
-                let accion = await confirmarActualizar({ titulo: 'Actualizar nombre de formulario', boton: 'ok', texto: 'Ok para continuar...' })
-                if (accion.isConfirmed) {
-                    setModalEditar(false)
-                    setEstado(1)
-                    setTexto('Actualizando...')
-                    axios.post(URL + '/variable/actualizar', {
-                        id: id.campo,
-                        variable1: variable.campo,
-                        gestion: gestion.campo ? gestion.campo : año,
-                        rol_: idRol.campo,
-                        modificado: fecha + ' ' + horafinal
-                    }).then(json => {
-                        if (json.data.ok) {
-                            setLista(json.data.data[0])
-                            setCantidad(json.data.data[1])
-                            setVariable({ campo: null, valido: null })
-                            setEstado(0)
-                            alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
-                        } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
-                    }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                }
-            } else toast.error('Complete el campo variable')
+            if (id.valido === 'true' && gestion.valido === 'true' && variable.valido === 'true' && idRol.valido === 'true' && ss.valido === 'true') {
+                if (seleccion.length > 0) {
+                    let accion = await confirmarActualizar({ titulo: 'Actualizar nombre de formulario', boton: 'ok', texto: 'Ok para continuar...' })
+                    if (accion.isConfirmed) {
+                        setModalEditar(false)
+                        setEstado(1)
+                        setTexto('Actualizando...')
+                        axios.post(URL + '/variable/actualizar', {
+                            id: id.campo,
+                            variable1: variable.campo,
+                            lista: seleccion,
+                            gestion: gestion.campo ? gestion.campo : año,
+                            rol_: idRol.campo,
+                            ssector: ss.campo,
+                            modificado: fecha + ' ' + horafinal
+                        }).then(json => {
+                            if (json.data.ok) {
+                                setLista(json.data.data[0])
+                                setCantidad(json.data.data[1])
+                                setVariable({ campo: null, valido: null })
+                                // setSs({ campo: null, valido: null })
+                                setSeleccion([])
+                                setEstado(0)
+                                listar()
+                                alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
+                            } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                        }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                    }
+                } else toast.error('Seleccione al menos un SUB-SECTOR')
+            } else toast.error('Debe rellenar todos los campos solicitado')
         }
 
         const eliminar = async (e) => {
-            if (e && (gestion.valido === 'true' || año !== null)) {
+            if (e && gestion.valido === 'true' && ss.valido === 'true') {
                 let accion = await confirmarEliminar({ titulo: 'Eliminar Registro ?', boton: 'ok', texto: 'Ok para continuar.' })
                 if (accion.isConfirmed) {
                     let accion = await confirmarEliminar({ titulo: 'Eliminar formulario ?', boton: 'ok', texto: 'Ok para continuar.' })
@@ -254,50 +317,24 @@ function Variable() {
                             id: e,
                             gestion: gestion.campo ? gestion.campo : año,
                             rol_: idRol.campo,
+                            ssector: ss.campo,
                             modificado: fecha + ' ' + horafinal
                         }).then(json => {
                             if (json.data.ok) {
                                 alert2({ icono: 'success', titulo: 'Operaccion Exitoso', boton: 'ok', texto: json.data.msg })
+
                                 setLista(json.data.data[0])
                                 setCantidad(json.data.data[1])
                                 setEstado(0)
+                                listar()
                             } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
 
                         }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
 
                     }
                 }
-            }
+            } else toast.error('Seleccione al menos un SUB-SECTOR')
         }
-
-        // const suspender = async (e) => {
-        //     if (e && (gestion.valido === 'true' || año !== null) && idRol.valido === 'true') {
-        //         let accion = await confirmarActualizar({ titulo: 'Suspender Formulario', boton: 'ok', texto: 'Ok para continuar.' })
-        //         if (accion.isConfirmed) {
-
-        //             setEstado(1)
-        //             setTexto('Deteniendo...')
-        //             axios.post(URL + '/variable/suspender', {
-        //                 id: e,
-        //                 gestion: gestion.campo ? gestion.campo : año,
-        //                 rol_: idRol.campo,
-        //                 modificado: fecha + ' ' + horafinal
-        //             }).then(json => {
-        //                 if (json.data.ok) {
-        //                     alert2({ icono: 'success', titulo: 'Operaccion Exitoso', boton: 'ok', texto: json.data.msg })
-        //                     setLista(json.data.data[0])
-        //                     setCantidad(json.data.data[1])
-        //                     setEstadoVar(3)
-        //                     setEstado(0)
-        //                 } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
-
-        //             }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-        //         }
-        //     }
-        // }
-
-
 
         const iniciarVariable = async (e) => {
             if (e && (gestion.valido === 'true' || año !== null && listaInput.length > 0)) {
@@ -305,49 +342,13 @@ function Variable() {
                 if (accion.isConfirmed) {
                     setEstado(1)
                     setTexto('Asegurando configuraciones, Por favor espere unos segundos ....')
-                    let span1 = 0
-                    let span2 = 0
-                    let spanaux = 0
-                    listaInput.forEach(e1 => {
-                        if (e1.tope === 1)
-                            e1.span = 1
-                        else
-                            listaInput.forEach(e2 => {
-                                if (parseInt(e1.id) === parseInt(e2.idinput)) {
-                                    span1++ // nivel 1
-                                    e1.span = span1
-                                    span2 = 0
-                                    if (e2.tope === 1) {
-                                        // console.log('entra nivel dos con span 1 y tope 1')
-                                        // e2.span = 1
-                                    } else {
-
-                                        listaInput.forEach(e3 => {
-                                            if (parseInt(e2.id) === parseInt(e3.idinput)) {
-                                                span2++
-                                                e2.span = span2
-                                                // if (e3.tope === 1) {
-                                                spanaux++
-                                                e1.span = spanaux
-                                                // }
-                                            }
-                                        });
-
-                                    }
-
-                                }
-                                span2 = 0
-
-                            })
-                        span1 = 0
-                        spanaux = 0
-                    })
                     setTimeout(() => {
                         axios.post(URL + '/variable/iniciar', {
                             variable_: e,
                             gestion: gestion.campo ? gestion.campo : año,
                             rol_: idRol.campo,
-                            lista: listaInput,
+                            lista: dataInput,
+                            cabecera: cabecera,
                             modificado: fecha + ' ' + horafinal
                         }).then(json => {
                             if (json.data.ok) {
@@ -356,18 +357,20 @@ function Variable() {
                                 setLista(json.data.data[0])
                                 setCantidad(json.data.data[1])
                                 setEstadoVar(1)
-
+                                setVentana(0)
+                                setDataInput([])
+                                setCabecera([])
                                 setEstado(0)
-                            } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                                listar()
+                            } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0); setDataInput([]); setCabecera([]); setVentana(0) }
 
-                        }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                        }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); setDataInput([]); setCabecera([]); setVentana(0) });
 
                     }, 3000)
 
                 }
             }
         }
-
 
         const detener = async (e) => {
             if (e && (gestion.valido === 'true' || año !== null) && idRol.valido === 'true') {
@@ -387,17 +390,18 @@ function Variable() {
                             setLista(json.data.data[0])
                             setCantidad(json.data.data[1])
                             setEstadoVar(2)
+                            setVentana(0)
+                            setDataInput([])
+                            setCabecera([])
                             setEstado(0)
-                        } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                            listar()
+                        } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0); setDataInput([]); setCabecera([]); setVentana(0) }
 
-                    }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                    }).catch(function (error) { setEstado(0); setDataInput([]); setCabecera([]); setVentana(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
 
                 }
             }
         }
-
-
-
 
 
 
@@ -428,23 +432,149 @@ function Variable() {
             }
         }
 
+        // let dataInput = []
         const listarIndicadoresParaFormulario = async (id) => {
             setEstado(1)
-            setTexto('cargando..')
+            setTexto('cargando formulario..')
             if (id) {
-                axios.post(URL + '/variable/listarindicador', { id: id }).then(json => {
+                axios.post(URL + '/variable/listarindicador1', { id: id }).then(json => {
                     if (json.data.ok) {
                         if (json.data.data[0].length > 0) {
-                            console.log(json.data.data[0][0].id, 'id indicador')
-                            listarInputFormulario(json.data.data[0][0].id)
-                            setVentana(3)
-                            setEstado(0)
+                            setListaIndicador(json.data.data[0])
+                            // console.log(json.data.data[0], 'lista indicadores')
+                            let c = 1
+                            json.data.data[0].forEach(e => {
+                                listarInputFormulario(e.id)
+
+                                if (c === json.data.data[0].length) {
+
+                                    setTimeout(() => {
+                                        if (dataInput.length > 0) {
+                                            // console.log('data input: ', dataInput)
+                                            setVentana(3)
+                                            setEstado(0)
+
+                                            let cab = []
+                                            let ind = json.data.data[0][0].id
+                                            dataInput.forEach(ele => {
+                                                if (parseInt(ele.indicador_) === ind)
+                                                    cab.push(ele)
+                                            })
+                                            let span1 = 0
+                                            let span2 = 0
+                                            let spanaux = 0
+                                            setTimeout(() => {
+                                                cab.forEach(e1 => {
+                                                    if (e1.tope === 1)
+                                                        e1.span = 1
+                                                    else
+                                                        cab.forEach(e2 => {
+                                                            if (parseInt(e1.id) === parseInt(e2.idinput)) {
+                                                                span1++ // nivel 1
+                                                                e1.span = span1
+                                                                span2 = 0
+                                                                if (e2.tope === 1) {
+                                                                    // console.log('entra nivel dos con span 1 y tope 1')
+                                                                    // e2.span = 1
+                                                                } else {
+
+                                                                    cab.forEach(e3 => {
+                                                                        if (parseInt(e2.id) === parseInt(e3.idinput)) {
+                                                                            span2++
+                                                                            e2.span = span2
+                                                                            spanaux++
+                                                                            e1.span = spanaux
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                            span2 = 0
+                                                        })
+                                                    span1 = 0
+                                                    spanaux = 0
+                                                })
+                                                setCabecera(cab)
+                                                setTimeout(() => {
+                                                    console.log(cab, 'cabecera')
+                                                    let min = 0
+                                                    cab.forEach(e => {
+                                                        if (parseInt(e.nivel) > min) {
+                                                            min = e.nivel
+                                                        }
+                                                    })
+                                                    setMaxOrden(min)
+                                                }, 1000)
+                                            }, 1000)
+
+                                        } else {
+                                            setEstado(0)
+                                            setVentana(0)
+                                            setDataInput([])
+                                            setListaInput([])
+                                            alert2({ icono: 'warning', titulo: 'No se encontró subvariable', boton: 'ok', texto: 'Primero cree al menos una subvariables' })
+                                        }
+                                    }, 7000)
+                                }
+                                c++
+                            })
                         } else { alert2({ icono: 'warning', titulo: 'Sin variables', boton: 'ok', texto: 'Primero cree variables' }); setVentana(0); setEstado(0) }
                     } else { alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json.data.msg }); setVentana(0); setEstado(0) }
                 }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
             }
         }
 
+        const listarInputFormulario = async (id) => {
+            if (id) {
+
+                axios.post(URL + '/variable/listarinput1', { id: id }).then(async json1 => {
+
+                    if (json1.data.ok) {
+                        json1.data.data.forEach(e => {
+                            dataInput.push(e)
+                        })
+
+                        json1.data.data.forEach(e1 => {
+                            axios.post(URL + '/variable/listarinput21', { id: e1.id }).then(json2 => {
+                                if (json2.data.ok) {
+
+                                    json1.data.data.forEach(async e1 => {
+                                        await json2.data.data.forEach(e2 => {
+
+                                            if (parseInt(e1.id) === parseInt(e2.idinput)) {
+                                                const indice = dataInput.findIndex((elemento, indice) => {
+                                                    if (parseInt(elemento.id) === parseInt(e2.idinput)) {
+                                                        return true;
+                                                    }
+                                                });
+                                                dataInput.splice(indice + 1, 0, e2)
+                                                axios.post(URL + '/variable/listarinput21', { id: e2.id }).then(json3 => {
+                                                    if (json3.data.ok) {
+                                                        json2.data.data.forEach(async e2 => {
+                                                            await json3.data.data.forEach(e3 => {
+
+                                                                if (parseInt(e2.id) === parseInt(e3.idinput)) {
+                                                                    const indice = dataInput.findIndex((elemento, indice) => {
+                                                                        if (parseInt(elemento.id) === parseInt(e3.idinput)) {
+                                                                            return true;
+                                                                        }
+                                                                    });
+                                                                    dataInput.splice(indice + 1, 0, e3)
+                                                                }
+                                                            })
+                                                        })
+                                                    } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json2.data.msg })
+                                                })
+                                            }
+                                        })
+                                    })
+                                } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json2.data.msg })
+                            })
+                        })
+                    } else { alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json1.data.msg }); setEstado(0) }
+                }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+
+            } else toast.error('Añade porlomenos un indicador')
+        }
 
         const listarIndicadoresAux = async (id) => {
             setEstado(1)
@@ -494,6 +624,7 @@ function Variable() {
                 }
             } else toast.error('Escriba correctamente la varialbe')
         }
+
         const actualizarIndicador = async () => {
             if (idIndicador.valido === 'true' && indicador.valido === 'true' && idVariable.valido === 'true' && ini.valido === 'true' && fin.valido === 'true') {
                 let accion = await confirmarActualizar({ titulo: 'Actualizar variable', boton: 'ok', texto: 'Ok para continuar...' })
@@ -541,6 +672,7 @@ function Variable() {
                             setCantidadIndicador(json.data.data[1])
                             setIdIndicador({ campo: null, valido: null })
                             setEstado(0)
+                            setTimeout(() => { listar() }, 4000)
                             alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
                         } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
                     }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
@@ -564,12 +696,14 @@ function Variable() {
                             setCantidadIndicador(json.data.data[1])
                             setIdIndicador({ campo: null, valido: null })
                             setEstado(0)
+                            setTimeout(() => { listar() }, 4000)
                             alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
                         } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
                     }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
                 }
             } else toast.error('Error Consulte con el administrador')
         }
+
         const desactivarIndicador = async (id) => {
             if (id && idVariable.valido === 'true') {
                 let accion = await confirmarActualizar({ titulo: 'desactivar variable', boton: 'ok', texto: 'Ok para continuar...' })
@@ -586,15 +720,13 @@ function Variable() {
                             setCantidadIndicador(json.data.data[1])
                             setIdIndicador({ campo: null, valido: null })
                             setEstado(0)
+                            setTimeout(() => { listar() }, 4000)
                             alert2({ icono: 'success', titulo: 'Operacion Exitoso', boton: 'ok', texto: json.data.msg })
                         } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
                     }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
                 }
             } else toast.error('Error Consulte con el administrador')
         }
-
-
-
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -641,6 +773,7 @@ function Variable() {
                                     if (json.data.ok) {
                                         setEstado(0)
                                         setVentana(1)
+                                        setTimeout(() => { listar() }, 4000)
                                         alert2({ icono: 'success', titulo: 'Cabeceras añadidos', boton: 'ok', texto: json.data.msg })
                                     } else { alert2({ icono: 'warning', titulo: 'Operacion Fallida', boton: 'ok', texto: json.data.msg }); setEstado(0) }
                                 }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
@@ -682,50 +815,6 @@ function Variable() {
                                                                     setListaInput(data)
                                                                     setCantidadInput(data.length)
 
-                                                                    axios.post(URL + '/variable/listarinput2', { id: e3.id }).then(json4 => {
-                                                                        // console.log(json3.data.data)
-
-                                                                        if (json4.data.ok) {
-                                                                            json3.data.data.forEach(async e3 => {
-                                                                                await json4.data.data.forEach(e4 => {
-
-                                                                                    if (parseInt(e3.id) === parseInt(e4.idinput)) {
-                                                                                        const indice = data.findIndex((elemento, indice) => {
-                                                                                            if (parseInt(elemento.id) === parseInt(e4.idinput)) {
-                                                                                                return true;
-                                                                                            }
-                                                                                        });
-                                                                                        data.splice(indice + 1, 0, e4)
-                                                                                        setListaInput(data)
-                                                                                        setCantidadInput(data.length)
-
-                                                                                        axios.post(URL + '/variable/listarinput2', { id: e4.id }).then(json5 => {
-                                                                                            // console.log(json3.data.data)
-
-                                                                                            if (json5.data.ok) {
-                                                                                                json4.data.data.forEach(async e4 => {
-                                                                                                    await json5.data.data.forEach(e5 => {
-
-                                                                                                        if (parseInt(e4.id) === parseInt(e5.idinput)) {
-                                                                                                            const indice = data.findIndex((elemento, indice) => {
-                                                                                                                if (parseInt(elemento.id) === parseInt(e5.idinput)) {
-                                                                                                                    return true;
-                                                                                                                }
-                                                                                                            });
-                                                                                                            data.splice(indice + 1, 0, e5)
-                                                                                                            setListaInput(data)
-                                                                                                            setCantidadInput(data.length)
-
-                                                                                                        }
-                                                                                                    })
-                                                                                                })
-                                                                                            } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json2.data.msg })
-                                                                                        })
-                                                                                    }
-                                                                                })
-                                                                            })
-                                                                        } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json2.data.msg })
-                                                                    })
                                                                 }
                                                             })
                                                         })
@@ -743,112 +832,6 @@ function Variable() {
             } else toast.error('Añade porlomenos un indicador')
         }
 
-        const listarInputFormulario = async (id) => {
-            let data = []
-            if (id) {
-                axios.post(URL + '/variable/listarinput', { id: id }).then(async json1 => {
-
-                    if (json1.data.ok) {
-                        data = json1.data.data
-                        setListaInput(data)
-                        setCantidadInput(json1.data.data.length)
-                        json1.data.data.forEach(e1 => {
-                            setEstado(1)
-                            axios.post(URL + '/variable/listarinput2', { id: e1.id }).then(json2 => {
-                                if (json2.data.ok) {
-
-                                    setEstado(0)
-                                    json1.data.data.forEach(async e1 => {
-                                        await json2.data.data.forEach(e2 => {
-
-                                            if (parseInt(e1.id) === parseInt(e2.idinput)) {
-                                                const indice = data.findIndex((elemento, indice) => {
-                                                    if (parseInt(elemento.id) === parseInt(e2.idinput)) {
-                                                        return true;
-                                                    }
-                                                });
-                                                data.splice(indice + 1, 0, e2)
-                                                setListaInput(data)
-                                                setCantidadInput(data.length)
-
-                                                axios.post(URL + '/variable/listarinput2', { id: e2.id }).then(json3 => {
-                                                    // console.log(json3.data.data)
-
-                                                    if (json3.data.ok) {
-                                                        json2.data.data.forEach(async e2 => {
-                                                            await json3.data.data.forEach(e3 => {
-
-                                                                if (parseInt(e2.id) === parseInt(e3.idinput)) {
-                                                                    const indice = data.findIndex((elemento, indice) => {
-                                                                        if (parseInt(elemento.id) === parseInt(e3.idinput)) {
-                                                                            return true;
-                                                                        }
-                                                                    });
-                                                                    data.splice(indice + 1, 0, e3)
-                                                                    setListaInput(data)
-                                                                    setCantidadInput(data.length)
-
-                                                                    axios.post(URL + '/variable/listarinput2', { id: e3.id }).then(json4 => {
-                                                                        // console.log(json3.data.data)
-
-                                                                        if (json4.data.ok) {
-                                                                            json3.data.data.forEach(async e3 => {
-                                                                                await json4.data.data.forEach(e4 => {
-
-                                                                                    if (parseInt(e3.id) === parseInt(e4.idinput)) {
-                                                                                        const indice = data.findIndex((elemento, indice) => {
-                                                                                            if (parseInt(elemento.id) === parseInt(e4.idinput)) {
-                                                                                                return true;
-                                                                                            }
-                                                                                        });
-                                                                                        data.splice(indice + 1, 0, e4)
-                                                                                        setListaInput(data)
-                                                                                        setCantidadInput(data.length)
-
-                                                                                        axios.post(URL + '/variable/listarinput2', { id: e4.id }).then(json5 => {
-                                                                                            // console.log(json3.data.data)
-
-                                                                                            if (json5.data.ok) {
-                                                                                                json4.data.data.forEach(async e4 => {
-                                                                                                    await json5.data.data.forEach(e5 => {
-
-                                                                                                        if (parseInt(e4.id) === parseInt(e5.idinput)) {
-                                                                                                            const indice = data.findIndex((elemento, indice) => {
-                                                                                                                if (parseInt(elemento.id) === parseInt(e5.idinput)) {
-                                                                                                                    return true;
-                                                                                                                }
-                                                                                                            });
-                                                                                                            data.splice(indice + 1, 0, e5)
-                                                                                                            setListaInput(data)
-                                                                                                            setCantidadInput(data.length)
-
-                                                                                                        }
-                                                                                                    })
-                                                                                                })
-                                                                                            } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json2.data.msg })
-                                                                                        })
-                                                                                    }
-                                                                                })
-                                                                            })
-                                                                        } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json2.data.msg })
-                                                                    })
-                                                                }
-                                                            })
-                                                        })
-                                                    } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json2.data.msg })
-                                                })
-                                            }
-                                        })
-                                    })
-                                } else alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json2.data.msg })
-                            })
-                        })
-                        setEstado(0)
-                    } else { alert2({ icono: 'warning', titulo: 'Error al procesar su solicitud, Intente nuevamente', boton: 'ok', texto: json1.data.msg }); setEstado(0) }
-                }).catch(function (error) { setEstado(0); alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-            } else toast.error('Añade porlomenos un indicador')
-        }
         const listarInput = async (id) => {
             let data = []
             if (id) {
@@ -996,7 +979,7 @@ function Variable() {
         const actualizarInput = async () => {
             console.log(idInput)
             if (idIndicador.valido === 'true') {
-                if (input.valido === 'true' && idInput.valido === 'true' && codigo && idPrincipal.valido === 'true' && ini.valido === 'true' && fin.valido === 'true') {
+                if (input.valido === 'true' && idInput.valido === 'true' && codigo && idPrincipal.valido === 'true' && ini.valido === 'true' && fin.valido === 'true' && idVariable.valido === 'true') {
                     let accion = await confirmarActualizar({ titulo: 'Actualizar subvariable', boton: 'ok', texto: 'Ok para continuar...' })
                     if (accion.isConfirmed) {
                         setEstado(1)
@@ -1008,6 +991,7 @@ function Variable() {
                             codigo: codigo,
                             ini: ini.campo,
                             fin: fin.campo,
+                            variable_: idVariable.campo,
                             modificado: fecha + ' ' + horafinal
                         }).then(json => {
                             if (json.data.ok) {
@@ -1029,7 +1013,6 @@ function Variable() {
                 } else toast.error('Complete el formulario')
             } else toast.error('No se ha encontrado la variable')
         }
-
 
         const eliminarInput = async (codigo, idinput) => {
             if (codigo && idVariable.valido === 'true' && idinput && gestion.valido === 'true') {
@@ -1056,7 +1039,6 @@ function Variable() {
                 }
             } else toast.error('Error Consulte con el administrador')
         }
-
 
         const desactivarInput = async (codigo, idinput) => {
             if (codigo && idVariable.valido === 'true' && idinput && gestion.valido === 'true') {
@@ -1175,39 +1157,52 @@ function Variable() {
                     <div className="container_">
                         <div className='contenedor-cabecera row'>
 
-                            <span className='titulo' style={{}}>GEstiÓn de Formularios estadíticos SDIS-VE </span>
+                            <span className='titulo' style={{}}> CREACIÓN de Formularios estadísticos SDIS-VE </span>
 
                         </div>
                         <div className='contenedor'>
                             <div className='row elementos-contenedor'>
-                                <div className='col-4 col-sm-3 col-md-3 col-lg-3'>
-                                    <Select1
-                                        estado={gestion}
-                                        cambiarEstado={setGestion}
-                                        ExpresionRegular={INPUT.ID}
-                                        lista={listaGestion}
-                                        etiqueta={'Gestion'}
-                                        msg='Seleccione una opcion'
-                                    />
+                                <div className='col-9'>
+                                    <div className='row'>
+                                        <div className='col-3 col-sm-3 col-md-3 col-lg-3'>
+                                            <Select1
+                                                estado={gestion}
+                                                cambiarEstado={setGestion}
+                                                ExpresionRegular={INPUT.ID}
+                                                lista={listaGestion}
+                                                etiqueta={'Gestion'}
+                                                msg='Seleccione una opcion'
+                                            />
+                                        </div>
+                                        <div className='col-4 col-sm-3 col-md-3 col-lg-3'>
+                                            <Select1
+                                                estado={ss}
+                                                cambiarEstado={setSs}
+                                                ExpresionRegular={INPUT.ID}
+                                                lista={ssector}
+                                                etiqueta={'Sub-Sector'}
+                                                msg='Seleccione una opcion'
+                                            />
+                                        </div>
+                                        <div className='col-4 col-sm-3 col-md-3 col-lg-3'>
+                                            <Select1
+                                                estado={idRol}
+                                                cambiarEstado={setIdRol}
+                                                ExpresionRegular={INPUT.ID}
+                                                lista={listaRol}
+                                                etiqueta={'Nivel'}
+                                                msg='Seleccione una opcion'
+                                                funcion={listar}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className='col-4 col-sm-3 col-md-3 col-lg-3'>
-                                    <Select1
-                                        estado={idRol}
-                                        cambiarEstado={setIdRol}
-                                        ExpresionRegular={INPUT.ID}
-                                        lista={listaRol}
-                                        etiqueta={'Rol'}
-                                        msg='Seleccione una opcion'
-                                        funcion={listar}
-                                    />
-                                </div>
-                                {/* <div className='col-4 col-sm-3 col-md-3 col-lg-3'>
-                                    <button className="btn-simple col-auto" onClick={() => listar()} >Cargar
-                                    </button>
-                                </div> */}
-                                <div className='col-4 col-sm-6 col-md-6 col-lg-6'>
+
+                                <div className='col-3'>
                                     <div className='contenedor-boton'>
-                                        <button className="btn-nuevo col-auto" onClick={() => setModalRegistrar(true)} >
+                                        <button className="btn-nuevo col-auto" onClick={() => {
+                                            listarRelacionInsertar();
+                                        }} >
                                             <FontAwesomeIcon className='btn-icon-nuevo' icon={faPlusCircle} />Nuevo
                                         </button>
                                     </div>
@@ -1223,15 +1218,14 @@ function Variable() {
                                             <th className="col-1">GESTION</th>
                                             <th ></th>
                                             <th className="col-2">Nivel de Aplicación</th>
-
                                         </tr>
                                     </thead>
                                     <tbody >
                                         {lista.map((a) => (
                                             <tr key={a.id} className='item'>
                                                 <th className='tooltip_' >
-                                                    <span class="tooltiptext_">Adicionar Variables para este formulario</span>
-                                                    <button type="button" class="adicionar" onClick={() => {
+                                                    <span className="tooltiptext_">Adicionar Variables para este formulario</span>
+                                                    <button type="button" className="adicionar" onClick={() => {
                                                         listarIndicadores(a.id);
                                                         setNombreVariable(a.variable);
                                                         setIdVariable({ campo: a.id, valido: 'true' })
@@ -1244,7 +1238,7 @@ function Variable() {
                                                 </td>
                                                 <td  >{a.gestion}</td>
                                                 <td className='tooltip_' >
-                                                    <span class="tooltiptext_">Ver Formulario </span>
+                                                    <span className="tooltiptext_">Ver Formulario </span>
                                                     <div style={{ cursor: 'pointer' }} className='row' onClick={() => {
                                                         setNombreVariable(a.variable);
                                                         listarIndicadoresParaFormulario(a.id); setEstadoVar(a.estado); setIdVarForm(a.id)
@@ -1254,7 +1248,6 @@ function Variable() {
                                                             {a.estado == 0 && <FontAwesomeIcon className='stop-f' icon={faEye} />}
                                                         </div>
                                                     </div>
-
                                                 </td>
                                                 <td  >{a.rol}</td>
                                                 <td className="largTable">
@@ -1266,16 +1259,15 @@ function Variable() {
                                                         onClick={() => {
                                                             setId({ campo: a.id, valido: 'true' });
                                                             setVariable({ campo: a.variable, valido: 'true' });
-                                                            setModalEditar(true)
+                                                            listarRelacion(a.id)
                                                         }} />
-                                                    {/* </div> */}
                                                 </td>
                                             </tr>
                                         ))}
                                     </tbody>
 
                                 </Table>
-                                {lista.length < 1 && (idRol.valido === null || gestion.valido === null) ? <div style={{ fontSize: '18px' }}>SELECCIONE EL AÑO y ROL</div> : lista.length < 1 &&
+                                {lista.length < 1 && (idRol.valido === null || gestion.valido === null) ? <div style={{ fontSize: '18px' }}>SELECCIONE EL AÑO, SUB-SECTOR y ROL</div> : lista.length < 1 &&
                                     <div style={{ fontSize: '18px' }}>LISTA VACÍA</div>}
                             </div>
                             <div className='cantidad-registros'>{cantidad + ' Registro(s)'}</div>
@@ -1311,7 +1303,7 @@ function Variable() {
                                             <th style={{ background: 'white', border: '2px solid  #006699 ', borderBottom: 'none' }} ></th>
                                             <th className="col-4 ">VARIABLE</th>
                                             <th className="col-4">FORMULARIO</th>
-                                            <th className="col-2">ESTADO</th>
+                                            <th ></th>
                                             <th className="col-1">DESDE</th>
                                             <th className="col-1">HASTA</th>
                                         </tr>
@@ -1320,35 +1312,35 @@ function Variable() {
                                         {listaIndicador.map((a) => (
                                             <tr key={a.id} className='item' >
                                                 <td className='tooltip_ '>
-                                                    <span class="tooltiptext_">Adicionar sub-variables</span>
-                                                    <button type="button" class="adicionar"
+                                                    <span className="tooltiptext_">Adicionar sub-variables</span>
+                                                    <button type="button" className="adicionar"
                                                         onClick={() => {
                                                             listarInput(a.id)
                                                             setIdIndicador({ campo: a.id, valido: 'true' });
                                                             listarIndicadoresAux(idVariable.campo);
-                                                        }} style={{ cursor: 'pointer' }}>
+                                                        }} style={{ cursor: 'pointer', }}>
                                                         <FontAwesomeIcon icon={faPlus} />
                                                     </button>
                                                 </td>
                                                 <td  >{a.indicador}</td>
                                                 <td >{a.variable}</td>
                                                 <td className='tooltip_'  >
-                                                    {a.estado == 0 && <span class="tooltiptext_">variable desactivado. Click para activar...</span>}
-                                                    {a.estado == 1 && <span class="tooltiptext_">variable activado. Click para desactivar...</span>}
+                                                    {a.estado == 0 && <span className="tooltiptext_">variable desactivado. Click para activar...</span>}
+                                                    {a.estado == 1 && <span className="tooltiptext_">variable activado. Click para desactivar...</span>}
 
                                                     <div style={{ cursor: 'pointer' }} className='row' onClick={() => {
                                                         a.estado === 0 ? activarIndicador(a.id) : desactivarIndicador(a.id)
                                                     }}>
                                                         <div className='col-auto' >
-                                                            {a.estado == 1 && <FontAwesomeIcon className='play' icon={faPlay} />}
-                                                            {a.estado == 0 && <FontAwesomeIcon className='stop' icon={faStop} />}
+                                                            {a.estado == 1 && <FontAwesomeIcon className='play-f' icon={faPlay} />}
+                                                            {a.estado == 0 && <FontAwesomeIcon className='stop-f' icon={faStop} />}
                                                         </div>
-                                                        <div className='col-auto'>
+                                                        {/* <div className='col-auto'>
                                                             <div className=' ver-form' style={{ cursor: 'pointer' }}>
                                                                 {a.estado == 1 && <span>DISPONIBLE</span>}
                                                                 {a.estado == 0 && <span>NO DISPONIBLE</span>}
                                                             </div>
-                                                        </div>
+                                                        </div> */}
                                                     </div>
 
                                                 </td>
@@ -1390,7 +1382,7 @@ function Variable() {
 
                         <div className='contenedor-cabecera row'>
                             <span className='titulo'>{'CREACIÓN DE SUBVARIABLES'}</span>
-                            <p style={{ fontSize: '13px', marginBottom: '0' }} className='text-center'>{nombreVariable + ' ' + año}  </p>
+                            <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#595959', marginBottom: '0' }} className='text-center'>{'FORMULARIO:  ' + nombreVariable + ' ' + año}  </p>
                         </div>
 
                         <div className='contenedor' style={{ paddingTop: '0' }}>
@@ -1410,7 +1402,7 @@ function Variable() {
                                         <tr >
                                             <th style={{ background: 'white', border: '2px solid  #006699 ', borderBottom: 'none' }}  ></th>
                                             <th className="col-5 ">SUBVARIABLES</th>
-                                            <th className="col-2">ESTADO</th>
+                                            <th ></th>
                                             <th className="col-3  ">DESDE</th>
                                             <th className="col-3  ">HASTA</th>
                                         </tr>
@@ -1421,8 +1413,8 @@ function Variable() {
                                             <tr key={a.id} className={a.nivel === 1 ? `nivel1 item` :
                                                 a.nivel === 2 ? `nivel2 item` : a.nivel === 3 ? `nivel3 item` : null} >
                                                 <th className='tooltip_' >
-                                                    <span class="tooltiptext_">Adicionar subvariable dependiente de esta</span>
-                                                    {a.nivel < 3 && <button type="button" class="adicionar"
+                                                    <span className="tooltiptext_">Adicionar subvariable dependiente de esta</span>
+                                                    {a.nivel < 3 && <button type="button" className="adicionar"
                                                         onClick={() => {
                                                             setOrdenInput({ campo: a.orden, valido: 'true' })
                                                             setIdInput({ campo: a.id, valido: 'true' })
@@ -1444,22 +1436,22 @@ function Variable() {
                                                     {a.nivel === 3 && <div style={{ paddingLeft: '40px' }}>{a.input}</div>}
                                                 </td>
                                                 <td className='tooltip_'  >
-                                                    {a.estado == 0 && <span class="tooltiptext_">subvariable desactivado . Click para activar...</span>}
-                                                    {a.estado == 1 && <span class="tooltiptext_">subvariable activo. Click para desactivar...</span>}
+                                                    {a.estado == 0 && <span className="tooltiptext_">subvariable desactivado . Click para activar...</span>}
+                                                    {a.estado == 1 && <span className="tooltiptext_">subvariable activo. Click para desactivar...</span>}
 
                                                     <div style={{ cursor: 'pointer' }} className='row' onClick={() => {
                                                         a.estado === 0 ? activarInput(a.cod, a.id) : desactivarInput(a.cod, a.id)
                                                     }}>
                                                         <div className='col-auto' >
-                                                            {a.estado == 1 && <FontAwesomeIcon className='play' icon={faPlay} />}
-                                                            {a.estado == 0 && <FontAwesomeIcon className='stop' icon={faStop} />}
+                                                            {a.estado == 1 && <FontAwesomeIcon className='play-f' icon={faPlay} />}
+                                                            {a.estado == 0 && <FontAwesomeIcon className='stop-f' icon={faStop} />}
                                                         </div>
-                                                        <div className='col-auto'>
+                                                        {/* <div className='col-auto'>
                                                             <div className=' ver-form' style={{ cursor: 'pointer' }}>
                                                                 {a.estado == 1 && <span>DISPONIBLE</span>}
                                                                 {a.estado == 0 && <span>NO DISPONIBLE</span>}
                                                             </div>
-                                                        </div>
+                                                        </div> */}
                                                     </div>
 
                                                 </td>
@@ -1498,11 +1490,11 @@ function Variable() {
                 {ventana === 3 &&
                     <div className="container_">
                         <div className='col-11 col-sm-12 col-md-10 col-lg-7 m-auto'>
-                            <div className='contenedor-cabecera row' onClick={() => console.log(listaInput, 'lista input')}>
-                                <span className='titulo'>{'FORMULARIO GENERADO'}</span>
-                                <p style={{ fontSize: '13px', marginBottom: '0' }} className='text-center'>{nombreVariable + ' ' + año}  </p>
+                            <div className='contenedor-cabecera row' onClick={() => console.log(dataInput, 'configuracion cabecera')}>
+                                <span className='titulo'>{'FORMULARIO:  ' + nombreVariable + ' ' + año} </span>
+                                {/* <p style={{ fontSize: '16px', fontWeight:'bold', marginBottom: '0' }} className='text-center'>{'FORMULARIO:  '+ nombreVariable + ' ' + año}  </p> */}
                             </div>
-                            {listaInput.length > 0 ?
+                            {/* {dataInput.length > 0 ?
                                 <div>{estadoVar ?
                                     <div className='leyenda-form'>
                                         Formulario Iniciado
@@ -1513,8 +1505,8 @@ function Variable() {
                                 }</div> :
                                 <div className='leyenda-form'>
                                     Para iniciar las variables de este cuaderno debe crear al menos una clasificacion para las variables
-                                </div>}
-                            <div className='contenedor' style={{ paddingTop: '0' }}>
+                                </div>} */}
+                            {/* <div className='contenedor' style={{ paddingTop: '0' }}>
                                 <div className="table table-responsive custom contenedor-formulario" style={{ minHeight: '340px' }}>
 
                                     <div className='tituloPrimarioFormulario' >{nombreVariable}</div>
@@ -1565,23 +1557,93 @@ function Variable() {
 
 
                                 </div >
+                            </div > */}
+
+                            <div className='mt-4'>
+                                {/* <div className='tituloPrimario'>{lista.map(e => (parseInt(e.id) === idVarForm && <div key={e.id}>{e.variable}</div>))}</div> */}
+
+                                <div className="table table-responsive custom mb-3 quitarBorder" style={{ height: 'auto', width: 'auto' }}>
+                                    <table className='table table-sm' style={{ border: "2px solid #006699", borderSpacing: '0px', padding: '0px' }} >
+                                        {dataInput.length > 0 &&
+
+                                            <thead className='cab-form'>
+                                                <tr  >
+                                                    {maxOrden === 1 ? <th className="col-4 mincelda titulo-var" style={{ fontWeight: 'bold', fontSize: '14px', color: '#595959', textAlign: 'center' }}>{'VARIABLE'}</th> :
+                                                        <th className="col-4 mincelda titulo-var" style={{ color: '#595959', paddingLeft: '' }}></th>}
+                                                    {cabecera.map(cb => (
+                                                        parseInt(cb.nivel) == 1 &&
+                                                        <th className='text-center nivel1F' style={{ background: '#006699', borderRight: '1px solid white' }} colSpan={cb.span}
+                                                            key={cb.id} >{cb.input}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                                <tr style={{ borderTop: '1px solid #595959' }}>
+                                                    {maxOrden === 2 ? <th className="col-4 mincelda titulo-var" style={{ fontWeight: 'bold', fontSize: '14px', color: '#595959', textAlign: 'center' }}>{'VARIABLE'}</th> :
+                                                        maxOrden === 1 ? null : <th className="col-4 mincelda titulo-var" style={{ color: '#595959', paddingLeft: '' }}></th>}
+                                                    {cabecera.map(cb => (
+                                                        parseInt(cb.nivel) == 2 &&
+                                                        <th className='text-center nivel1F' style={{ background: '#006699', borderRight: '1px solid white', borderTop: '1px solid white' }} colSpan={cb.span}
+                                                            key={cb.id} >{cb.input}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                                <tr style={{ borderTop: '1px solid #595959' }} >
+                                                    {maxOrden === 3 ? <th className="col-4 mincelda titulo-var" style={{ fontWeight: 'bold', fontSize: '14px', color: '#595959', textAlign: 'center' }}>{'VARIABLE'}</th> :
+                                                        maxOrden === 1 || maxOrden === 2 ? null : <th className="col-4 mincelda titulo-var" style={{ color: '#595959', paddingLeft: '' }}></th>}
+                                                    {cabecera.map(cb => (
+                                                        parseInt(cb.nivel) == 3 &&
+                                                        <th className='text-center nivel1F' style={{ background: '#006699', borderRight: '1px solid white', borderTop: '1px solid white' }} colSpan={cb.span}
+                                                            key={cb.id} >{cb.input}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>}
+                                        <tbody >
+                                            {listaIndicador.map((ind) => (
+                                                <tr key={ind.id}>
+                                                    <td className="col-4 mincelda TituloSecundario" style={{ border: '1px solid #006699' }}>
+                                                        <div className='col-9'>{ind.indicador}</div>
+                                                    </td>
+                                                    {
+                                                        dataInput.map(d => (
+                                                            parseInt(ind.id) === parseInt(d.indicador_) && d.tope === 1 &&
+                                                            <td
+                                                                style={{
+                                                                    padding: '2px', paddingBottom: '0', background: 'white',
+                                                                }} key={d.id}>
+                                                                <div style={{ border: '0.5px solid #ABB2B9', height: '29px' }}  >
+                                                                    <InputDinamico
+                                                                        className="form-control form-control-sm"
+                                                                        disabled
+                                                                        value={0}
+                                                                    /></div>
+                                                            </td>
+                                                        ))
+                                                    }
+                                                </tr>
+                                            ))}
+                                        </tbody>
+
+                                    </table>
+                                </div>
                             </div >
+
                             <div className='botonModal row pb-3'>
                                 <div className='col-auto'>
-                                    <button className="form-cerrar" onClick={() => { setVentana(0); setListaInput([]) }}>
-                                        cerrar
+                                    <button className="form-cerrar" onClick={() => { setVentana(0); setListaInput([]); setDataInput([]) }}>
+                                        VOLVER
                                     </button>
                                 </div>
-                                {listaInput.length > 0 && <>
+                                {dataInput.length > 0 && <>
 
                                     {estadoVar == 1 ?
                                         <div className='col-auto'>
-                                            <button className="detener" onClick={() => detener(idVarForm)}>
+                                            <button className="detener" onClick={() => { detener(idVarForm); }}>
                                                 Detener Formulario
                                             </button>
                                         </div> :
                                         <div className='col-auto'>
-                                            <button className="btn-nodisponible" onClick={() => iniciarVariable(idVarForm)}>
+                                            <button className="btn-nodisponible" onClick={() => { iniciarVariable(idVarForm); }}>
                                                 Iniciar formulario
                                             </button>
                                         </div>
@@ -1607,19 +1669,38 @@ function Variable() {
 
                 <Modal isOpen={modalRegistrar}>
                     <ModalHeader toggle={() => {
-                        setModalRegistrar(false)
-                    }}> <p style={{ fontSize: '14px' }}>AÑADIR NOMBRE DE FORMULARIO</p>
-                        <h6 > {'GESTIÓN  ' + año}</h6>
+                        setModalRegistrar(false); setSeleccion([])
+                    }}> <p style={{ fontSize: '14px' }} onClick={() => console.log(seleccion, 'seleccion de subsector')}>Nuevo FORMULARIO</p>
+                        <h6 > {'GESTIÓN  '}<span>{año ? año : new Date().getFullYear()}</span> </h6>
                         {listaRol.length > 0 && <> {listaRol.map(e => (
                             e.id == idRol.campo &&
-                            <h5 style={{ fontSize: '12px' }}> {'ROl (' + e.nombre + ')'}</h5>
+                            <h5 style={{ fontSize: '12px' }}> {'nivel (' + e.nombre + ')'}</h5>
                         ))}
                         </>
                         }
 
                     </ModalHeader>
                     <ModalBody>
+                        <div>
+                            <p>Sub-sectores</p>
+                            <div className='row p-3'>
 
+                                {ssector.map((x) => (
+
+                                    <div key={x.id} className="col-auto pr-5" >
+                                        {
+                                            <ComponenteCheckMTM
+                                                id={x.id}
+                                                item={x.nombre}
+                                                admitidos={seleccion}
+                                                marcarTodos={true}
+
+                                            />
+                                        }
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                         <InputUsuario
                             estado={variable}
                             cambiarEstado={setVariable}
@@ -1645,7 +1726,7 @@ function Variable() {
                                     cambiarEstado={setIdRol}
                                     ExpresionRegular={INPUT.ID}
                                     lista={listaRol}
-                                    etiqueta={'Rol'}
+                                    etiqueta={' Nivel'}
                                     msg='Seleccione una opcion'
                                 />
                             </div>
@@ -1661,17 +1742,37 @@ function Variable() {
 
                 <Modal isOpen={modalEditar}>
                     <ModalHeader toggle={() => {
-                        setModalEditar(false)
-                    }}>  <p style={{ fontSize: '14px' }}>ACTUALIZAR NOMBRE DE FORMULARIO</p>
+                        setModalEditar(false); setSeleccion([])
+                    }}>  <p onClick={() => console.log(seleccion, 'seleccinados')} style={{ fontSize: '14px' }}>ACTUALIZAR NOMBRE DE FORMULARIO</p>
                         <h6 > {'GESTIÓN  ' + año}</h6>
                         {listaRol.length > 0 && <> {listaRol.map(e => (
                             e.id == idRol.campo &&
-                            <h5 style={{ fontSize: '12px' }}> {'ROl (' + e.nombre + ')'}</h5>
+                            <h5 style={{ fontSize: '12px' }}> {'nivel (' + e.nombre + ')'}</h5>
                         ))}
                         </>
                         }
                     </ModalHeader>
                     <ModalBody>
+                        <div>
+                            <p>Sub-sectores</p>
+                            <div className='row p-3'>
+                                {ssector.map((x) => (
+
+                                    <div key={x.id} className="col-auto pr-5" >
+                                        {
+                                            <ComponenteCheckMTM
+                                                id={x.id}
+                                                item={x.nombre}
+                                                admitidos={seleccion}
+                                            // examen={usuario}
+                                            // mostrar={setSeleccionMostrar}
+
+                                            />
+                                        }
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                         <InputUsuario
                             estado={variable}
                             cambiarEstado={setVariable}

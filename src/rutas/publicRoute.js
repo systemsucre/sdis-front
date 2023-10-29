@@ -9,22 +9,28 @@ export default function PublicRoute({ component: Component, ...rest }) {
         const auth = useAuth();
         let url = null
         if (parseInt(localStorage.getItem('numRol')) === 1) {
+            // console.log('la ruta que corresponde a este usuario')
             url = "/variables"
         }
 
         if (parseInt(localStorage.getItem('numRol')) === 2) {
-            url = "/reportes2" 
+            url = "/reportes-por-formulario-sedes" 
         }
         if (parseInt(localStorage.getItem('numRol')) === 3) {
-            url = "/reportes3"
+            url = "/reportes-por-formulario-red"
         }
         if (parseInt(localStorage.getItem('numRol')) === 4) {
-            url = "/reportes4"
+            url = "/reportes-por-municipio"
         }
         
         if (parseInt(localStorage.getItem('numRol')) === 5) {
-            url = "/formulario"
+            url = "/formulario5"
         }
+        if (parseInt(localStorage.getItem('numRol')) === 6) {
+            url = "/reportes-por-formulario-area"
+        }
+
+       
 
         return (
             <Route {...rest}>
