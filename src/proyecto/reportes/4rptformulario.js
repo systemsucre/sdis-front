@@ -12,6 +12,7 @@ import { SelectSM } from '../../elementos/elementos';
 import { Table } from 'reactstrap';
 import { img } from './logo';
 import { imgG } from './gobernacion';
+import { toast } from 'react-hot-toast';
 
 const ExcelJS = require('exceljs')
 
@@ -65,7 +66,7 @@ function ReportesFormulario() {
                 document.title = 'REPORTES'
                 listarGestion()
             }
-            if(ss.campo == 1000) listarTodosGrupos()
+            if (ss.campo == 1000) listarTodosGrupos()
             else listarGrupos()
         }, [ss])
 
@@ -130,7 +131,7 @@ function ReportesFormulario() {
                         // console.log(json.data.data,'data de la bd')
                     } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
                 }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-            } 
+            }
         }
 
         const listarGrupos = async () => {
@@ -142,116 +143,34 @@ function ReportesFormulario() {
                         // console.log(json.data.data,'data de la bd')
                     } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
                 }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-            } 
+            }
         }
 
 
         const procesar = async () => {
             // consolidad todo el municipio
             if (mes1.valido === 'true' && mes2.valido === 'true' && gestion.valido === 'true' && idVariable.valido === 'true' && alc.valido === 'true') {
-                setEstado(1)
-                setTexto('Espere, cargando información')
-                let data_ = []
-                axios.post(URL + '/reportes4/listarcabeceras', { variable: idVariable.campo }).then(json => {
-                    if (json.data.ok)
-                        setCabecera(json.data.data)
-                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+
                 if (alc.campo == 2) {
-
-                    axios.post(URL + '/reportes4/listarhospitales',).then(json => {
+                    axios.post(URL + '/reportes4/procesar-por-establecimiento_form_est', { variable: idVariable.campo, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
                         if (json.data.ok) {
-                            let data__ = []
-                            let contador_color = 2
-                            let color = null
-                            json.data.data.forEach(h => {
-                                let rango = 1
-
-                                if ((contador_color % 2) == 0)
-                                    axios.post(URL + '/reportes4/listarindicadores', { variable: idVariable.campo }).then(json => {
-                                        if (json.data.ok) {
-                                            json.data.data.forEach(i => {
-                                                i.color = 1
-                                                i.est = null
-                                                i.idest = h.id
-                                                if (rango == 1) i.est = h.nombre
-                                                rango = 0
-                                                data__.push(i)
-                                            })
-                                        }
-                                        else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                    }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                                else axios.post(URL + '/reportes4/listarindicadores', { variable: idVariable.campo }).then(json => {
-                                    if (json.data.ok) {
-                                        json.data.data.forEach(i => {
-                                            i.color = 0
-                                            i.est = null
-                                            i.idest = h.id
-                                            if (rango == 1) i.est = h.nombre
-                                            rango = 0
-                                            data__.push(i)
-                                        })
-                                    }
-                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                                console.log(color, contador_color, 'division exacta')
-
-
-                                contador_color++
-                            })
-                            setListaEstablecimientos(data__)
-                            setTimeout(() => { setListaEstablecimientos([]); setListaEstablecimientos(data__); setEstado(0) }, 4000)
-                        }
-                        else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                            setListaEstablecimientos(json.data.conf)
+                            setData(json.data.data)
+                            setCabecera(json.data.cabecera)
+                            setEstado(0)
+                        } else { toast.error(json.data.msg); setEstado(0) }
                     }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                    axios.post(URL + '/reportes4/listarhospitales',).then(json => {
-                        json.data.data.forEach(h => {
-                            axios.post(URL + '/reportes4/listardatosformulario', { est: h.id, variable: idVariable.campo, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                                if (json.data.ok)
-                                    json.data.data[1].forEach(i => {
-                                        json.data.data[0].forEach(v => {
-                                            if (parseInt(i.input) === parseInt(v.idinput)) {
-                                                i.valor = v.valor
-                                            }
-                                        })
-                                        i.idest = h.id
-                                        i.est = h.nombre
-                                        data_.push(i)
-                                    })
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        })
-
-                    })
                 }
                 if (alc.campo == 1) {
-                    axios.post(URL + '/reportes4/listarindicadores', { variable: idVariable.campo }).then(json => {
+                    axios.post(URL + '/reportes4/procesar-por-municipio_form_est', { mun:localStorage.getItem('mun'), variable: idVariable.campo, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
                         if (json.data.ok) {
-                            setListaEstablecimientos(json.data.data)
-                        }
-                        else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                    }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                    axios.post(URL + '/reportes4/listardatosformularioconsolidado', { variable: idVariable.campo, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                        if (json.data.ok) {
-                            json.data.data[1].forEach(i => {
-                                json.data.data[0].forEach(v => {
-                                    if (parseInt(i.input) === parseInt(v.idinput)) {
-                                        i.valor = v.valor
-                                    }
-                                })
-                                data_.push(i)
-                            })
-                        }
-                        else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
+                            setListaEstablecimientos(json.data.conf)
+                            setData(json.data.data)
+                            setCabecera(json.data.cabecera)
+                            setEstado(0)
+                        } else { toast.error(json.data.msg); setEstado(0) }
                     }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
                 }
-                setData(data_)
-                setTimeout(() => {
-                    setData(data_)
-                    setEstado(0)
-                }, 4000)
             } else alert2({ icono: 'question', titulo: 'selecione los parametros año, mes1, mes2, el formulario y el alcance', boton: 'ok' })
 
         }
@@ -282,10 +201,10 @@ function ReportesFormulario() {
 
             principal.columns.forEach((column) => {
                 column.alignment = { vertical: 'middle', }  //  wrapText: true ajustar texto dentro de la celda
-                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 8, italic: false };
+                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 7, italic: false };
             })
-            principal.mergeCells("B1:C5");
-            principal.mergeCells("K1:L5");
+           // principal.mergeCells("A1:A5");
+           principal.mergeCells("H1:H5");
 
             const imageId = workbook.addImage({
                 base64: img,
@@ -316,54 +235,57 @@ function ReportesFormulario() {
 
 
             // CONFIGURACION DE LOS TIRULOS, NOMBRE HOSPITAL, MESES Y GESTION
-            principal.addImage(imageId, { tl: { col: 1.1, row: 0.1 }, ext: { width: 100, height: 95 } })
-            principal.addImage(imageIdGob, { tl: { col: 10.6, row: 0.1 }, ext: { width: 100, height: 100 } })
-            principal.mergeCells('D2:J2');
-            principal.getCell('D2').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
-            principal.getCell('D2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+            principal.addImage(imageId, { tl: { col: 0.1, row: 0.1 }, ext: { width: 100, height: 95 } })
+            principal.addImage(imageIdGob, { tl: { col: 7, row: 0.1 }, ext: { width: 100, height: 100 } })
+            principal.mergeCells('B2:G2');
+            principal.getCell('B2').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
+            principal.getCell('B2').font = { bold: 700, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('D3:J3');
-            principal.getCell('D3').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
-            principal.getCell('D3').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('B3:G3');
+            principal.getCell('B3').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
+            principal.getCell('B3').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
+
+            principal.mergeCells('C5:F5');
+            principal.getCell('C5').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('C5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
+
+            principal.getCell('C5').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+
+           
+            principal.mergeCells('A6:D6');
+            principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('A6').value = 'ALCANCE REPORTE: ' + entidad
+
+            principal.getCell('A6').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
 
 
-            principal.mergeCells('E5:I5');
-            principal.getCell('E5').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('E5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
+            principal.mergeCells('E6:E6');
+            principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
+            principal.getCell('E6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
-            principal.getCell('E5').font = { bold: 600, color: { argb: '595959' }, italic: false }
-
-            principal.mergeCells('B6:F6');
-            principal.getCell('B6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('B6').value = 'ALCANCE REPORTE: ' + entidad
-
-            principal.getCell('B6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('F6:H6');
+            principal.getCell('F6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('F6').value = 'MES REPORTADO :  [' + mes1_ + ' - ' + mes2_+']'
+            principal.getCell('F6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
 
-            principal.mergeCells('G6:H6');
-            principal.getCell('G6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('G6').value = 'GESTIÓN: ' + gestion_
-            principal.getCell('G6').font = { bold: 600, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('I6:K6');
-            principal.getCell('I6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('I6').value = 'MES REPORTADO: ' + mes1_ + ' - ' + mes2_
-            principal.getCell('I6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('A7:H7');
+            principal.getCell('A7').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('A7').value = 'FORMULARIO: ' + form
+            principal.getCell('A7').font = { bold: 800, size: 9, color: { argb: '595959' }, italic: true }
 
-            principal.mergeCells('B7:L7');
-            principal.getCell('B7').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('B7').value = 'FORMULARIO: ' + form
-            principal.getCell('B7').font = { bold: 800, color: { argb: '595959' }, size: 11, italic: true }
 
             let numero_fila = 7
 
             numero_fila = numero_fila + 1
 
-            let numero_columna_1 = 8
-            let numero_columna_2 = 8
-            let numero_columna_3 = 8
+            let numero_columna_1 = 7
+            let numero_columna_2 = 7
+            let numero_columna_3 = 7
             let aumento_1 = true
             let aumento_2 = true
             let aumento_ini = 0
@@ -422,16 +344,16 @@ function ReportesFormulario() {
                     numero_columna_3 = numFinal_columna + 1
                 }
             }
-            let ini_titulo = principal.getRow(8).getCell(2)._address
-            let fin_titulo = principal.getRow(8 + aumento_ini).getCell(4)._address
+            let ini_titulo = principal.getRow(8).getCell(1)._address
+            let fin_titulo = principal.getRow(8 + aumento_ini).getCell(3)._address
             principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
             principal.getCell(`${ini_titulo}`).value = 'ENTIDAD'//lg.nombre 
             principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
             principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
 
 
-            let ini_titulo_ = principal.getRow(8).getCell(5)._address
-            let fin_titulo_ = principal.getRow(8 + aumento_ini).getCell(7)._address
+            let ini_titulo_ = principal.getRow(8).getCell(4)._address
+            let fin_titulo_ = principal.getRow(8 + aumento_ini).getCell(6)._address
             principal.mergeCells(`${ini_titulo_ + ':' + fin_titulo_}`);
             principal.getCell(`${ini_titulo_}`).value = 'VARIABLE'//lg.nombre 
             principal.getCell(`${ini_titulo_}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
@@ -444,28 +366,29 @@ function ReportesFormulario() {
             for (let e of listaEstablecimientos) {
                 ultimo++
                 let fila = principal.getRow(numero_fila)
-                let ini_titulo = fila.getCell(2)._address
-                let fin_titulo = fila.getCell(4)._address
+                let ini_titulo = fila.getCell(1)._address
+                let fin_titulo = fila.getCell(3)._address
                 principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
                 principal.getCell(`${ini_titulo}`).value = e.est
                 principal.getCell(`${ini_titulo}`).border = { top: {}, left: { style: 'thin' }, bottom: { style: ultimo == listaEstablecimientos.length ? 'thin' : null }, right: { style: 'thin' } };
-                 principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC':null }, } 
+                principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC' : null }, }
 
                 let fila_ = principal.getRow(numero_fila)
-                let ini_titulo_ = fila_.getCell(5)._address
-                let fin_titulo_ = fila_.getCell(7)._address
+                let ini_titulo_ = fila_.getCell(4)._address
+                let fin_titulo_ = fila_.getCell(6)._address
                 principal.mergeCells(`${ini_titulo_ + ':' + fin_titulo_}`);
                 principal.getCell(`${ini_titulo_}`).value = e.indicador
                 principal.getCell(`${ini_titulo_}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                principal.getCell(`${ini_titulo_}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC':null }, } 
-                let contador_columna = 8
+                principal.getCell(`${ini_titulo_}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC' : null }, }
+                let contador_columna = 7
                 data.forEach(d => {
-                    if ( e.idest == d.idest && parseInt(d.indicador) === parseInt(e.id)) {
+                    if (e.idest == d.idest && parseInt(d.indicador) === parseInt(e.id)) {
                         let ini_titulo = fila.getCell(contador_columna)._address
                         principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
                         principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
                         principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                        principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC':null }, } 
+                        principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC' : null }, }
+                        principal.getCell(`${ini_titulo}`).font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
                         contador_columna++
                     }
                 })
@@ -508,7 +431,7 @@ function ReportesFormulario() {
                         <div className='orden-tiempo '>
                             <div className='col-12'>
                                 <div className='row '>
-                                    <div className='col-6 col-sm-4 col-md-2 col-lg-2 p-1' onClick={()=>setIdVariable({campo:null, valido:null})} >
+                                    <div className='col-6 col-sm-4 col-md-2 col-lg-2 p-1' onClick={() => setIdVariable({ campo: null, valido: null })} >
                                         <SelectSM
                                             estado={ss}
                                             cambiarEstado={setSs}

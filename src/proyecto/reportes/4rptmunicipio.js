@@ -172,189 +172,62 @@ function ReportesMunicipio() {
 
 
         const procesar = async () => {
-            if (estab.campo === 1000) {
-                // consolidad todo el municipio
-                if (mes1.valido === 'true' && mes2.valido === 'true' && gestion.valido === 'true')
-                    if (grupoSeleccionados.length > 0) {
-                        setEstado(1)
-                        setTexto('Espere unos segundos, se esta procesando la informacion...')
-                        if (variablesSeleccionado.length > 0) {
-                            let data_ = []
-                            axios.post(URL + '/reportes4/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
-                                if (json.data.ok)
-                                    setCabecera(json.data.data)
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                            axios.post(URL + '/reportes4/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
-                                if (json.data.ok)
-                                    setListaIndicadores(json.data.data)
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                            variablesSeleccionado.forEach(e => {
-
-                                axios.post(URL + '/reportes4/indicadorespecificoconsolidado', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                                    if (json.data.ok)
-                                        json.data.data[1].forEach(e1 => {
-                                            json.data.data[0].forEach(e2 => {
-                                                if (parseInt(e1.input) === parseInt(e2.idinput)) {
-                                                    e1.valor = e2.valor
-                                                }
-                                            })
-                                            data_.push(e1)
-                                        })
-                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                            })
-                            setData(data_)
-                            setTimeout(() => {
-                                setData([])
-                                setData(data_)
+            if (mes1.valido === 'true' && mes2.valido === 'true' && gestion.valido === 'true' && estab.valido === 'true')
+                if (estab.campo === 1000) {
+                    setEstado(1)
+                    setTexto('Procesando la informacion...')
+                    if (variablesSeleccionado.length > 0) {
+                        axios.post(URL + '/reportes4/reportes-formularios-dividido-est-nivel-4', { lista: variablesSeleccionado, variable: grupoSeleccionados[0], gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                            if (json.data.ok) {
+                                console.log('datos del server', json.data)
+                                setData(json.data.dataForm)
+                                setCabecera(json.data.cabeceras)
+                                setListaIndicadores(json.data.indicadores)
+                                setVentana(1)
                                 setEstado(0)
-                            }, 2000)
-
-                        } else {
-                            console.log(grupoSeleccionados)
-                            let dataCabeceras = []
-                            let dataInd_ = []
-                            let data_ = []
-                            grupoSeleccionados.forEach(e => {
-                                axios.post(URL + '/reportes4/listarcabeceras', { variable: e }).then(json => {
-                                    if (json.data.ok)
-                                        json.data.data.forEach(e => {
-                                            dataCabeceras.push(e)
-                                        })
-                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                                axios.post(URL + '/reportes4/listarindicadores', { variable: e }).then(json => {
-                                    if (json.data.ok)
-                                        json.data.data.forEach(e => {
-                                            dataInd_.push(e)
-                                        })
-                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                                axios.post(URL + '/reportes4/unavariableconsolidado', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                                    if (json.data.ok)
-                                        json.data.data[1].forEach(e1 => {
-                                            json.data.data[0].forEach(e2 => {
-                                                if (parseInt(e1.input) === parseInt(e2.idinput)) {
-                                                    e1.valor = e2.valor
-                                                }
-                                            })
-                                            data_.push(e1)
-                                        })
-                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                            })
-                            setCabecera(dataCabeceras)
-                            setListaIndicadores(dataInd_)
-                            setData(data_)
-                            setTimeout(() => {
-                                setData([])
-                                setCabecera([])
-                                setListaIndicadores([])
-                                setListaIndicadores(dataInd_)
-                                setData(data_)
-                                setCabecera(dataCabeceras)
+                            } else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                        }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                    } else {
+                        axios.post(URL + '/reportes4/reportes-formularios-enteros-est-nivel-4', { lista: grupoSeleccionados, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                            if (json.data.ok) {
+                                console.log('datos del server', json.data)
+                                setData(json.data.dataForm)
+                                setCabecera(json.data.cabeceras)
+                                setListaIndicadores(json.data.indicadores)
+                                setVentana(1)
                                 setEstado(0)
-                            }, 4000)
-                        }
-                        setVentana(1)
-                    } else alert2({ icono: 'question', titulo: 'selecione una o mas opciones del cuaderno', boton: 'ok' })
-                else alert2({ icono: 'question', titulo: 'selecione los parametros año, mes1 y mes2', boton: 'ok' })
-            } else {
-                // por establecimiento
-                if (mes1.valido === 'true' && mes2.valido === 'true' && gestion.valido === 'true' && estab.valido === 'true')
-                    if (grupoSeleccionados.length > 0) {
-                        setEstado(1)
-                        setTexto('Espere unos segundos, se esta procesando la informacion...')
-                        if (variablesSeleccionado.length > 0) {
-                            let data_ = []
-                            axios.post(URL + '/reportes4/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
-                                if (json.data.ok)
-                                    setCabecera(json.data.data)
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                            axios.post(URL + '/reportes4/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
-                                if (json.data.ok)
-                                    setListaIndicadores(json.data.data)
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                            variablesSeleccionado.forEach(e => {
-
-                                axios.post(URL + '/reportes4/indicadorespecificoestablecimiento', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo, est: estab.campo }).then(json => {
-                                    if (json.data.ok)
-                                        json.data.data[1].forEach(e1 => {
-                                            json.data.data[0].forEach(e2 => {
-                                                if (parseInt(e1.input) === parseInt(e2.idinput)) {
-                                                    e1.valor = e2.valor
-                                                }
-                                            })
-                                            data_.push(e1)
-                                        })
-                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                            })
-                            setData(data_)
-                            setTimeout(() => {
-                                setData([])
-                                setData(data_)
+                            } else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                        }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                    }
+                } else {
+                    // por establecimiento
+                    setEstado(1)
+                    setTexto('Procesando la informacion...')
+                    if (variablesSeleccionado.length > 0) {
+                        axios.post(URL + '/reportes4/reportes-formularios-dividido-est-nivel-5', { lista: variablesSeleccionado, variable: grupoSeleccionados[0], gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo, est: estab.campo }).then(json => {
+                            if (json.data.ok) {
+                                console.log('datos del server', json.data)
+                                setData(json.data.dataForm)
+                                setCabecera(json.data.cabeceras)
+                                setListaIndicadores(json.data.indicadores)
+                                setVentana(1)
                                 setEstado(0)
-                            }, 2000)
-
-                        } else {
-                            console.log(grupoSeleccionados)
-                            let dataCabeceras = []
-                            let dataInd_ = []
-                            let data_ = []
-                            grupoSeleccionados.forEach(e => {
-                                axios.post(URL + '/reportes4/listarcabeceras', { variable: e }).then(json => {
-                                    if (json.data.ok)
-                                        json.data.data.forEach(e => {
-                                            dataCabeceras.push(e)
-                                        })
-                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                                axios.post(URL + '/reportes4/listarindicadores', { variable: e }).then(json => {
-                                    if (json.data.ok)
-                                        json.data.data.forEach(e => {
-                                            dataInd_.push(e)
-                                        })
-                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                                axios.post(URL + '/reportes4/unavariableporestablecimiento', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo, est: estab.campo }).then(json => {
-                                    if (json.data.ok)
-                                        json.data.data[1].forEach(e1 => {
-                                            json.data.data[0].forEach(e2 => {
-                                                if (parseInt(e1.input) === parseInt(e2.idinput)) {
-                                                    e1.valor = e2.valor
-                                                }
-                                            })
-                                            data_.push(e1)
-                                        })
-                                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                                }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                            })
-                            setCabecera(dataCabeceras)
-                            setListaIndicadores(dataInd_)
-                            setData(data_)
-                            setTimeout(() => {
-                                setData([])
-                                setCabecera([])
-                                setListaIndicadores([])
-                                setListaIndicadores(dataInd_)
-                                setData(data_)
-                                setCabecera(dataCabeceras)
+                            } else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                        }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                    } else {
+                        axios.post(URL + '/reportes4/reportes-formularios-enteros-est-nivel-5', { lista: grupoSeleccionados, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo, est: estab.campo }).then(json => {
+                            if (json.data.ok) {
+                                console.log('datos del server', json.data)
+                                setData(json.data.dataForm)
+                                setCabecera(json.data.cabeceras)
+                                setListaIndicadores(json.data.indicadores)
+                                setVentana(1)
                                 setEstado(0)
-                            }, 4000)
-                        }
-                        setVentana(1)
-                    } else alert2({ icono: 'question', titulo: 'selecione una o mas opciones del cuaderno', boton: 'ok' })
-                else alert2({ icono: 'question', titulo: 'selecione los parametros año, mes1 y mes2 ', boton: 'ok', texto: 'Si desea ver la informacion por establecimientos, seleccione una' })
-            }
+                            } else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                        }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                    }
+                }
+            else alert2({ icono: 'question', titulo: 'selecione los parametros año, mes1 y mes2 ', boton: 'ok', texto: 'Si desea ver la informacion por establecimientos, seleccione una' })
         }
         const excel = () => {
             const workbook = new ExcelJS.Workbook();
@@ -378,10 +251,10 @@ function ReportesMunicipio() {
 
             principal.columns.forEach((column) => {
                 column.alignment = { vertical: 'middle', }  //  wrapText: true ajustar texto dentro de la celda
-                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 8, italic: false };
+                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 7, italic: false };
             })
-            principal.mergeCells("B1:C5");
-            principal.mergeCells("K1:L5");
+            // principal.mergeCells("A1:A5");
+            principal.mergeCells("H1:H5");
 
             const imageId = workbook.addImage({
                 base64: img,
@@ -410,45 +283,46 @@ function ReportesMunicipio() {
                 if (e.id == estab.campo) entidad = e.nombre
             })
             // CONFIGURACION DE LOS TIRULOS, NOMBRE HOSPITAL, MESES Y GESTION
-            principal.addImage(imageId, { tl: { col: 1.1, row: 0.1 }, ext: { width: 100, height: 95 } })
-            principal.addImage(imageIdGob, { tl: { col: 10.6, row: 0.1 }, ext: { width: 100, height: 100 } })
-            principal.mergeCells('D2:J2');
-            principal.getCell('D2').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
-            principal.getCell('D2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+            principal.addImage(imageId, { tl: { col: 0.1, row: 0.1 }, ext: { width: 100, height: 95 } })
+            principal.addImage(imageIdGob, { tl: { col: 7, row: 0.1 }, ext: { width: 100, height: 100 } })
+            principal.mergeCells('B2:G2');
+            principal.getCell('B2').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
+            principal.getCell('B2').font = { bold: 700, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('D3:J3');
-            principal.getCell('D3').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
-            principal.getCell('D3').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('B3:G3');
+            principal.getCell('B3').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
+            principal.getCell('B3').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
 
 
-            principal.mergeCells('E5:I5');
-            principal.getCell('E5').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('E5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
-            principal.getCell('E5').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('C5:F5');
+            principal.getCell('C5').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('C5').value = 'NIVEL FORMULARIO: RED'
+            principal.getCell('C5').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
+
 
 
             // principal.mergeCells('D4:H4');
 
-            principal.mergeCells('B6:F6');
-            principal.getCell('B6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.mergeCells('A6:D6');
+            principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
 
             if (estab.campo == 1000) { // mun
-                principal.getCell('B6').value = 'INFORMACION: ' + entidad + '-' + localStorage.getItem('mun')
-            } else principal.getCell('B6').value = 'ESTABLECIEMIENTO : ' + entidad
-            principal.getCell('B6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+                principal.getCell('A6').value = 'INFORMACION: ' + entidad + '-' + localStorage.getItem('mun')
+            } else principal.getCell('A6').value = 'ESTABLECIEMIENTO : ' + entidad
+            principal.getCell('A6').font = { bold: 600, size:8, color: { argb: '595959' }, italic: false }
 
 
-            principal.mergeCells('G6:H6');
-            principal.getCell('G6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('G6').value = 'GESTIÓN: ' + gestion_
-            principal.getCell('G6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('E6:E6');
+            principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
+            principal.getCell('E6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('I6:K6');
-            principal.getCell('I6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('I6').value = 'MES REPORTADO: ' + mes1_ + ' - ' + mes2_
-            principal.getCell('I6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('F6:H6');
+            principal.getCell('F6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('F6').value = 'MES REPORTADO :  [' + mes1_ + ' - ' + mes2_ + ']'
+            principal.getCell('F6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
             let numero_fila = 6
             let inicio_fila_titulo = 6
@@ -459,9 +333,9 @@ function ReportesMunicipio() {
                         numero_fila = numero_fila + 1
                         inicio_fila_titulo = inicio_fila_titulo + 1
                         fin_fila_titulo = fin_fila_titulo + 1
-                        let numero_columna_1 = 7
-                        let numero_columna_2 = 7
-                        let numero_columna_3 = 7
+                        let numero_columna_1 = 6
+                        let numero_columna_2 = 6
+                        let numero_columna_3 = 6
                         let aumento_1 = true
                         let aumento_2 = true
                         let aumento_ini = 0
@@ -528,8 +402,8 @@ function ReportesMunicipio() {
                                 }
                             }
                         }
-                        let ini_titulo = principal.getRow(inicio_fila_titulo - aumento_ini).getCell(2)._address
-                        let fin_titulo = principal.getRow(fin_fila_titulo).getCell(6)._address
+                        let ini_titulo = principal.getRow(inicio_fila_titulo - aumento_ini).getCell(1)._address
+                        let fin_titulo = principal.getRow(fin_fila_titulo).getCell(5)._address
                         principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
                         principal.getCell(`${ini_titulo}`).value = lg.nombre
                         principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
@@ -540,13 +414,13 @@ function ReportesMunicipio() {
                         fin_fila_titulo = fin_fila_titulo + 1
                         for (let ind of listaIndicadores) {
                             if (parseInt(ind.variable) === parseInt(gs)) {
-                                let contador_columna = 7
+                                let contador_columna = 6
                                 if (variablesSeleccionado.length > 0) {
                                     variablesSeleccionado.forEach(vs => {
                                         if (parseInt(ind.id) === parseInt(vs)) {
                                             let fila = principal.getRow(numero_fila)
-                                            let ini_titulo = fila.getCell(2)._address
-                                            let fin_titulo = fila.getCell(6)._address
+                                            let ini_titulo = fila.getCell(1)._address
+                                            let fin_titulo = fila.getCell(5)._address
                                             principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
                                             principal.getCell(`${ini_titulo}`).value = ind.indicador
                                             principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
@@ -557,6 +431,7 @@ function ReportesMunicipio() {
                                                     principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
                                                     principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
                                                     principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                                                    principal.getCell(`${ini_titulo}`).font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
                                                     contador_columna++
                                                 }
                                             })
@@ -564,8 +439,8 @@ function ReportesMunicipio() {
                                     })
                                 } else {
                                     let fila = principal.getRow(numero_fila)
-                                    let ini_titulo = fila.getCell(2)._address
-                                    let fin_titulo = fila.getCell(6)._address
+                                    let ini_titulo = fila.getCell(1)._address
+                                    let fin_titulo = fila.getCell(5)._address
                                     principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
                                     principal.getCell(`${ini_titulo}`).value = ind.indicador
                                     principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
@@ -576,6 +451,7 @@ function ReportesMunicipio() {
                                             principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
                                             principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
                                             principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                                            principal.getCell(`${ini_titulo}`).font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
                                             contador_columna++
                                         }
                                     })
@@ -605,8 +481,6 @@ function ReportesMunicipio() {
 
 
         }
-
-
 
 
         return (

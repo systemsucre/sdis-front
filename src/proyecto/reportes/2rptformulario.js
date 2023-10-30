@@ -376,10 +376,10 @@ function ReportesFormularioSedes() {
 
             principal.columns.forEach((column) => {
                 column.alignment = { vertical: 'middle', }  //  wrapText: true ajustar texto dentro de la celda
-                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 8, italic: false };
+                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 7, italic: false };
             })
-            principal.mergeCells("B1:C5");
-            principal.mergeCells("K1:L5");
+            // principal.mergeCells("A1:A5");
+            principal.mergeCells("H1:H5");
 
             const imageId = workbook.addImage({
                 base64: img,
@@ -410,56 +410,58 @@ function ReportesFormularioSedes() {
 
 
             // CONFIGURACION DE LOS TIRULOS, NOMBRE HOSPITAL, MESES Y GESTION
-            principal.addImage(imageId, { tl: { col: 1.1, row: 0.1 }, ext: { width: 100, height: 95 } })
-            principal.addImage(imageIdGob, { tl: { col: 10.6, row: 0.1 }, ext: { width: 100, height: 100 } })
-            principal.mergeCells('D2:J2');
-            principal.getCell('D2').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
-            principal.getCell('D2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+            principal.addImage(imageId, { tl: { col: 0.1, row: 0.1 }, ext: { width: 100, height: 95 } })
+            principal.addImage(imageIdGob, { tl: { col: 7, row: 0.1 }, ext: { width: 100, height: 100 } })
+            principal.mergeCells('B2:G2');
+            principal.getCell('B2').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
+            principal.getCell('B2').font = { bold: 700, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('D3:J3');
-            principal.getCell('D3').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
-            principal.getCell('D3').font = { bold: 600, color: { argb: '595959' }, italic: false }
-
-
-            principal.mergeCells('E5:I5');
-            principal.getCell('E5').alignment = { vertical: 'center', horizontal: 'center' };
-            if (nivelAplicacion.campo == 1) principal.getCell('E5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
-            if (nivelAplicacion.campo == 2) principal.getCell('E5').value = 'NIVEL FORMULARIO: MUNICIPIO'
-            if (nivelAplicacion.campo == 3) principal.getCell('E5').value = 'NIVEL FORMULARIO: RED'
-            if (nivelAplicacion.campo == 4) principal.getCell('E5').value = 'NIVEL FORMULARIO: AREA'
-            principal.getCell('E5').font = { bold: 600, color: { argb: '595959' }, italic: false }
-
-            principal.mergeCells('B6:F6');
-            principal.getCell('B6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('B6').value = 'ALCANCE REPORTE: ' + entidad
-
-            principal.getCell('B6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('B3:G3');
+            principal.getCell('B3').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
+            principal.getCell('B3').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
 
 
-            principal.mergeCells('G6:H6');
-            principal.getCell('G6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('G6').value = 'GESTIÓN: ' + gestion_
-            principal.getCell('G6').font = { bold: 600, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('I6:K6');
-            principal.getCell('I6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('I6').value = 'MES REPORTADO: ' + mes1_ + ' - ' + mes2_
-            principal.getCell('I6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('C5:F5');
+            principal.getCell('F5').alignment = { vertical: 'center', horizontal: 'center' };
+            if (nivelAplicacion.campo == 1) principal.getCell('F5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
+            if (nivelAplicacion.campo == 2) principal.getCell('F5').value = 'NIVEL FORMULARIO: MUNICIPIO'
+            if (nivelAplicacion.campo == 3) principal.getCell('F5').value = 'NIVEL FORMULARIO: RED'
+            if (nivelAplicacion.campo == 4) principal.getCell('F5').value = 'NIVEL FORMULARIO: AREA'
+            principal.getCell('C5').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('B7:L7');
-            principal.getCell('B7').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('B7').value = 'FORMULARIO: ' + form
-            principal.getCell('B7').font = { bold: 800, color: { argb: '595959' }, size: 11, italic: true }
+            principal.mergeCells('A6:D6');
+            principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('A6').value = 'ALCANCE REPORTE: ' + entidad
 
+            principal.getCell('A6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+
+
+            principal.mergeCells('E6:E6');
+            principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
+            principal.getCell('E6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+
+            principal.mergeCells('F6:H6');
+            principal.getCell('F6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('F6').value = 'MES REPORTADO :  [' + mes1_ + ' - ' + mes2_ + ']'
+            principal.getCell('F6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+
+
+
+            principal.mergeCells('A7:H7');
+            principal.getCell('A7').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('A7').value = 'FORMULARIO: ' + form
+            principal.getCell('A7').font = { bold: 800, size: 9, color: { argb: '595959' }, italic: true }
             let numero_fila = 7
 
             numero_fila = numero_fila + 1
 
-            let numero_columna_1 = 8
-            let numero_columna_2 = 8
-            let numero_columna_3 = 8
+            let numero_columna_1 = 7
+            let numero_columna_2 = 7
+            let numero_columna_3 = 7
             let aumento_1 = true
             let aumento_2 = true
             let aumento_ini = 0
@@ -518,16 +520,16 @@ function ReportesFormularioSedes() {
                     numero_columna_3 = numFinal_columna + 1
                 }
             }
-            let ini_titulo = principal.getRow(8).getCell(2)._address
-            let fin_titulo = principal.getRow(8 + aumento_ini).getCell(4)._address
+            let ini_titulo = principal.getRow(8).getCell(1)._address
+            let fin_titulo = principal.getRow(8 + aumento_ini).getCell(3)._address
             principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
             principal.getCell(`${ini_titulo}`).value = 'ENTIDAD'//lg.nombre 
             principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
             principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
 
 
-            let ini_titulo_ = principal.getRow(8).getCell(5)._address
-            let fin_titulo_ = principal.getRow(8 + aumento_ini).getCell(7)._address
+            let ini_titulo_ = principal.getRow(8).getCell(4)._address
+            let fin_titulo_ = principal.getRow(8 + aumento_ini).getCell(6)._address
             principal.mergeCells(`${ini_titulo_ + ':' + fin_titulo_}`);
             principal.getCell(`${ini_titulo_}`).value = 'VARIABLE'//lg.nombre 
             principal.getCell(`${ini_titulo_}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
@@ -540,28 +542,29 @@ function ReportesFormularioSedes() {
             for (let e of listaEstablecimientos) {
                 ultimo++
                 let fila = principal.getRow(numero_fila)
-                let ini_titulo = fila.getCell(2)._address
-                let fin_titulo = fila.getCell(4)._address
+                let ini_titulo = fila.getCell(1)._address
+                let fin_titulo = fila.getCell(3)._address
                 principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
                 principal.getCell(`${ini_titulo}`).value = e.est
                 principal.getCell(`${ini_titulo}`).border = { top: {}, left: { style: 'thin' }, bottom: { style: ultimo == listaEstablecimientos.length ? 'thin' : null }, right: { style: 'thin' } };
-                 principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC':null }, } 
+                principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC' : null }, }
 
                 let fila_ = principal.getRow(numero_fila)
-                let ini_titulo_ = fila_.getCell(5)._address
-                let fin_titulo_ = fila_.getCell(7)._address
+                let ini_titulo_ = fila_.getCell(4)._address
+                let fin_titulo_ = fila_.getCell(6)._address
                 principal.mergeCells(`${ini_titulo_ + ':' + fin_titulo_}`);
                 principal.getCell(`${ini_titulo_}`).value = e.indicador
                 principal.getCell(`${ini_titulo_}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                principal.getCell(`${ini_titulo_}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC':null }, } 
-                let contador_columna = 8
+                principal.getCell(`${ini_titulo_}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC' : null }, }
+                let contador_columna = 7
                 data.forEach(d => {
-                    if ( e.idest == d.idest && parseInt(d.indicador) === parseInt(e.id)) {
+                    if (e.idest == d.idest && parseInt(d.indicador) === parseInt(e.id)) {
                         let ini_titulo = fila.getCell(contador_columna)._address
                         principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
                         principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
                         principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                        principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC':null }, } 
+                        principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: e.color ? 'FDEDEC' : null }, }
+                        principal.getCell(`${ini_titulo}`).font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
                         contador_columna++
                     }
                 })

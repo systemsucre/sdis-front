@@ -616,10 +616,10 @@ function ReportesSedes() {
 
             principal.columns.forEach((column) => {
                 column.alignment = { vertical: 'middle', }  //  wrapText: true ajustar texto dentro de la celda
-                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 8, italic: false };
+                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 7, italic: false };
             })
-            principal.mergeCells("B1:C5");
-            principal.mergeCells("K1:L5");
+            // principal.mergeCells("A1:A5");
+            principal.mergeCells("H1:H5");
 
             const imageId = workbook.addImage({
                 base64: img,
@@ -648,98 +648,97 @@ function ReportesSedes() {
                 if (e.id == estab.campo) entidad = e.nombre
             })
             // CONFIGURACION DE LOS TIRULOS, NOMBRE HOSPITAL, MESES Y GESTION
-            principal.addImage(imageId, { tl: { col: 1.1, row: 0.1 }, ext: { width: 100, height: 95 } })
-            principal.addImage(imageIdGob, { tl: { col: 10.6, row: 0.1 }, ext: { width: 100, height: 100 } })
-            principal.mergeCells('D2:J2');
-            principal.getCell('D2').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
-            principal.getCell('D2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+            principal.addImage(imageId, { tl: { col: 0.1, row: 0.1 }, ext: { width: 100, height: 95 } })
+            principal.addImage(imageIdGob, { tl: { col: 7, row: 0.1 }, ext: { width: 100, height: 100 } })
+            principal.mergeCells('B2:G2');
+            principal.getCell('B2').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
+            principal.getCell('B2').font = { bold: 700, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('D3:J3');
-            principal.getCell('D3').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('D3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
-            principal.getCell('D3').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('B3:G3');
+            principal.getCell('B3').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
+            principal.getCell('B3').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
 
 
-            principal.mergeCells('E5:I5');
-            principal.getCell('E5').alignment = { vertical: 'center', horizontal: 'center' };
-            if (nivelAplicacion.campo == 1) principal.getCell('E5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
-            if (nivelAplicacion.campo == 2) principal.getCell('E5').value = 'NIVEL FORMULARIO: MUNICIPIO'
-            if (nivelAplicacion.campo == 3) principal.getCell('E5').value = 'NIVEL FORMULARIO: RED'
-            if (nivelAplicacion.campo == 4) principal.getCell('E5').value = 'NIVEL FORMULARIO: AREA'
-            principal.getCell('E5').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('C5:F5');
+            principal.getCell('C5').alignment = { vertical: 'center', horizontal: 'center' };
+            if (nivelAplicacion.campo == 1) principal.getCell('C5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
+            if (nivelAplicacion.campo == 2) principal.getCell('C5').value = 'NIVEL FORMULARIO: MUNICIPIO'
+            if (nivelAplicacion.campo == 3) principal.getCell('C5').value = 'NIVEL FORMULARIO: RED'
+            if (nivelAplicacion.campo == 4) principal.getCell('C5').value = 'NIVEL FORMULARIO: AREA'
+            principal.getCell('C5').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
 
 
             // principal.mergeCells('D4:H4');
-
-            principal.mergeCells('B6:F6');
-            principal.getCell('B6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.mergeCells('A6:D6');
+            principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
             if (nivelAplicacion.campo == 1) {
                 if (nivel == 5) { // est
-                    principal.getCell('B6').value = 'ESTABLECIMIENTO: ' + entidad
+                    principal.getCell('A6').value = 'ESTABLECIMIENTO: ' + entidad
                 }
                 if (nivel == 4) { // mun
-                    principal.getCell('B6').value = 'MUNICIPIO: ' + entidad
+                    principal.getCell('A6').value = 'MUNICIPIO: ' + entidad
                 }
                 if (nivel == 3) { // red
-                    principal.getCell('B6').value = entidad
+                    principal.getCell('A6').value = entidad
                 }
                 if (nivel == 1000) { // consolidado
-                    principal.getCell('B6').value = 'INFORMACION: ' + entidad+' - DEPTO CH'
+                    principal.getCell('A6').value = 'INFORMACION: ' + entidad + ' - DEPTO CH'
 
                 }
             }
             if (nivelAplicacion.campo == 2) {
 
                 if (nivel == 4) { // mun
-                    principal.getCell('B6').value = 'MUNICIPIO: ' + entidad
+                    principal.getCell('A6').value = 'MUNICIPIO: ' + entidad
                 }
                 if (nivel == 3) { // red
-                    principal.getCell('B6').value = entidad
+                    principal.getCell('A6').value = entidad
                 }
                 if (nivel == 1000) { // consolidado
-                    principal.getCell('B6').value = 'INFORMACION: ' + entidad+' - DEPTO CH'
+                    principal.getCell('A6').value = 'INFORMACION: ' + entidad + ' - DEPTO CH'
 
                 }
             }
 
             if (nivelAplicacion.campo == 3) {
                 if (nivel == 3) { // red
-                    principal.getCell('B6').value = entidad
+                    principal.getCell('A6').value = entidad
                 }
                 if (nivel == 1000) { // consolidado
-                    principal.getCell('B6').value = 'INFORMACION: ' + entidad+' - DEPTO CH'
+                    principal.getCell('A6').value = 'INFORMACION: ' + entidad + ' - DEPTO CH'
 
                 }
             }
             if (nivelAplicacion.campo == 4) {
-                principal.getCell('B6').value = 'REPORTE DE AREA'
+                principal.getCell('A6').value = 'REPORTE DE AREA'
             }
-            principal.getCell('B6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.getCell('A6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
 
-            principal.mergeCells('G6:H6');
-            principal.getCell('G6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('G6').value = 'GESTIÓN: ' + gestion_
-            principal.getCell('G6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('E6:E6');
+            principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
+            principal.getCell('E6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('I6:K6');
-            principal.getCell('I6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('I6').value = 'MES REPORTADO: ' + mes1_ + ' - ' + mes2_
-            principal.getCell('I6').font = { bold: 600, color: { argb: '595959' }, italic: false }
+            principal.mergeCells('F6:H6');
+            principal.getCell('F6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('F6').value = 'MES REPORTADO :  [' + mes1_ + ' - ' + mes2_ + ']'
+            principal.getCell('F6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
             let numero_fila = 6
             let inicio_fila_titulo = 6
-            let fin_fila_titulo = 6 
+            let fin_fila_titulo = 6
             listaGrupo.forEach(lg => {
                 grupoSeleccionados.forEach(gs => {
                     if (parseInt(lg.id) === parseInt(gs)) {
                         numero_fila = numero_fila + 1
                         inicio_fila_titulo = inicio_fila_titulo + 1
                         fin_fila_titulo = fin_fila_titulo + 1
-                        let numero_columna_1 = 7
-                        let numero_columna_2 = 7
-                        let numero_columna_3 = 7
+                        let numero_columna_1 = 6
+                        let numero_columna_2 = 6
+                        let numero_columna_3 = 6
                         let aumento_1 = true
                         let aumento_2 = true
                         let aumento_ini = 0
@@ -806,8 +805,8 @@ function ReportesSedes() {
                                 }
                             }
                         }
-                        let ini_titulo = principal.getRow(inicio_fila_titulo - aumento_ini).getCell(2)._address
-                        let fin_titulo = principal.getRow(fin_fila_titulo).getCell(6)._address
+                        let ini_titulo = principal.getRow(inicio_fila_titulo - aumento_ini).getCell(1)._address
+                        let fin_titulo = principal.getRow(fin_fila_titulo).getCell(5)._address
                         principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
                         principal.getCell(`${ini_titulo}`).value = lg.nombre
                         principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
@@ -818,13 +817,13 @@ function ReportesSedes() {
                         fin_fila_titulo = fin_fila_titulo + 1
                         for (let ind of listaIndicadores) {
                             if (parseInt(ind.variable) === parseInt(gs)) {
-                                let contador_columna = 7
+                                let contador_columna = 6
                                 if (variablesSeleccionado.length > 0) {
                                     variablesSeleccionado.forEach(vs => {
                                         if (parseInt(ind.id) === parseInt(vs)) {
                                             let fila = principal.getRow(numero_fila)
-                                            let ini_titulo = fila.getCell(2)._address
-                                            let fin_titulo = fila.getCell(6)._address
+                                            let ini_titulo = fila.getCell(1)._address
+                                            let fin_titulo = fila.getCell(5)._address
                                             principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
                                             principal.getCell(`${ini_titulo}`).value = ind.indicador
                                             principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
@@ -835,6 +834,7 @@ function ReportesSedes() {
                                                     principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
                                                     principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
                                                     principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                                                    principal.getCell(`${ini_titulo}`).font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
                                                     contador_columna++
                                                 }
                                             })
@@ -842,8 +842,8 @@ function ReportesSedes() {
                                     })
                                 } else {
                                     let fila = principal.getRow(numero_fila)
-                                    let ini_titulo = fila.getCell(2)._address
-                                    let fin_titulo = fila.getCell(6)._address
+                                    let ini_titulo = fila.getCell(1)._address
+                                    let fin_titulo = fila.getCell(5)._address
                                     principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
                                     principal.getCell(`${ini_titulo}`).value = ind.indicador
                                     principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
@@ -854,6 +854,7 @@ function ReportesSedes() {
                                             principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
                                             principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
                                             principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                                            principal.getCell(`${ini_titulo}`).font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
                                             contador_columna++
                                         }
                                     })

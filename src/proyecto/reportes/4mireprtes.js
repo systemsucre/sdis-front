@@ -15,8 +15,8 @@ import Load from '../../elementos/load'
 import { ComponenteCheck, ComponenteCheckXL, SelectSM } from '../../elementos/elementos';
 import { Table } from 'reactstrap';
 import { img } from './logo';
+import { imgG } from './gobernacion';
 const ExcelJS = require('exceljs')
-
 
 
 function Mireportes4() {
@@ -137,7 +137,7 @@ function Mireportes4() {
                         // console.log(json.data.data,'data de la bd')
                     } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
                 }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-            } 
+            }
         }
 
 
@@ -151,7 +151,7 @@ function Mireportes4() {
                         // console.log(json.data.data,'data de la bd')
                     } else alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg })
                 }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-            } 
+            }
         }
 
 
@@ -179,94 +179,36 @@ function Mireportes4() {
         const procesar = async () => {
             // console.log(grupoSeleccionados, 'grupos seleccinados')
 
-            if (mes1.valido === 'true' && mes2.valido === 'true' && gestion.valido === 'true')
-                if (grupoSeleccionados.length > 0) {
-                    setEstado(1)
-                    setTexto('Espere unos segundos, se esta procesando la informacion...')
-                    if (variablesSeleccionado.length > 0) {
-                        let data_ = []
-                        axios.post(URL + '/reportes4/listarcabeceras', { variable: grupoSeleccionados[0] }).then(json => {
-                            if (json.data.ok)
-                                setCabecera(json.data.data)
-                            else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                        }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        axios.post(URL + '/reportes4/listarindicadores', { variable: grupoSeleccionados[0] }).then(json => {
-                            if (json.data.ok)
-                                setListaIndicadores(json.data.data)
-                            else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                        }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        variablesSeleccionado.forEach(e => {
+            if (mes1.valido === 'true' && mes2.valido === 'true' && gestion.valido === 'true') {
 
-                            axios.post(URL + '/reportes4/indicadorespecificoM', { indicador: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                                if (json.data.ok)
-                                    json.data.data[1].forEach(e1 => {
-                                        json.data.data[0].forEach(e2 => {
-                                            if (parseInt(e1.input) === parseInt(e2.idinput)) {
-                                                e1.valor = e2.valor
-                                            }
-                                        })
-                                        data_.push(e1)
-                                    })
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        })
-                        setData(data_)
-                        setTimeout(() => {
-                            setData([])
-                            setData(data_)
+                setEstado(1)
+                setTexto('Procesando la informacion...')
+                if (variablesSeleccionado.length > 0) {
+                    axios.post(URL + '/reportes4/reportes-formularios-dividido-mi-formulario', { lista: variablesSeleccionado, variable: grupoSeleccionados[0], gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                        if (json.data.ok) {
+                            console.log('datos del server', json.data)
+                            setData(json.data.dataForm)
+                            setCabecera(json.data.cabeceras)
+                            setListaIndicadores(json.data.indicadores)
+                            setVentana(1)
                             setEstado(0)
-                        }, 2000)
-
-                    } else {
-                        console.log(grupoSeleccionados)
-                        let dataCabeceras = []
-                        let dataInd_ = []
-                        let data_ = []
-                        grupoSeleccionados.forEach(e => {
-                            axios.post(URL + '/reportes4/listarcabeceras', { variable: e }).then(json => {
-                                if (json.data.ok)
-                                    json.data.data.forEach(e => {
-                                        dataCabeceras.push(e)
-                                    })
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                            axios.post(URL + '/reportes4/listarindicadores', { variable: e }).then(json => {
-                                if (json.data.ok)
-                                    json.data.data.forEach(e => {
-                                        dataInd_.push(e)
-                                    })
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-
-                            axios.post(URL + '/reportes4/unavariableM', { variable: e, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
-                                if (json.data.ok)
-                                    json.data.data[1].forEach(e1 => {
-                                        json.data.data[0].forEach(e2 => {
-                                            if (parseInt(e1.input) === parseInt(e2.idinput)) {
-                                                e1.valor = e2.valor
-                                            }
-                                        })
-                                        data_.push(e1)
-                                    })
-                                else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
-                            }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
-                        })
-                        setCabecera(dataCabeceras)
-                        setListaIndicadores(dataInd_)
-                        setData(data_)
-                        setTimeout(() => {
-                            setData([])
-                            setCabecera([])
-                            setListaIndicadores([])
-                            setListaIndicadores(dataInd_)
-                            setData(data_)
-                            setCabecera(dataCabeceras)
+                        } else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                    }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                } else {
+                    axios.post(URL + '/reportes4/reportes-formularios-enteros-mi-formulario', { lista: grupoSeleccionados, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
+                        if (json.data.ok) {
+                            console.log('datos del server', json.data)
+                            setData(json.data.dataForm)
+                            setCabecera(json.data.cabeceras)
+                            setListaIndicadores(json.data.indicadores)
+                            setVentana(1)
                             setEstado(0)
-                        }, 4000)
-                    }
-                    setVentana(1)
-                } else alert2({ icono: 'question', titulo: 'selecione una o mas formularios', boton: 'ok' })
+                        } else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); setEstado(0) }
+                    }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
+                }
+
+            }
+
             else alert2({ icono: 'question', titulo: 'selecione los parametros año, mes1 y mes2', boton: 'ok' })
 
         }
@@ -276,16 +218,10 @@ function Mireportes4() {
             workbook.creator = 'SDIS-VE';
             workbook.lastModifiedBy = 'SDIS-VE';
 
-            const principal = workbook.addWorksheet('DATOS', {
-                views:
-                    [
-                        // { showGridLines: false },
-                        // { state: 'frozen', xSplit: 0, ySplit: 6, topLeftCell: 'G10', activeCell: 'A2' }
-                        // {state: 'split', xSplit:2000,ySplit:3000,topLeftCell:'G10', activeCell:'A2'}
-                    ],
+            const principal = workbook.addWorksheet('ESTRUCTURA', {
                 properties:
                 {
-                    tabColor: { argb: '28B463' }
+                    tabColor: { argb: 'ECF0F1' }
                 },
                 pageSetup: {
                     paperSize: 9, orientation: 'landscape'
@@ -298,104 +234,214 @@ function Mireportes4() {
             }
 
             principal.columns.forEach((column) => {
-                column.alignment = { vertical: 'middle', wrapText: true }
-                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 9, italic: false };
+                column.alignment = { vertical: 'middle', }  //  wrapText: true ajustar texto dentro de la celda
+                column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 7, italic: false };
             })
-            principal.mergeCells("A1:B5");
+            // principal.mergeCells("A1:A5");
+            principal.mergeCells("H1:H5");
 
             const imageId = workbook.addImage({
                 base64: img,
                 extension: 'png',
             })
+            const imageIdGob = workbook.addImage({
+                base64: imgG,
+                extension: 'png',
+            })
+
             let mes1_ = null
             let mes2_ = null
             let gestion_ = null
             listaMes.forEach(e => {
                 if (e.id == mes1.campo) mes1_ = e.nombre
+            })
+            listaMes.forEach(e => {
                 if (e.id == mes2.campo) mes2_ = e.nombre
             })
             listaGestion.forEach(e => {
                 if (e.id == gestion.campo) gestion_ = e.nombre
             })
+
             // CONFIGURACION DE LOS TIRULOS, NOMBRE HOSPITAL, MESES Y GESTION
-            principal.addImage(imageId, { tl: { col: 0.5, row: 0.5 }, ext: { width: 100, height: 100 } })
-            principal.mergeCells('C2:H2');
-            principal.getCell('C2').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('C2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS I NIVEL SEDES CHUQUISACA'
-            principal.mergeCells('C3:H3');
-            principal.getCell('C3').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('C3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 2-4/2020)'
-            principal.mergeCells('C4:H4');
-            principal.getCell('C4').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('C4').value = 'INFORME EST. ' + localStorage.getItem('est')
-            principal.getCell('C4').font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 8, italic: false };
+            principal.addImage(imageId, { tl: { col: 0.1, row: 0.1 }, ext: { width: 100, height: 95 } })
+            principal.addImage(imageIdGob, { tl: { col: 7, row: 0.1 }, ext: { width: 100, height: 100 } })
+            principal.mergeCells('B2:G2');
+            principal.getCell('B2').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
+            principal.getCell('B2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+
+            principal.mergeCells('B3:G3');
+            principal.getCell('B3').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('B3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
+            principal.getCell('B3').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
+
+
+            principal.mergeCells('C5:F5');
+            principal.getCell('C5').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('C5').value = 'NIVEL FORMULARIO: MUNICIPIO'
+            principal.getCell('C5').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
+
+
+            // principal.mergeCells('D4:H4');
 
             principal.mergeCells('A6:D6');
             principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('A6').value = 'MES REPORTADO: ' + mes1_ + ' - ' + mes2_
-            principal.mergeCells('E6:F6');
+            principal.getCell('A6').value ='MUNICIPIO : '+ localStorage.getItem('mun')
+            principal.getCell('A6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+
+
+            principal.mergeCells('E6:E6');
             principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
             principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
+            principal.getCell('E6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
+            principal.mergeCells('F6:H6');
+            principal.getCell('F6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.getCell('F6').value = 'MES REPORTADO :  [' + mes1_ + ' - ' + mes2_ + ']'
+            principal.getCell('F6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
-            //IMPLEMENTACION DE LAS CABECERAS INDICADORES Y LOS DATOS EN EL CUERPO DE LA HOJA
+            let numero_fila = 6
+            let inicio_fila_titulo = 6
+            let fin_fila_titulo = 6
+            listaGrupo.forEach(lg => {
+                grupoSeleccionados.forEach(gs => {
+                    if (parseInt(lg.id) === parseInt(gs)) {
+                        numero_fila = numero_fila + 1
+                        inicio_fila_titulo = inicio_fila_titulo + 1
+                        fin_fila_titulo = fin_fila_titulo + 1
+                        let numero_columna_1 = 6
+                        let numero_columna_2 = 6
+                        let numero_columna_3 = 6
+                        let aumento_1 = true
+                        let aumento_2 = true
+                        let aumento_ini = 0
+                        for (let c of cabecera) {
 
-            let x = 0
-            // for (let i = 7; i <= listaIndicadores.length + cabecera.length + grupoSeleccionados.length; i++) {
-            // const fila = principal.getRow(i)
+                            if (parseInt(c.variable) === parseInt(gs)) {
 
-            let i = 7
-            var fila = null
-            grupoSeleccionados.forEach(g => {
-                axios.post(URL + '/reportes4/maxorden', { id: g }).then(json => {
-                    if (json.data.ok) {
-                        let ultimo = json.data.data
-                        let body = []
-                        fila = principal.getRow(i)
-
-                        let numIni = 5
-                        cabecera.forEach(c => {
-
-                            if (parseInt(g) === parseInt(c.variable)) {
-
-                                if (c.nivel === 1) {
-                                    let ini = fila.getCell(parseInt(numIni))._address  // NOMBRE DE LA CELDA
-                                    let numFinal = numIni + c.span - 1
-
-                                    // console.log(numIni, numFinal, 'numero inicial con incremento', c.nivel, grupoSeleccionados)
-                                    let fin = fila.getCell(numFinal)._address
-                                    let convi = JSON.stringify(ini + ":" + fin)
-                                    console.log(`${ini.split(0) + ini.split(1) + ':' + fin.split(0) + fin.split(1)}`, 'string convinado jsonstrinfy', ini, fin)
-                                    principal.mergeCells(`${ini.split(0) + ini.split(1) + ':' + fin.split(0) + fin.split(1)}`);
-                                    principal.getCell(JSON.stringify(ini)).value = 'Este es una cabecera'
-                                    numIni = numFinal + 1
+                                if (parseInt(c.nivel) == 1) {
+                                    aumento_1 = true
+                                    aumento_2 = true
+                                    let fila_nivel1 = principal.getRow(numero_fila)
+                                    let ini = fila_nivel1.getCell(parseInt(numero_columna_1))._address  // NOMBRE DE LA CELDA
+                                    let numFinal_columna = numero_columna_1 + c.span - 1
+                                    let fin = fila_nivel1.getCell(numFinal_columna)._address
+                                    principal.mergeCells(`${ini + ':' + fin}`);
+                                    principal.getCell(`${ini}`).value = c.input
+                                    principal.getCell(`${ini}`).alignment = { vertical: 'center', horizontal: c.span > 1 ? 'center' : null }
+                                    principal.getCell(`${ini}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
+                                    principal.getCell(`${ini}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                                    numero_columna_1 = numFinal_columna + 1
 
                                 }
+                                if (parseInt(c.nivel) == 2) {
+                                    aumento_2 = true
+                                    if (aumento_1) {
+                                        aumento_1 = false;
+                                        numero_fila = numero_fila + 1;
+                                        inicio_fila_titulo = inicio_fila_titulo + 1;
+                                        aumento_ini++
+                                        fin_fila_titulo++
+                                    }
+                                    let fila_nivel1 = principal.getRow(numero_fila)
+                                    let ini = fila_nivel1.getCell(parseInt(numero_columna_2))._address  // NOMBRE DE LA CELDA
+                                    let numFinal_columna = numero_columna_2 + c.span - 1
+                                    let fin = fila_nivel1.getCell(numFinal_columna)._address
+                                    principal.mergeCells(`${ini + ':' + fin}`);
+                                    principal.getCell(`${ini}`).value = c.input
+                                    principal.getCell(`${ini}`).alignment = { vertical: 'center', horizontal: c.span > 1 ? 'center' : null }
+                                    principal.getCell(`${ini}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
+                                    principal.getCell(`${ini}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+                                    numero_columna_2 = numFinal_columna + 1
+                                }
+                                if (parseInt(c.nivel) == 3) {
+                                    if (aumento_2) {
+                                        aumento_2 = false;
+                                        numero_fila = numero_fila + 1;
+                                        inicio_fila_titulo = inicio_fila_titulo + 1;
+                                        fin_fila_titulo++
+                                        aumento_ini++
+                                    }
+
+                                    let fila_nivel1 = principal.getRow(numero_fila)
+                                    let ini = fila_nivel1.getCell(parseInt(numero_columna_3))._address  // NOMBRE DE LA CELDA
+                                    let numFinal_columna = numero_columna_3 + c.span - 1
+                                    let fin = fila_nivel1.getCell(numFinal_columna)._address
+                                    principal.mergeCells(`${ini + ':' + fin}`);
+                                    principal.getCell(`${ini}`).value = c.input
+                                    principal.getCell(`${ini}`).alignment = { vertical: 'center', horizontal: 'center' }
+                                    principal.getCell(`${ini}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
+                                    principal.getCell(`${ini}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+                                    numero_columna_3 = numFinal_columna + 1
+                                }
                             }
-                        })
+                        }
+                        let ini_titulo = principal.getRow(inicio_fila_titulo - aumento_ini).getCell(1)._address
+                        let fin_titulo = principal.getRow(fin_fila_titulo).getCell(5)._address
+                        principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
+                        principal.getCell(`${ini_titulo}`).value = lg.nombre
+                        principal.getCell(`${ini_titulo}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'f0f8ff' }, }
+                        principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
 
-                        fila.values = body
-                        i++
+                        numero_fila = numero_fila + 1
+                        inicio_fila_titulo = inicio_fila_titulo + 1
+                        fin_fila_titulo = fin_fila_titulo + 1
+                        for (let ind of listaIndicadores) {
+                            if (parseInt(ind.variable) === parseInt(gs)) {
+                                let contador_columna = 6
+                                if (variablesSeleccionado.length > 0) {
+                                    variablesSeleccionado.forEach(vs => {
+                                        if (parseInt(ind.id) === parseInt(vs)) {
+                                            let fila = principal.getRow(numero_fila)
+                                            let ini_titulo = fila.getCell(1)._address
+                                            let fin_titulo = fila.getCell(5)._address
+                                            principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
+                                            principal.getCell(`${ini_titulo}`).value = ind.indicador
+                                            principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+                                            data.forEach(d => {
+                                                if (parseInt(ind.id) === parseInt(d.indicador)) {
+                                                    let ini_titulo = fila.getCell(contador_columna)._address
+                                                    principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
+                                                    principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
+                                                    principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                                                    principal.getCell(`${ini_titulo}`).font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+                                                    contador_columna++
+                                                }
+                                            })
+                                        }
+                                    })
+                                } else {
+                                    let fila = principal.getRow(numero_fila)
+                                    let ini_titulo = fila.getCell(1)._address 
+                                    let fin_titulo = fila.getCell(5)._address
+                                    principal.mergeCells(`${ini_titulo + ':' + fin_titulo}`);
+                                    principal.getCell(`${ini_titulo}`).value = ind.indicador
+                                    principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+                                    data.forEach(d => {
+                                        if (parseInt(ind.id) === parseInt(d.indicador)) {
+                                            let ini_titulo = fila.getCell(contador_columna)._address
+                                            principal.getCell(`${ini_titulo}`).value = parseInt(d.valor)
+                                            principal.getCell(`${ini_titulo}`).alignment = { vertical: 'center', horizontal: 'right' };
+                                            principal.getCell(`${ini_titulo}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                                            principal.getCell(`${ini_titulo}`).font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+                                            contador_columna++
+                                        }
+                                    })
+                                }
+                                numero_fila = numero_fila + 1
+                                inicio_fila_titulo = inicio_fila_titulo + 1
+                                fin_fila_titulo = fin_fila_titulo + 1
+                            }
+                        }
+
+
                     }
-                    else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); }
                 })
-
-
             })
-
-
-            // principal.mergeCells(`A` + i + `:D` + i);
-            // principal.getCell(`A` + i).value = 'INDICADR' + x
-            // x++
-
-            // }
-
-
-
-
-
-
-
             workbook.xlsx.writeBuffer().then(data => {
                 const blob = new Blob([data], {
                     type: "aplication/vnd.openxmlformats-officedocumets.spreadshhed.sheed",
@@ -403,12 +449,14 @@ function Mireportes4() {
                 const url = window.URL.createObjectURL(blob);
                 const anchor = document.createElement('a');
                 anchor.href = url;
-                anchor.download = 'REPORTE SDIS-VE.xlsx';
+                anchor.download = 'FORMULARIO ADICIONAL 301C ' + gestion_ + '_' + mes1_ + '-' + mes2_ + '-' + localStorage.getItem('mun') + '.xlsx';
+                // 'FORMULARIO ADICIONAL 301C 2023_ABRIL-NOVIEMBRE_SAN ROQUE'
                 anchor.click();
                 window.URL.revokeObjectURL(url);
             })
-        }
 
+
+        }
 
 
 
@@ -433,7 +481,7 @@ function Mireportes4() {
                             <div className='orden-tiempo '>
                                 <div className='col-12'>
                                     <div className='row pb-2'>
-                                        <div className='col-3 col-sm-4 col-md-4 col-lg-4 p-1' onClick={()=>{
+                                        <div className='col-3 col-sm-4 col-md-4 col-lg-4 p-1' onClick={() => {
                                             setListaGrupo([]); setListaVariable([]); setGruposSeleccionado([]); setVariablesSeleccionados([])
                                         }}>
                                             <SelectSM
