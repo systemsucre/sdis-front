@@ -924,7 +924,7 @@ function ReportesSedes() {
                                             />
                                         </div>
                                         <div className='col-5 col-sm-5 col-md-2 col-lg-2 p-1' onClick={() => {
-                                            setEstab({ campo: null, valido: null });
+                                            setEstab({ campo: 1000, valido: 'true' });
                                             setListaGrupo([]); setListaVariable([]); setGruposSeleccionado([]); setVariablesSeleccionados([])
                                         }}>
 
@@ -938,7 +938,7 @@ function ReportesSedes() {
                                             />
                                         </div>
                                         <div className='col-3 col-sm-3 col-md-1 col-lg-1 p-1' onClick={() => {
-                                            setEstab({ campo: null, valido: null });
+                                            setEstab({ campo: 1000, valido: 'true' });
                                             setListaGrupo([]); setListaVariable([]); setGruposSeleccionado([]); setVariablesSeleccionados([])
                                         }}>
                                             <SelectSM
@@ -1092,11 +1092,11 @@ function ReportesSedes() {
                                 nivel == 3 && <>
                                     <div className='row'>
                                         <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{localStorage.getItem('red')} </p>
+                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{localStorage.getItem('red')} </p>
                                         </div>
                                         <div className='col-6'>
                                             {listaSs.map(e => (
-                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
+                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
                                             ))}
                                         </div>
                                     </div>
@@ -1105,14 +1105,14 @@ function ReportesSedes() {
                                             {
                                                 est.map(e => (
                                                     estab.campo == e.id &&
-                                                    <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
+                                                    <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
                                                         {'TIPO REPORTE :' + e.nombre}</p>
                                                 ))
                                             }
                                         </div>
                                         <div className='col-6'>
                                             <p className='titulo-reportes'
-                                                style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
+                                                style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
                                                 {
                                                     listaMes.map(e => (
                                                         mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
@@ -1134,7 +1134,7 @@ function ReportesSedes() {
                                     <div className='row'>
                                         <div className='col-6'>
                                             {est.map(e => (
-                                                parseInt(e.id) == parseInt(estab.campo) && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
+                                                parseInt(e.id) == parseInt(estab.campo) && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
                                                     'MUNICIPIO: ' + e.nombre.split('(')[0]
                                                 }  </p>
                                             ))}
@@ -1142,18 +1142,18 @@ function ReportesSedes() {
                                         </div>
                                         <div className='col-6'>
                                             {listaSs.map(e => (
-                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
+                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
                                             ))}
                                         </div>
                                     </div>
                                     <div className='row'>
                                         <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
+                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
                                                 {'TIPO REPORTE : CONSOLIDADO POR MUNICIPIO'}</p>
                                         </div>
                                         <div className='col-6'>
                                             <p className='titulo-reportes'
-                                                style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
+                                                style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
                                                 {
                                                     listaMes.map(e => (
                                                         mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
@@ -1176,7 +1176,7 @@ function ReportesSedes() {
                                     <div className='row'>
                                         <div className='col-6'>
                                             {est.map(e => (
-                                                e.id == estab.campo && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
+                                                e.id == estab.campo && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
                                                     'ESTABLECIMIENTO: ' + e.nombre
                                                 }  </p>
                                             ))}
@@ -1184,18 +1184,18 @@ function ReportesSedes() {
                                         </div>
                                         <div className='col-6'>
                                             {listaSs.map(e => (
-                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
+                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
                                             ))}
                                         </div>
                                     </div>
                                     <div className='row'>
                                         <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
+                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
                                                 {'TIPO REPORTE : ESTABLECIMIENTO'}</p>
                                         </div>
                                         <div className='col-6'>
                                             <p className='titulo-reportes'
-                                                style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
+                                                style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
                                                 {
                                                     listaMes.map(e => (
                                                         mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
@@ -1219,25 +1219,25 @@ function ReportesSedes() {
                                 estab.campo == 2000 ? <>
                                     <div className='row'>
                                         <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
+                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
                                                 localStorage.getItem('red')
                                             }  </p>
 
                                         </div>
                                         <div className='col-6'>
                                             {listaSs.map(e => (
-                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
+                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
                                             ))}
                                         </div>
                                     </div>
                                     <div className='row'>
                                         <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
+                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
                                                 {'FORMULARIO: DE USO MUNICIPAL (CONSOLIDADO)'}</p>
                                         </div>
                                         <div className='col-6'>
                                             <p className='titulo-reportes'
-                                                style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
+                                                style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
                                                 {
                                                     listaMes.map(e => (
                                                         mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
@@ -1257,7 +1257,7 @@ function ReportesSedes() {
                                         <div className='row'>
                                             <div className='col-6'>
                                                 {est.map(e => (
-                                                    e.id == estab.campo && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
+                                                    e.id == estab.campo && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
                                                         'MUNICIPIO: ' + e.nombre
                                                     }  </p>
                                                 ))}
@@ -1265,18 +1265,18 @@ function ReportesSedes() {
                                             </div>
                                             <div className='col-6'>
                                                 {listaSs.map(e => (
-                                                    ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
+                                                    ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
                                                 ))}
                                             </div>
                                         </div>
                                         <div className='row'>
                                             <div className='col-6'>
-                                                <p className='titulo-reportes' style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
+                                                <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
                                                     {'FORMULARIO: DE USO MUNICIPAL'}</p>
                                             </div>
                                             <div className='col-6'>
                                                 <p className='titulo-reportes'
-                                                    style={{ color: '#2980B9', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
+                                                    style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
                                                     {
                                                         listaMes.map(e => (
                                                             mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
@@ -1302,42 +1302,42 @@ function ReportesSedes() {
                                     parseInt(lg.id) === parseInt(gs) && <div key={gs}>
                                         <p className='titulo-variable'>{lg.nombre} </p>
                                         <div className="table table-responsive custom" style={{ height: 'auto', padding: "0.0rem 0.0rem", marginBottom: '0' }}>
-                                            <Table className=' table-sm' style={{ border: "1px solid #000040", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
+                                            <Table className=' table-sm' style={{ border: "1px solid #dee2e6", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
                                                 {cabecera.length > 0 &&
                                                     <thead className='cab-form'>
                                                         <tr  >
-                                                            <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>VARIABLE</th>
+                                                            <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6', }}>VARIABLE</th>
                                                             {cabecera.map(cb => (
                                                                 parseInt(cb.variable) === parseInt(gs) && parseInt(cb.nivel) == 1 &&
                                                                 <th className='text-center nivel1F' style={{
                                                                     background: 'AliceBlue',
-                                                                    borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                    borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                 }} colSpan={cb.span}
                                                                     key={cb.id} >{cb.input}
                                                                 </th>
                                                             ))}
                                                         </tr>
                                                         <tr style={{ borderTop: '1px solid #595959' }}>
-                                                            <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                            <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                             {cabecera.map(cb => (
                                                                 parseInt(cb.variable) === parseInt(gs) && parseInt(cb.nivel) == 2 &&
                                                                 <th className='text-center nivel1F' style={{
                                                                     background: 'AliceBlue',
-                                                                    borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                    borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                    fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                 }} colSpan={cb.span}
                                                                     key={cb.id} >{cb.input}
                                                                 </th>
                                                             ))}
                                                         </tr>
                                                         <tr style={{ borderTop: '1px solid #595959' }} >
-                                                            <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                            <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                             {cabecera.map(cb => (
                                                                 parseInt(cb.variable) === parseInt(gs) && parseInt(cb.nivel) == 3 &&
                                                                 <th className='text-center nivel1F' style={{
                                                                     background: 'AliceBlue',
-                                                                    borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
+                                                                    borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
                                                                     fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52'
                                                                 }} colSpan={cb.span}
                                                                     key={cb.id} >{cb.input}
@@ -1348,20 +1348,20 @@ function ReportesSedes() {
 
                                                 {variablesSeleccionado.length > 0 ?
                                                     // VARIABLES ESPECIFICOS
-                                                    <tbody style={{ borderRight: '1px solid #000040', }}>
+                                                    <tbody style={{ borderRight: '1px solid #dee2e6', }}>
 
                                                         {listaIndicadores.map((ind) => (
                                                             parseInt(ind.variable) === parseInt(gs) &&
                                                             // <div key={ind.id}>{
                                                             variablesSeleccionado.map(vs => (
                                                                 parseInt(ind.id) === parseInt(vs) &&
-                                                                <tr key={ind.id} style={{ borderRight: '1px solid #000040', }}>
-                                                                    <td className="col-3 mincelda titulo-indicador" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }}>{ind.indicador}</td>
+                                                                <tr key={ind.id} style={{ borderRight: '1px solid #dee2e6', }}>
+                                                                    <td className="col-3 mincelda titulo-indicador" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #dee2e6', borderRight: '1px solid #dee2e6', }}>{ind.indicador}</td>
                                                                     {
                                                                         data.map(d => (
                                                                             parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center"
-                                                                                style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', background: 'white', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
-                                                                                <div style={{ border: '0.0px solid #ABB2B9', height: '29px' }}  >{d.valor}</div>
+                                                                                style={{ padding: '3px 0px 3px 0px', paddingBottom: '0', background: 'white', borderBottom: '0px', borderTop: '1px solid #dee2e6', borderRight: '1px solid #dee2e6', }} key={d.id}>
+                                                                                <div style={{ border: '0.0px solid #ABB2B9', height: 'auto' }}  >{d.valor}</div>
                                                                             </td>
                                                                         ))
                                                                     }
@@ -1374,13 +1374,13 @@ function ReportesSedes() {
                                                     <tbody>
                                                         {listaIndicadores.map((ind) => (
                                                             parseInt(ind.variable) === parseInt(gs) &&
-                                                            <tr key={ind.id} style={{ borderRight: '1px solid #000040', }} className='item'>
-                                                                <td className="col-3 mincelda titulo-indicador" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }}>{ind.indicador}</td>
+                                                            <tr key={ind.id} style={{ borderRight: '1px solid #dee2e6', }} className='item'>
+                                                                <td className="col-3 mincelda titulo-indicador" style={{ padding: '4px 0px 0px 0px', borderBottom: '0px', borderTop: '1px solid #dee2e6', borderRight: '1px solid #dee2e6', }}>{ind.indicador}</td>
                                                                 {
                                                                     data.map(d => (
                                                                         parseInt(ind.id) === parseInt(d.indicador) && <td className="text-center item_1"
-                                                                            style={{ padding: '4px 0px 0px 0px', paddingBottom: '0', borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040', }} key={d.id}>
-                                                                            <div style={{ height: '29px' }}  >{d.valor}</div>
+                                                                            style={{ padding: '3px 0px 3px 0px', paddingBottom: '0', borderBottom: '0px', borderTop: '1px solid #dee2e6', borderRight: '1px solid #dee2e6', }} key={d.id}>
+                                                                            <div style={{ height: 'auto' }}  >{d.valor}</div>
                                                                         </td>
                                                                     ))
                                                                 }

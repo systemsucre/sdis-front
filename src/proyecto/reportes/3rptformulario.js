@@ -684,48 +684,48 @@ function ReportesFormularioRed() {
                                 }
                                 < div className="table table-responsive custom" style={{ height: 'auto', padding: "0.0rem 0.0rem", marginBottom: '0' }}>
 
-                                    <Table className=' table-sm' style={{ border: "1px solid #000040", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
+                                    <Table className=' table-sm' style={{ border: "1px solid #dee2e6", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
                                         {nivelAplicacion.campo == 1 && <>
                                             {alc.campo == 1 &&
                                                 <>
                                                     {cabecera.length > 0 &&
                                                         <thead className='cab-form'>
                                                             <tr  >
-                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>ESTABLECIMIENTO</th>
-                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>VARIABLE</th>
+                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6', }}>ESTABLECIMIENTO</th>
+                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6', }}>VARIABLE</th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 1 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
                                                                     </th>
                                                                 ))}
                                                             </tr>
                                                             <tr style={{ borderTop: '1px solid #595959' }}>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', }}></th>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 2 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
                                                                     </th>
                                                                 ))}
                                                             </tr>
                                                             <tr style={{ borderTop: '1px solid #595959' }} >
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 3 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
                                                                         fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52'
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
@@ -737,18 +737,18 @@ function ReportesFormularioRed() {
                                                         {
                                                             listaEstablecimientos.map((e, index) => (
                                                                 // parseInt(ind.variable) === parseInt(gs) &&
-                                                                <tr className='item' key={index} style={{ borderRight: '1px solid #000040', background: e.color == 1 ? '#FDEDEC' : null, }}>
+                                                                <tr className='item' key={index} style={{ borderRight: '1px solid #dee2e6', background: e.color == 1 ? '#FDEDEC' : null, }}>
                                                                     <td className="col-3 mincelda titulo-indicador"
                                                                         style={{
                                                                             padding: '3px 0px 0px 3px', borderBottom: '0px',
 
-                                                                            borderRight: '1px solid #000040',
+                                                                            borderRight: '1px solid #dee2e6',
                                                                         }}
                                                                     >{e.est}</td>
                                                                     <td className="col-3 mincelda titulo-indicador"
                                                                         style={{
-                                                                            padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #000040',
-                                                                            borderRight: '1px solid #000040',
+                                                                            padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #dee2e6',
+                                                                            borderRight: '1px solid #dee2e6',
                                                                         }}
                                                                     >{e.indicador}</td>
                                                                     {
@@ -756,10 +756,10 @@ function ReportesFormularioRed() {
                                                                             e.idest == d.idest && parseInt(d.indicador) === parseInt(e.id) &&
                                                                             <td className="text-center item_1"
                                                                                 style={{
-                                                                                    padding: '4px 0px 0px 0px', paddingBottom: '0',
-                                                                                    borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040',
+                                                                                    padding: '3px 0px 3px 0px', paddingBottom: '0',
+                                                                                    borderBottom: '0px', borderTop: '1px solid #dee2e6', borderRight: '1px solid #dee2e6',
                                                                                 }} key={d.id}>
-                                                                                <div style={{ height: '29px' }}  >{d.valor}</div>
+                                                                                <div style={{ height: 'auto' }}  >{d.valor}</div>
                                                                             </td>
                                                                         ))
                                                                     }
@@ -777,41 +777,41 @@ function ReportesFormularioRed() {
                                                     {cabecera.length > 0 &&
                                                         <thead className='cab-form'>
                                                             <tr  >
-                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>MUNICIPIO</th>
-                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>VARIABLE</th>
+                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6', }}>MUNICIPIO</th>
+                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6', }}>VARIABLE</th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 1 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
                                                                     </th>
                                                                 ))}
                                                             </tr>
                                                             <tr style={{ borderTop: '1px solid #595959' }}>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', }}></th>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 2 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
                                                                     </th>
                                                                 ))}
                                                             </tr>
                                                             <tr style={{ borderTop: '1px solid #595959' }} >
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 3 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
                                                                         fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52'
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
@@ -823,18 +823,18 @@ function ReportesFormularioRed() {
                                                         {
                                                             listaEstablecimientos.map((e, index) => (
                                                                 // parseInt(ind.variable) === parseInt(gs) &&
-                                                                <tr className='item' key={index} style={{ borderRight: '1px solid #000040', background: e.color == 1 ? '#FDEDEC' : null, }}>
+                                                                <tr className='item' key={index} style={{ borderRight: '1px solid #dee2e6', background: e.color == 1 ? '#FDEDEC' : null, }}>
                                                                     <td className="col-3 mincelda titulo-indicador"
                                                                         style={{
                                                                             padding: '3px 0px 0px 3px', borderBottom: '0px',
 
-                                                                            borderRight: '1px solid #000040',
+                                                                            borderRight: '1px solid #dee2e6',
                                                                         }}
                                                                     >{e.est}</td>
                                                                     <td className="col-3 mincelda titulo-indicador"
                                                                         style={{
-                                                                            padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #000040',
-                                                                            borderRight: '1px solid #000040',
+                                                                            padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #dee2e6',
+                                                                            borderRight: '1px solid #dee2e6',
                                                                         }}
                                                                     >{e.indicador}</td>
                                                                     {
@@ -842,10 +842,10 @@ function ReportesFormularioRed() {
                                                                             e.idest == d.idest && parseInt(d.indicador) === parseInt(e.id) &&
                                                                             <td className="text-center item_1"
                                                                                 style={{
-                                                                                    padding: '4px 0px 0px 0px', paddingBottom: '0',
-                                                                                    borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040',
+                                                                                    padding: '3px 0px 3px 0px', paddingBottom: '0',
+                                                                                    borderBottom: '0px', borderTop: '1px solid #dee2e6', borderRight: '1px solid #dee2e6',
                                                                                 }} key={d.id}>
-                                                                                <div style={{ height: '29px' }}  >{d.valor}</div>
+                                                                                <div style={{ height: 'auto' }}  >{d.valor}</div>
                                                                             </td>
                                                                         ))
                                                                     }
@@ -862,38 +862,38 @@ function ReportesFormularioRed() {
                                                     {cabecera.length > 0 &&
                                                         <thead className='cab-form'>
                                                             <tr  >
-                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>VARIABLE</th>
+                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6', }}>VARIABLE</th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 1 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
                                                                     </th>
                                                                 ))}
                                                             </tr>
                                                             <tr style={{ borderTop: '1px solid #595959' }}>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 2 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
                                                                     </th>
                                                                 ))}
                                                             </tr>
                                                             <tr style={{ borderTop: '1px solid #595959' }} >
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 3 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
                                                                         fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52'
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
@@ -906,11 +906,11 @@ function ReportesFormularioRed() {
 
                                                             listaEstablecimientos.map((e, index) => (
                                                                 // parseInt(ind.variable) === parseInt(gs) &&
-                                                                <tr className='item' key={index} style={{ borderRight: '1px solid #000040', background: e.color == 1 ? '#FDEDEC' : null, }}>
+                                                                <tr className='item' key={index} style={{ borderRight: '1px solid #dee2e6', background: e.color == 1 ? '#FDEDEC' : null, }}>
                                                                     <td className="col-3 mincelda TituloSecundario"
                                                                         style={{
-                                                                            padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #000040',
-                                                                            borderRight: '1px solid #000040',
+                                                                            padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #dee2e6',
+                                                                            borderRight: '1px solid #dee2e6',
                                                                         }}
                                                                     >{e.indicador}</td>
                                                                     {
@@ -918,10 +918,10 @@ function ReportesFormularioRed() {
                                                                             parseInt(d.indicador) === parseInt(e.id) &&
                                                                             <td className="text-center item_1"
                                                                                 style={{
-                                                                                    padding: '4px 0px 0px 0px', paddingBottom: '0',
-                                                                                    borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040',
+                                                                                    padding: '3px 0px 3px 0px', paddingBottom: '0',
+                                                                                    borderBottom: '0px', borderTop: '1px solid #dee2e6', borderRight: '1px solid #dee2e6',
                                                                                 }} key={d.id}>
-                                                                                <div style={{ height: '29px' }}  >{d.valor}</div>
+                                                                                <div style={{ height: 'auto' }}  >{d.valor}</div>
                                                                             </td>
                                                                         ))
                                                                     }
@@ -939,41 +939,41 @@ function ReportesFormularioRed() {
                                                     {cabecera.length > 0 &&
                                                         <thead className='cab-form'>
                                                             <tr  >
-                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>MUNICIPIO</th>
-                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>VARIABLE</th>
+                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6', }}>MUNICIPIO</th>
+                                                                <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6', }}>VARIABLE</th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 1 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
                                                                     </th>
                                                                 ))}
                                                             </tr>
                                                             <tr style={{ borderTop: '1px solid #595959' }}>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', }}></th>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 2 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                        fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
                                                                     </th>
                                                                 ))}
                                                             </tr>
                                                             <tr style={{ borderTop: '1px solid #595959' }} >
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
-                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
+                                                                <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                 {cabecera.map(cb => (
                                                                     parseInt(cb.nivel) == 3 &&
                                                                     <th className='text-center nivel1F' style={{
                                                                         background: 'AliceBlue',
-                                                                        borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
+                                                                        borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
                                                                         fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52'
                                                                     }} colSpan={cb.span}
                                                                         key={cb.id} >{cb.input}
@@ -985,18 +985,18 @@ function ReportesFormularioRed() {
                                                         {
                                                             listaEstablecimientos.map((e, index) => (
                                                                 // parseInt(ind.variable) === parseInt(gs) &&
-                                                                <tr className='item' key={index} style={{ borderRight: '1px solid #000040', background: e.color == 1 ? '#FDEDEC' : null, }}>
+                                                                <tr className='item' key={index} style={{ borderRight: '1px solid #dee2e6', background: e.color == 1 ? '#FDEDEC' : null, }}>
                                                                     <td className="col-3 mincelda titulo-indicador"
                                                                         style={{
                                                                             padding: '3px 0px 0px 3px', borderBottom: '0px',
 
-                                                                            borderRight: '1px solid #000040',
+                                                                            borderRight: '1px solid #dee2e6',
                                                                         }}
                                                                     >{e.est}</td>
                                                                     <td className="col-3 mincelda titulo-indicador"
                                                                         style={{
-                                                                            padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #000040',
-                                                                            borderRight: '1px solid #000040',
+                                                                            padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #dee2e6',
+                                                                            borderRight: '1px solid #dee2e6',
                                                                         }}
                                                                     >{e.indicador}</td>
                                                                     {
@@ -1004,10 +1004,10 @@ function ReportesFormularioRed() {
                                                                             e.idest == d.idest && parseInt(d.indicador) === parseInt(e.id) &&
                                                                             <td className="text-center item_1"
                                                                                 style={{
-                                                                                    padding: '4px 0px 0px 0px', paddingBottom: '0',
-                                                                                    borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040',
+                                                                                    padding: '3px 0px 3px 0px', paddingBottom: '0',
+                                                                                    borderBottom: '0px', borderTop: '1px solid #dee2e6', borderRight: '1px solid #dee2e6',
                                                                                 }} key={d.id}>
-                                                                                <div style={{ height: '29px' }}  >{d.valor}</div>
+                                                                                <div style={{ height: 'auto' }}  >{d.valor}</div>
                                                                             </td>
                                                                         ))
                                                                     }
@@ -1023,38 +1023,38 @@ function ReportesFormularioRed() {
                                                         {cabecera.length > 0 &&
                                                             <thead className='cab-form'>
                                                                 <tr  >
-                                                                    <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', borderTop: '1px solid #000040', }}>VARIABLE</th>
+                                                                    <th className="col-3 mincelda var" style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6', }}>VARIABLE</th>
                                                                     {cabecera.map(cb => (
                                                                         parseInt(cb.nivel) == 1 &&
                                                                         <th className='text-center nivel1F' style={{
                                                                             background: 'AliceBlue',
-                                                                            borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                            fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                            borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                            fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                         }} colSpan={cb.span}
                                                                             key={cb.id} >{cb.input}
                                                                         </th>
                                                                     ))}
                                                                 </tr>
                                                                 <tr style={{ borderTop: '1px solid #595959' }}>
-                                                                    <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                    <th className="col-3 mincelda " style={{ color: '#595959', background: 'AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                     {cabecera.map(cb => (
                                                                         parseInt(cb.nivel) == 2 &&
                                                                         <th className='text-center nivel1F' style={{
                                                                             background: 'AliceBlue',
-                                                                            borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
-                                                                            fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #000040',
+                                                                            borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
+                                                                            fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52', borderBottom: '1px solid #dee2e6',
                                                                         }} colSpan={cb.span}
                                                                             key={cb.id} >{cb.input}
                                                                         </th>
                                                                     ))}
                                                                 </tr>
                                                                 <tr style={{ borderTop: '1px solid #595959' }} >
-                                                                    <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #000040', }}></th>
+                                                                    <th className="col-3 mincelda " style={{ color: '#595959', background: ' AliceBlue', borderRight: '1px solid #dee2e6', }}></th>
                                                                     {cabecera.map(cb => (
                                                                         parseInt(cb.nivel) == 3 &&
                                                                         <th className='text-center nivel1F' style={{
                                                                             background: 'AliceBlue',
-                                                                            borderLeft: '1px solid white', borderRight: '1px solid #000040', borderTop: '1px solid #000040',
+                                                                            borderLeft: '1px solid white', borderRight: '1px solid #dee2e6', borderTop: '1px solid #dee2e6',
                                                                             fontSize: '8pt', fontWeight: 'bold', fontFamily: 'Verdana', color: '#023c52'
                                                                         }} colSpan={cb.span}
                                                                             key={cb.id} >{cb.input}
@@ -1067,11 +1067,11 @@ function ReportesFormularioRed() {
 
                                                                 listaEstablecimientos.map((e, index) => (
                                                                     // parseInt(ind.variable) === parseInt(gs) &&
-                                                                    <tr className='item' key={index} style={{ borderRight: '1px solid #000040', background: e.color == 1 ? '#FDEDEC' : null, }}>
+                                                                    <tr className='item' key={index} style={{ borderRight: '1px solid #dee2e6', background: e.color == 1 ? '#FDEDEC' : null, }}>
                                                                         <td className="col-3 mincelda TituloSecundario"
                                                                             style={{
-                                                                                padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #000040',
-                                                                                borderRight: '1px solid #000040',
+                                                                                padding: '3px 0px 0px 3px', borderBottom: '0px', borderTop: '1px solid #dee2e6',
+                                                                                borderRight: '1px solid #dee2e6',
                                                                             }}
                                                                         >{e.indicador}</td>
                                                                         {
@@ -1079,10 +1079,10 @@ function ReportesFormularioRed() {
                                                                                 parseInt(d.indicador) === parseInt(e.id) &&
                                                                                 <td className="text-center item_1"
                                                                                     style={{
-                                                                                        padding: '4px 0px 0px 0px', paddingBottom: '0',
-                                                                                        borderBottom: '0px', borderTop: '1px solid #000040', borderRight: '1px solid #000040',
+                                                                                        padding: '3px 0px 3px 0px', paddingBottom: '0',
+                                                                                        borderBottom: '0px', borderTop: '1px solid #dee2e6', borderRight: '1px solid #dee2e6',
                                                                                     }} key={d.id}>
-                                                                                    <div style={{ height: '29px' }}  >{d.valor}</div>
+                                                                                    <div style={{ height: 'auto' }}  >{d.valor}</div>
                                                                                 </td>
                                                                             ))
                                                                         }
