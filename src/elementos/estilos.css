@@ -201,7 +201,7 @@ body {
 .contenedor-cabecera .titulo {
     font-size: 2rem;
     text-transform: uppercase;
-    color: var(--color-primario-text-claro);
+    color: var(--color-titulo-reportes);
     font-weight: bold;
     font-family: fantasy;
 
