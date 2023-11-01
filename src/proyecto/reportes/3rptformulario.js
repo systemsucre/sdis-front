@@ -134,7 +134,7 @@ function ReportesFormularioRed() {
         }
 
 
-        const listarMes = async (id = null) => {  
+        const listarMes = async (id = null) => {
             if (gestion.valido === 'true' || id) {
                 axios.post(URL + '/reportes3/listarmes', { id: id ? id : gestion.campo, fecha: fecha + ' ' + horafinal }).then(json => {
                     if (json.data.ok) {
@@ -291,7 +291,7 @@ function ReportesFormularioRed() {
                     paperSize: 9, orientation: 'landscape'
                 },
 
-            })   
+            })
 
             for (let index = 1; index < 1000; index++) {
                 principal.getColumn(index).width = 12
@@ -338,44 +338,28 @@ function ReportesFormularioRed() {
             principal.mergeCells('B2:G2');
             principal.getCell('B2').alignment = { vertical: 'center', horizontal: 'center' };
             principal.getCell('B2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
-            principal.getCell('B2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+            principal.getCell('B2').font = { bold: 700, size:11, color: { argb: '595959' }, italic: false }
 
             principal.mergeCells('B3:G3');
             principal.getCell('B3').alignment = { vertical: 'center', horizontal: 'center' };
             principal.getCell('B3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
-            principal.getCell('B3').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
+            principal.getCell('B3').font = { bold: 600, size: 11, color: { argb: '595959' }, italic: false }
+
+            principal.mergeCells('C4:F4');
+            principal.getCell('C4').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('C4').value = localStorage.getItem('red')
+            principal.getCell('C4').font = { bold: 700, size: 11, color: { argb: 'DC7633' }, italic: false }
 
 
             principal.mergeCells('C5:F5');
-            principal.getCell('C5').alignment = { vertical: 'center', horizontal: 'center' };
-            if (nivelAplicacion.campo == 1) principal.getCell('C5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
-            if (nivelAplicacion.campo == 2) principal.getCell('C5').value = 'NIVEL FORMULARIO: MUNICIPIO'
-
-            principal.getCell('C5').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
-
-            principal.mergeCells('A6:D6');
-            principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('A6').value = 'ALCANCE REPORTE: ' + entidad
-
-            principal.getCell('A6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
-
-
-            principal.mergeCells('E6:E6');
-            principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
-            principal.getCell('E6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
-
-            principal.mergeCells('F6:H6');
-            principal.getCell('F6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('F6').value = 'MES REPORTADO :  [' + mes1_ + ' - ' + mes2_+']'
-            principal.getCell('F6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
-
-
+            principal.getCell('F5').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('F5').value = 'GESTIÓN ' + gestion_ + ' DEL MES ' + mes1_ + ' A ' + mes2_
+            principal.getCell('C5').font = { bold: 600, size: 8, color: { argb: '808080' }, italic: false }
 
             principal.mergeCells('A7:H7');
             principal.getCell('A7').alignment = { vertical: 'center', horizontal: 'left' };
             principal.getCell('A7').value = 'FORMULARIO: ' + form
-            principal.getCell('A7').font = { bold: 800, size: 9, color: { argb: '595959' }, italic: true }
+            principal.getCell('A7').font = { bold: 800, size: 11, color: { argb: '595959' }, italic: true }
 
             let numero_fila = 7
 
@@ -545,7 +529,19 @@ function ReportesFormularioRed() {
                                             very={1}
                                         />
                                     </div>
-                                    <div className='col-5 col-sm-5 col-md-5 col-lg-1 p-1' onClick={() => { setIdVariable({ campo: null, valido: null }) }} >
+                                    <div className='col-4 col-sm-2 col-md-3 col-lg-2 mb-2 p-1'
+                                        onClick={() => { setData([]); setListaEstablecimientos([]) }} >
+                                        <SelectSM
+                                            estado={alc}
+                                            cambiarEstado={setAlc}
+                                            ExpresionRegular={INPUT.ID}
+                                            lista={alcance}
+                                            etiqueta={'Consolidado por'}
+                                            msg='Seleccione una opcion'
+                                        // very={1}
+                                        />
+                                    </div>
+                                    <div className='col-4 col-sm-6 col-md-5 col-lg-1 p-1' onClick={() => { setIdVariable({ campo: null, valido: null }) }} >
                                         <SelectSM
                                             estado={ss}
                                             cambiarEstado={setSs}
@@ -555,7 +551,7 @@ function ReportesFormularioRed() {
                                             msg='Seleccione una opcion'
                                         />
                                     </div>
-                                    <div className='col-3 col-sm-3 col-md-3 col-lg-1 p-1' >
+                                    <div className='col-4 col-sm-3 col-md-3 col-lg-1 p-1' >
                                         <SelectSM
                                             estado={gestion}
                                             cambiarEstado={setGestion}
@@ -567,7 +563,7 @@ function ReportesFormularioRed() {
                                         />
                                     </div>
 
-                                    <div className='col-6 col-sm-2 col-md-2 col-lg-1 p-1' onClick={() => { listarMes() }} >
+                                    <div className='col-4 col-sm-2 col-md-2 col-lg-1 p-1' onClick={() => { listarMes() }} >
                                         <SelectSM
                                             estado={mes1}
                                             cambiarEstado={setMes1}
@@ -578,7 +574,7 @@ function ReportesFormularioRed() {
                                             very={1}
                                         />
                                     </div>
-                                    <div className='col-6 col-sm-2 col-md-2 col-lg-1 p-1' onClick={() => { listarMes() }} >
+                                    <div className='col-4 col-sm-2 col-md-2 col-lg-1 p-1' onClick={() => { listarMes() }} >
                                         <SelectSM
                                             estado={mes2}
                                             cambiarEstado={setMes2}
@@ -589,7 +585,7 @@ function ReportesFormularioRed() {
                                             very={1}
                                         />
                                     </div>
-                                    <div className='col-8 col-sm-6 col-md-5 col-lg-5 p-1' onClick={() => { (ss.valido == 'false' || ss.valido == null) && toast.error('Seleccione subsector') }} >
+                                    <div className='col-12 col-sm-5 col-md-5 col-lg-4 p-1' onClick={() => { (ss.valido == 'false' || ss.valido == null) && toast.error('Seleccione subsector') }} >
                                         <SelectSM
                                             estado={idVariable}
                                             cambiarEstado={setIdVariable}
@@ -599,18 +595,7 @@ function ReportesFormularioRed() {
                                             msg='Seleccione una opcion'
                                         />
                                     </div>
-                                    <div className='col-4 col-sm-2 col-md-3 col-lg-1 mb-2 p-1'
-                                        onClick={() => { setData([]); setListaEstablecimientos([]) }} >
-                                        <SelectSM
-                                            estado={alc}
-                                            cambiarEstado={setAlc}
-                                            ExpresionRegular={INPUT.ID}
-                                            lista={alcance}
-                                            etiqueta={'Alcance'}
-                                            msg='Seleccione una opcion'
-                                        // very={1}
-                                        />
-                                    </div>
+   
 
                                 </div>
                             </div>

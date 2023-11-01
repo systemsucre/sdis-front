@@ -2100,6 +2100,7 @@ div:where(.swal2-container) .swal2-html-container {
     color: var(--color-titulo-reportes);
     font-weight: bold;
     font-family: fantasy;
+    /* padding-top: 10px; */
 
 }
 
@@ -2208,10 +2209,11 @@ div:where(.swal2-container) .swal2-html-container {
     }
 }
 
-@media(max-width:1100px) {
+@media(max-width:1199px) {
 
     .header-reportes .titulo {
         /* padding-left: 7rem; */
+        padding-top: 15px;
         font-size: 1.5rem;
     }
 }
@@ -2221,6 +2223,7 @@ div:where(.swal2-container) .swal2-html-container {
     .header-reportes .titulo {
         /* padding-left: 7rem; */
         font-size: 1.5rem;
+        padding-top: 15px;
     }
 
     .header-reportes {
@@ -2237,6 +2240,7 @@ div:where(.swal2-container) .swal2-html-container {
 
     .header-reportes .titulo {
         /* padding-left: 12rem; */
+        padding-top: 15px;
     }
 }
 
@@ -2246,6 +2250,7 @@ div:where(.swal2-container) .swal2-html-container {
     .header-reportes .titulo {
         /* padding-left: 5rem; */
         font-size: 1.4rem;
+        padding-top: 15px;
     }
 
     .header-reportes {

@@ -301,43 +301,30 @@ function ReportesFormularioArea() {
             principal.mergeCells('B2:G2');
             principal.getCell('B2').alignment = { vertical: 'center', horizontal: 'center' };
             principal.getCell('B2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
-            principal.getCell('B2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+            principal.getCell('B2').font = { bold: 700, size: 11, color: { argb: '595959' }, italic: false }
 
             principal.mergeCells('B3:G3');
             principal.getCell('B3').alignment = { vertical: 'center', horizontal: 'center' };
             principal.getCell('B3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
-            principal.getCell('B3').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
+            principal.getCell('B3').font = { bold: 600, size: 11, color: { argb: '595959' }, italic: false }
+
+            principal.mergeCells('C4:F4');
+            principal.getCell('C4').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('C4').value = nivelAplicacion.campo == 1 ? 'ESTABLECIEMIENTO: ' + entidad_ : nivelAplicacion.campo == 2 ? 'MUNICIPIO: ' + entidad_ : nivelAplicacion.campo == 3 ? 'MUNICIPIO :' + entidad_ + '(CONSOLIDADO)'
+                : nivelAplicacion.campo == 4 ? 'RED: ' + entidad_ : nivelAplicacion.campo == 5 ? 'RED: ' + entidad_ + '(CONSOLIDADO)' : nivelAplicacion.campo == 6 ? 'DEPARTAMENTO CH.' : nivelAplicacion.campo == 7 ?
+                    'CONSOLIDADO DEPTO. CH.' : null
+            principal.getCell('C4').font = { bold: 700, size: 11, color: { argb: 'DC7633' }, italic: false }
 
 
             principal.mergeCells('C5:F5');
-            principal.getCell('C5').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('C5').value = 'NIVEL FORMULARIO: RED'
-            principal.getCell('C5').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
-
-
-            principal.mergeCells('A6:D6');
-            principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('A6').value =  nivelAplicacion.campo == 1 ? 'ESTABLECIEMIENTO: ' + entidad_: nivelAplicacion.campo == 2 ? 'MUNICIPIO: ' + entidad_ : nivelAplicacion.campo == 3 ? 'MUNICIPIO :' + entidad_+'(CONSOLIDADO)'
-                : nivelAplicacion.campo == 4 ? 'RED: ' + entidad_  : nivelAplicacion.campo == 5 ? 'RED: ' + entidad_ +'(CONSOLIDADO)' : nivelAplicacion.campo == 6 ? 'DEPARTAMENTO CH.': nivelAplicacion.campo == 7 ?
-                    'CONSOLIDADO DEPTO. CH.' : null
-
-            principal.getCell('A6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
-
-
-            principal.mergeCells('E6:E6');
-            principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
-            principal.getCell('E6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
-
-            principal.mergeCells('F6:H6');
-            principal.getCell('F6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('F6').value = 'MES REPORTADO :  [' + mes1_ + ' - ' + mes2_ + ']'
-            principal.getCell('F6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+            principal.getCell('F5').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('F5').value = 'GESTIÓN ' + gestion_ + ' DEL MES ' + mes1_ + ' A ' + mes2_
+            principal.getCell('C5').font = { bold: 600, size: 8, color: { argb: '808080' }, italic: false }
 
             principal.mergeCells('A7:H7');
             principal.getCell('A7').alignment = { vertical: 'center', horizontal: 'left' };
             principal.getCell('A7').value = 'FORMULARIO: ' + localStorage.getItem('area')
-            principal.getCell('A7').font = { bold: 800, color: { argb: '595959' }, size: 10, italic: true }
+            principal.getCell('A7').font = { bold: 800, size: 11, color: { argb: '595959' }, italic: true }
 
             let numero_fila = 7
 

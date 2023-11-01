@@ -618,7 +618,7 @@ function ReportesSedes() {
                 column.alignment = { vertical: 'middle', }  //  wrapText: true ajustar texto dentro de la celda
                 column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 7, italic: false };
             })
-            // principal.mergeCells("A1:A5");
+            principal.mergeCells("A1:A5");
             principal.mergeCells("H1:H5");
 
             const imageId = workbook.addImage({
@@ -653,79 +653,69 @@ function ReportesSedes() {
             principal.mergeCells('B2:G2');
             principal.getCell('B2').alignment = { vertical: 'center', horizontal: 'center' };
             principal.getCell('B2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
-            principal.getCell('B2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+            principal.getCell('B2').font = { bold: 700, size: 11, color: { argb: '595959' }, italic: false }
 
             principal.mergeCells('B3:G3');
             principal.getCell('B3').alignment = { vertical: 'center', horizontal: 'center' };
             principal.getCell('B3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
-            principal.getCell('B3').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
+            principal.getCell('B3').font = { bold: 600, size: 11, color: { argb: '595959' }, italic: false }
 
-
-            principal.mergeCells('C5:F5');
-            principal.getCell('C5').alignment = { vertical: 'center', horizontal: 'center' };
-            if (nivelAplicacion.campo == 1) principal.getCell('C5').value = 'NIVEL FORMULARIO: ESTABLECIMIENTO'
-            if (nivelAplicacion.campo == 2) principal.getCell('C5').value = 'NIVEL FORMULARIO: MUNICIPIO'
-            if (nivelAplicacion.campo == 3) principal.getCell('C5').value = 'NIVEL FORMULARIO: RED'
-            if (nivelAplicacion.campo == 4) principal.getCell('C5').value = 'NIVEL FORMULARIO: AREA'
-            principal.getCell('C5').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
-
-
-            // principal.mergeCells('D4:H4');
-            principal.mergeCells('A6:D6');
-            principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
+            principal.mergeCells('C4:F4');
+            principal.getCell('C4').alignment = { vertical: 'center', horizontal: 'center' };
             if (nivelAplicacion.campo == 1) {
                 if (nivel == 5) { // est
-                    principal.getCell('A6').value = 'ESTABLECIMIENTO: ' + entidad
+                    principal.getCell('C4').value = 'ESTABLECIMIENTO: ' + entidad
                 }
                 if (nivel == 4) { // mun
-                    principal.getCell('A6').value = 'MUNICIPIO: ' + entidad
+                    principal.getCell('C4').value = 'MUNICIPIO: ' + entidad
                 }
                 if (nivel == 3) { // red
-                    principal.getCell('A6').value = entidad
+                    principal.getCell('C4').value = entidad
                 }
                 if (nivel == 1000) { // consolidado
-                    principal.getCell('A6').value = 'INFORMACION: ' + entidad + ' - DEPTO CH'
+                    principal.getCell('C4').value = 'DEPTO CHUQUISACA'
 
                 }
             }
             if (nivelAplicacion.campo == 2) {
 
                 if (nivel == 4) { // mun
-                    principal.getCell('A6').value = 'MUNICIPIO: ' + entidad
+                    principal.getCell('C4').value = 'MUNICIPIO: ' + entidad
                 }
                 if (nivel == 3) { // red
-                    principal.getCell('A6').value = entidad
+                    principal.getCell('C4').value = entidad
                 }
                 if (nivel == 1000) { // consolidado
-                    principal.getCell('A6').value = 'INFORMACION: ' + entidad + ' - DEPTO CH'
+                    principal.getCell('C4').value = 'DEPTO CHUQUISACA'
 
                 }
             }
 
             if (nivelAplicacion.campo == 3) {
                 if (nivel == 3) { // red
-                    principal.getCell('A6').value = entidad
+                    principal.getCell('C4').value = entidad
                 }
                 if (nivel == 1000) { // consolidado
-                    principal.getCell('A6').value = 'INFORMACION: ' + entidad + ' - DEPTO CH'
+                    principal.getCell('C4').value = 'DEPTO CHUQUISACA'
 
                 }
             }
             if (nivelAplicacion.campo == 4) {
-                principal.getCell('A6').value = 'REPORTE DE AREA'
+                principal.getCell('C4').value = 'REPORTE DE AREA'
             }
-            principal.getCell('A6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+
+            principal.getCell('C4').font = { bold: 700, size: 11, color: { argb: 'DC7633' }, italic: false }
+
+            principal.mergeCells('C5:F5');
+            principal.getCell('F5').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('F5').value = 'GESTIÓN ' + gestion_ + ' DEL MES ' + mes1_ + ' A ' + mes2_
+            principal.getCell('C5').font = { bold: 600, size: 8, color: { argb: '808080' }, italic: false }
 
 
-            principal.mergeCells('E6:E6');
-            principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
-            principal.getCell('E6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
-            principal.mergeCells('F6:H6');
-            principal.getCell('F6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('F6').value = 'MES REPORTADO :  [' + mes1_ + ' - ' + mes2_ + ']'
-            principal.getCell('F6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
+
+
+
 
             let numero_fila = 6
             let inicio_fila_titulo = 6
@@ -909,7 +899,7 @@ function ReportesSedes() {
 
                                 <div className='col-12 '>
                                     <div className='row'>
-                                        <div className='col-4 col-sm-4 col-md-2 col-lg-2 p-1' onClick={() => {
+                                        <div className='col-6 col-sm-8 col-md-2 col-lg-2 p-1' onClick={() => {
                                             setListaGrupo([]); setListaVariable([]); setGruposSeleccionado([]); setVariablesSeleccionados([]); setEst([]);
                                             setSs({ campo: null, valido: null })
                                         }} >
@@ -923,7 +913,20 @@ function ReportesSedes() {
                                                 very={1}
                                             />
                                         </div>
-                                        <div className='col-5 col-sm-5 col-md-2 col-lg-2 p-1' onClick={() => {
+                                        {nivelAplicacion.campo < 4 && <div className='col-12 col-sm-12 col-md-3 col-lg-3 p-1' onClick={() => {
+                                            (ss.valido == 'false' || ss.valido == null) && toast.error('Seleccione el subsector')
+                                        }}>
+                                            <SelectSMString
+                                                estado={estab}
+                                                cambiarEstado={setEstab}
+                                                ExpresionRegular={INPUT.IDSTRING}
+                                                lista={est}
+                                                etiqueta={nivelAplicacion.campo == 1 ? 'Tipo Reporte' : nivelAplicacion.campo == 2 ? 'Municipio' : 'Red'}
+                                                msg='Seleccione una opcion'
+                                                nivel={setNivel}
+                                            />
+                                        </div>}
+                                        <div className='col-12 col-sm-12 col-md-2 col-lg-2 p-1' onClick={() => {
                                             setEstab({ campo: 1000, valido: 'true' });
                                             setListaGrupo([]); setListaVariable([]); setGruposSeleccionado([]); setVariablesSeleccionados([])
                                         }}>
@@ -937,7 +940,7 @@ function ReportesSedes() {
                                                 msg='Seleccione una opcion'
                                             />
                                         </div>
-                                        <div className='col-3 col-sm-3 col-md-1 col-lg-1 p-1' onClick={() => {
+                                        <div className='col-4 col-sm-4 col-md-1 col-lg-1 p-1' onClick={() => {
                                             setEstab({ campo: 1000, valido: 'true' });
                                             setListaGrupo([]); setListaVariable([]); setGruposSeleccionado([]); setVariablesSeleccionados([])
                                         }}>
@@ -952,7 +955,7 @@ function ReportesSedes() {
                                             />
                                         </div>
 
-                                        <div className='col-6 col-sm-3 col-md-1 col-lg-1 p-1' onClick={() => { listarMes(); }} >
+                                        <div className='col-4 col-sm-4 col-md-2 col-lg-2 p-1' onClick={() => { listarMes(); }} >
                                             <SelectSM
                                                 estado={mes1}
                                                 cambiarEstado={setMes1}
@@ -963,7 +966,7 @@ function ReportesSedes() {
                                                 very={1}
                                             />
                                         </div>
-                                        <div className='col-6 col-sm-3 col-md-1 col-lg-1 p-1' onClick={() => { listarMes() }} >
+                                        <div className='col-4 col-sm-4 col-md-2 col-lg-2 p-1' onClick={() => { listarMes() }} >
                                             <SelectSM
                                                 estado={mes2}
                                                 cambiarEstado={setMes2}
@@ -974,19 +977,7 @@ function ReportesSedes() {
                                                 very={1}
                                             />
                                         </div>
-                                        <div className='col-12 col-sm-6 col-md-4 col-lg-4 p-1' onClick={() => {
-                                            (ss.valido == 'false' || ss.valido == null) && toast.error('Seleccione el subsector')
-                                        }}>
-                                            <SelectSMString
-                                                estado={estab}
-                                                cambiarEstado={setEstab}
-                                                ExpresionRegular={INPUT.IDSTRING}
-                                                lista={est}
-                                                etiqueta={nivelAplicacion.campo == 1 ? 'Tipo Reporte' : nivelAplicacion.campo == 2 ? 'Municipio' : 'Red'}
-                                                msg='Seleccione una opcion'
-                                                nivel={setNivel}
-                                            />
-                                        </div>
+
 
                                     </div>
                                 </div>
@@ -1085,216 +1076,120 @@ function ReportesSedes() {
                     :
                     <div className="container_reportes m-auto" style={{ width: '97%' }} >
 
-                        <p className='titulo-reportes_1' style={{ marginBottom: '0px' }}  > FORMULARIO ADICIONAL 301c</p>
-                        <p className='titulo-reportes_1 mb-3' style={{ marginBottom: '0px' }}>GESTION {' ' + año}</p>
                         {nivelAplicacion.campo == 1 && <>
                             {
                                 nivel == 3 && <>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{localStorage.getItem('red')} </p>
-                                        </div>
-                                        <div className='col-6'>
-                                            {listaSs.map(e => (
-                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            {
-                                                est.map(e => (
-                                                    estab.campo == e.id &&
-                                                    <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
-                                                        {'TIPO REPORTE :' + e.nombre}</p>
-                                                ))
-                                            }
-                                        </div>
-                                        <div className='col-6'>
-                                            <p className='titulo-reportes'
-                                                style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
-                                                {
-                                                    listaMes.map(e => (
-                                                        mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
-                                                    ))
-                                                }
-                                                {
-                                                    listaMes.map(e => (
-                                                        mes2.campo == e.id && <span >{e.nombre} </span>
-                                                    ))
-                                                }
-                                            </p>
 
-                                        </div>
-                                    </div>
+                                    {
+                                        est.map(e => (
+                                            parseInt(e.id) == parseInt(estab.campo) && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>{
+                                                e.nombre.split('(')[0]
+                                            }  </p>
+                                        ))
+                                    }
                                 </>
+
                             }
                             {
                                 nivel == 4 && <>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            {est.map(e => (
-                                                parseInt(e.id) == parseInt(estab.campo) && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
-                                                    'MUNICIPIO: ' + e.nombre.split('(')[0]
-                                                }  </p>
-                                            ))}
 
-                                        </div>
-                                        <div className='col-6'>
-                                            {listaSs.map(e => (
-                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
-                                                {'TIPO REPORTE : CONSOLIDADO POR MUNICIPIO'}</p>
-                                        </div>
-                                        <div className='col-6'>
-                                            <p className='titulo-reportes'
-                                                style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
-                                                {
-                                                    listaMes.map(e => (
-                                                        mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
-                                                    ))
-                                                }
-                                                {
-                                                    listaMes.map(e => (
-                                                        mes2.campo == e.id && <span >{e.nombre} </span>
-                                                    ))
-                                                }
-                                            </p>
-
-                                        </div>
-                                    </div>
+                                    {
+                                        est.map(e => (
+                                            e.id == estab.campo && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>{
+                                                'MUNICIPIO: ' + e.nombre
+                                            }  </p>
+                                        ))
+                                    }
                                 </>
                             }
 
                             {
                                 nivel == 5 && <>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            {est.map(e => (
-                                                e.id == estab.campo && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
-                                                    'ESTABLECIMIENTO: ' + e.nombre
-                                                }  </p>
-                                            ))}
 
-                                        </div>
-                                        <div className='col-6'>
-                                            {listaSs.map(e => (
-                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
-                                                {'TIPO REPORTE : ESTABLECIMIENTO'}</p>
-                                        </div>
-                                        <div className='col-6'>
-                                            <p className='titulo-reportes'
-                                                style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
-                                                {
-                                                    listaMes.map(e => (
-                                                        mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
-                                                    ))
-                                                }
-                                                {
-                                                    listaMes.map(e => (
-                                                        mes2.campo == e.id && <span >{e.nombre} </span>
-                                                    ))
-                                                }
-                                            </p>
-
-                                        </div>
-                                    </div>
+                                    {est.map(e => (
+                                        e.id == estab.campo && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>{
+                                            'ESTABLECIMIENTO: ' + e.nombre
+                                        }  </p>
+                                    ))}
                                 </>
+                            }
+                            {
+                                nivel == 1000 && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>DPTO. CHUQUISACA</p>
                             }
                         </>}
                         {
-                            nivelAplicacion.campo == 2 && <>{
+                            nivelAplicacion.campo == 2 && <>
+                                {
+                                    nivel == 3 &&
 
-                                estab.campo == 2000 ? <>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
-                                                localStorage.getItem('red')
-                                            }  </p>
+                                    est.map(e => (
+                                        e.id == estab.campo && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>{
+                                            e.nombre
+                                        }  </p>
+                                    ))
 
-                                        </div>
-                                        <div className='col-6'>
-                                            {listaSs.map(e => (
-                                                ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
-                                                {'FORMULARIO: DE USO MUNICIPAL (CONSOLIDADO)'}</p>
-                                        </div>
-                                        <div className='col-6'>
-                                            <p className='titulo-reportes'
-                                                style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
-                                                {
-                                                    listaMes.map(e => (
-                                                        mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
-                                                    ))
-                                                }
-                                                {
-                                                    listaMes.map(e => (
-                                                        mes2.campo == e.id && <span >{e.nombre} </span>
-                                                    ))
-                                                }
-                                            </p>
+                                }
+                                {
+                                    nivel == 4 && <>
 
-                                        </div>
-                                    </div>
-                                </> :
-                                    <>
-                                        <div className='row'>
-                                            <div className='col-6'>
-                                                {est.map(e => (
-                                                    e.id == estab.campo && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
-                                                        'MUNICIPIO: ' + e.nombre
-                                                    }  </p>
-                                                ))}
-
-                                            </div>
-                                            <div className='col-6'>
-                                                {listaSs.map(e => (
-                                                    ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className='row'>
-                                            <div className='col-6'>
-                                                <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>
-                                                    {'FORMULARIO: DE USO MUNICIPAL'}</p>
-                                            </div>
-                                            <div className='col-6'>
-                                                <p className='titulo-reportes'
-                                                    style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
-                                                    {
-                                                        listaMes.map(e => (
-                                                            mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
-                                                        ))
-                                                    }
-                                                    {
-                                                        listaMes.map(e => (
-                                                            mes2.campo == e.id && <span >{e.nombre} </span>
-                                                        ))
-                                                    }
-                                                </p>
-
-                                            </div>
-                                        </div>
+                                        {
+                                            est.map(e => (
+                                                e.id == estab.campo && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>{
+                                                    'MUNICIPIO: ' + e.nombre
+                                                }  </p>
+                                            ))
+                                        }
                                     </>
-                            }</>
+                                }
+                                {
+                                    nivel == 1000 && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>DPTO. CHUQUISACA</p>
+                                }
+                            </>
+                        }
+
+                        {
+                            nivelAplicacion.campo == 3 && <>
+                                {
+                                    nivel == 3 &&
+
+                                    est.map(e => (
+                                        parseInt(e.id) == parseInt(estab.campo) && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>{
+                                            e.nombre
+                                        }  </p>
+                                    ))
+
+                                }
+                                {
+                                    nivel == 1000 && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>DPTO. CHUQUISACA</p>
+                                }
+                            </>
+                        }
+
+                        {
+                            nivelAplicacion.campo == 4 && <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>REPORTE AREA </p>
 
                         }
+
+
+                        <p className='titulo-reportes_1' style={{ marginBottom: '0px', fontSize: '10px' }} > FORMULARIO ADICIONAL 301c</p>
+
+                        <p className='titulo-reportes'
+                            style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>GESTION {' DEL ' + año + ' MES '}
+                            {
+                                listaMes.map(e => (
+                                    mes1.campo == e.id && <span >{' ' + e.nombre + ' A '} </span>
+                                ))
+                            }
+                            {
+                                listaMes.map(e => (
+                                    mes2.campo == e.id && <span >{e.nombre} </span>
+                                ))
+                            }
+                        </p>
+
+
+
+
                         <div className='p-2'>
 
                             {listaGrupo.map(lg => (

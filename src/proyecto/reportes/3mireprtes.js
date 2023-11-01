@@ -191,7 +191,7 @@ function Mireportes3() {
                             setVentana(1)
                             setEstado(0)
                         } else { alert2({ icono: 'warning', titulo: 'Intente Nuevamente mas tarde!', boton: 'ok', texto: json.data.msg }); setEstado(0) }
-                    }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });  
+                    }).catch(function (error) { alert2({ icono: 'error', titulo: 'Error al conectar a la API', boton: 'ok', texto: error.toJSON().message }); });
                 } else {
                     axios.post(URL + '/reportes3/reportes-formularios-enteros-red', { lista: grupoSeleccionados, gestion: gestion.campo, mes1: mes1.campo, mes2: mes2.campo }).then(json => {
                         if (json.data.ok) {
@@ -220,7 +220,7 @@ function Mireportes3() {
                     tabColor: { argb: 'ECF0F1' }
                 },
                 pageSetup: {
-                    paperSize: 9, orientation: 'landscape'  
+                    paperSize: 9, orientation: 'landscape'
                 },
 
             })
@@ -233,7 +233,7 @@ function Mireportes3() {
                 column.alignment = { vertical: 'middle', }  //  wrapText: true ajustar texto dentro de la celda
                 column.font = { name: 'Arial', color: { argb: '595959' }, family: 2, size: 7, italic: false };
             })
-            // principal.mergeCells("A1:A5");
+            principal.mergeCells("A1:A5");
             principal.mergeCells("H1:H5");
 
             const imageId = workbook.addImage({
@@ -264,37 +264,28 @@ function Mireportes3() {
             principal.mergeCells('B2:G2');
             principal.getCell('B2').alignment = { vertical: 'center', horizontal: 'center' };
             principal.getCell('B2').value = 'INFORME MENSUAL DE  PRODUCCIÓN DE SERVICIOS SEDES CHUQUISACA'
-            principal.getCell('B2').font = { bold: 700, color: { argb: '595959' }, italic: false }
+            principal.getCell('B2').font = { bold: 700, size: 11, color: { argb: '595959' }, italic: false }
 
             principal.mergeCells('B3:G3');
             principal.getCell('B3').alignment = { vertical: 'center', horizontal: 'center' };
             principal.getCell('B3').value = 'FORMULARIO ADICIONAL 301c ( SEDES - SDIS  N° 4-11/2023)'
-            principal.getCell('B3').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
+            principal.getCell('B3').font = { bold: 600, size: 11, color: { argb: '595959' }, italic: false }
+
+
+            principal.mergeCells('C4:F4');
+            principal.getCell('C4').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('C4').value = localStorage.getItem('red')
+            principal.getCell('C4').font = { bold: 700, size: 11, color: { argb: 'DC7633' }, italic: false }
 
 
             principal.mergeCells('C5:F5');
-            principal.getCell('C5').alignment = { vertical: 'center', horizontal: 'center' };
-            principal.getCell('C5').value = 'NIVEL FORMULARIO: RED'
-            principal.getCell('C5').font = { bold: 600, size: 9, color: { argb: '595959' }, italic: false }
+            principal.getCell('F5').alignment = { vertical: 'center', horizontal: 'center' };
+            principal.getCell('F5').value = 'GESTIÓN ' + gestion_ + ' DEL MES ' + mes1_ + ' A ' + mes2_
+            principal.getCell('C5').font = { bold: 600, size: 8, color: { argb: '808080' }, italic: false }
 
 
             // principal.mergeCells('D4:H4');
 
-            principal.mergeCells('A6:D6');
-            principal.getCell('A6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('A6').value = localStorage.getItem('red')
-            principal.getCell('A6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
-
-
-            principal.mergeCells('E6:E6');
-            principal.getCell('E6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('E6').value = 'GESTIÓN: ' + gestion_
-            principal.getCell('E6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
-
-            principal.mergeCells('F6:H6');
-            principal.getCell('F6').alignment = { vertical: 'center', horizontal: 'left' };
-            principal.getCell('F6').value = 'MES REPORTADO :  [' + mes1_ + ' - ' + mes2_ + ']'
-            principal.getCell('F6').font = { bold: 600, size: 8, color: { argb: '595959' }, italic: false }
 
             let numero_fila = 6
             let inicio_fila_titulo = 6
@@ -622,46 +613,32 @@ function Mireportes3() {
                     :
                     <div className="container_reportes m-auto" style={{ width: '97%' }}>
 
-                        <p className='titulo-reportes_1' style={{ marginBottom: '0px' }} > FORMULARIO ADICIONAL 301c</p>
-                        <p className='titulo-reportes_1' style={{ marginBottom: '0px' }}>GESTION {' ' + año}</p>
-                        <div className='row'>
-                            <div className='col-6'>
-                                <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{
-                                    localStorage.getItem('red')
-                                }  </p>
+                        <p className='titulo-reportes_1' style={{ marginBottom: '0px', color: '#023c52', }}>{
+                            'MUNICIPIO: ' + localStorage.getItem('red')}</p>
 
-                            </div>
-                            <div className='col-6'>
-                                {listaSs.map(e => (
-                                    ss.campo == e.id && <p className='titulo-reportes' style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>{'SUB-SECTOR: ' + e.nombre} </p>
-                                ))}
-                            </div>
-                        </div>
+                        <p className='titulo-reportes_1' style={{ marginBottom: '0px', fontSize: '10px' }} > FORMULARIO ADICIONAL 301c</p>
 
-                        <div className='col-6'>
-                            <p className='titulo-reportes'
-                                style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>MES(es):
-                                {
-                                    listaMes.map(e => (
-                                        mes1.campo == e.id && <span >{' ' + e.nombre + ' - '} </span>
-                                    ))
-                                }
-                                {
-                                    listaMes.map(e => (
-                                        mes2.campo == e.id && <span >{e.nombre} </span>
-                                    ))
-                                }
-                            </p>
-                        </div>
+                        <p className='titulo-reportes'
+                            style={{ color: '#023c52', textAlign: 'left', paddingLeft: '8px', marginBottom: '0', }}>GESTION {' ' + año + ' MES '}
+                            {
+                                listaMes.map(e => (
+                                    mes1.campo == e.id && <span >{' ' + e.nombre + ' A '} </span>
+                                ))
+                            }
+                            {
+                                listaMes.map(e => (
+                                    mes2.campo == e.id && <span >{e.nombre} </span>
+                                ))
+                            }
+                        </p>
+
+
                         <div className='p-2'>
 
                             {listaGrupo.map(lg => (
                                 grupoSeleccionados.map(gs => (
                                     parseInt(lg.id) === parseInt(gs) && <div key={gs}>
-                                        <p style={{ fontSize: '13px', marginBottom: '0', fontWeight: 'bold' }}>{lg.nombre}  {
-                                            listaSs.map(e => (parseInt(e.id) == parseInt(ss.campo) && <span style={{ fontWeight: 'bold' }}>{'/ Sub-Sector: ' + e.nombre}</span>
-                                            ))
-                                        } </p>
+                                        <p style={{ fontSize: '13px', marginBottom: '0', fontWeight: 'bold' }}>{lg.nombre}  </p>
 
                                         <div className="table table-responsive custom" style={{ height: 'auto', padding: "0.0rem 0.0rem", marginBottom: '0' }}>
                                             <Table className=' table-sm' style={{ border: "1px solid #dee2e6", borderRight: 'none', borderTop: '1px solid white', borderSpacing: '0px', padding: '0px' }} >
